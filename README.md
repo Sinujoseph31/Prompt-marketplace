@@ -1,47 +1,72 @@
-# Prompt Marketplace (Phase 1)
+# PromptWithSinu - AI Prompt Marketplace
 
-A scalable multi-category AI prompt marketplace built with Next.js App Router, Tailwind CSS, and Supabase.
+A full-stack, responsive AI Prompt Marketplace built with Next.js 15 (App Router), Tailwind CSS, and Supabase.
 
-## Features
-- **User Authentication**: Secure Sign Up & Login with Supabase Auth.
-- **Roles**: Buyers, Sellers, and Admins.
-- **Prompt Submission**: Approved sellers can easily submit their prompts (pending review).
-- **Public Listings**: View approved prompts categorized neatly. Reveal prompt contents dynamically.
-- **Admin Dashboard**: Approving sellers, reviewing prompts, and moderation.
-- **Security**: Robust Row Level Security (RLS) policies protecting user and prompt data.
+This MVP features a modern, mobile-first design system inspired by premium marketplaces like PromptBase, complete with user authentication, role-based access control, native image uploads, and interactive prompt discoverability.
 
-## Getting Started
+## ✨ Features
 
-### 1. Supabase Setup
-1. Create a new project on [Supabase](https://supabase.com).
-2. Go to the SQL Editor in your Supabase dashboard and copy/paste everything from `supabase_setup.sql` and run it. This creates all tables, triggers, and Row Level Security policies.
-3. Obtain your Project URL and Anon Key from **Project Settings > API**.
+*   **Modern UI/UX:** Clean, high-contrast, edge-to-edge design utilizing Tailwind CSS and `shadcn/ui` components.
+*   **Fully Responsive:** Mobile-first architecture ensures the marketplace looks pristine on smartphones, tablets, and ultra-wide desktop monitors.
+*   **Role-Based Access Control (RBAC):** Natively managed via Supabase SQL. Supports `buyer`, `seller`, and `admin` roles.
+*   **Seller Dashboard:** Approved sellers can submit prompts, configure categories/subcategories, upload multiple native images, select a primary display image, and edit live listings.
+*   **Interactive Discoverability:** Live global search bar, continuous-scroll category pills, and auto-generated "Similar Prompts" on detail pages.
+*   **Prompt Detail Pages:** Features a scrollable image gallery, a sticky detail sidebar for purchasing/revealing, and a user comments section.
+*   **Admin Moderation:** Admins have a dedicated dashboard to approve/reject sellers and prompts, delete spam, and manage users.
+
+## 🚀 Tech Stack
+
+*   **Framework:** Next.js 15 (App Router, Server Components, Server Actions)
+*   **Styling:** Tailwind CSS + shadcn/ui
+*   **Database & Auth:** Supabase (PostgreSQL, Supabase Auth)
+*   **Storage:** Supabase Storage (Public Buckets for native image uploads)
+*   **Icons:** Lucide React
+
+## 🛠️ Local Setup & Installation
+
+### 1. Supabase Initialization
+Before running the application, you need to set up the backend infrastructure on [Supabase](https://supabase.com/).
+
+1. Create a new project in the Supabase Dashboard.
+2. Go to the **SQL Editor** in your Supabase project.
+3. Open the `supabase_setup.sql` file located in the root of this repository.
+4. Copy the entire contents of `supabase_setup.sql` and run it in the SQL Editor. This will automatically provision your tables (`profiles`, `prompts`, `comments`), set up crucial Row Level Security (RLS) policies, and create the automated user triggers.
+5. Next, open `storage_setup.sql` and run it in the SQL Editor to create the `prompt-images` storage bucket and its associated public access policies.
 
 ### 2. Environment Variables
-Edit the `.env.local` file in the root of the project with your keys:
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+Create a `.env.local` file in the root of your project and populate it with your Supabase credentials:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_api_key
 ```
 
-### 3. Installation
-Install project dependencies if you haven't already:
+*(You can find these in your Supabase Dashboard under Project Settings > API).*
+
+### 3. Run the Development Server
+Install the dependencies and start the local Next.js server:
+
 ```bash
 npm install
-```
-
-### 4. Run Locally
-Start the development server:
-```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Roles & Testing
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the live marketplace!
 
-- **Buyer**: The default role when you sign up.
-- **Admin**: To test admin features, sign up normally, then go to your Supabase Table Editor (`profiles` table), find your row, and change `role` to `admin`. Refresh the app and you will see the Admin Panel.
-- **Seller**: As an admin, you can upgrade buyers to sellers via the Admin Panel. Approved sellers will see a "Submit Prompt" button.
+## 👑 Accessing the Admin Panel
 
-## Deployment
-This app can be deployed easily on [Vercel](https://vercel.com). Make sure to add the Supabase URL and Anon Key to Vercel's Environment Variables during deployment.
+By default, all new sign-ups are assigned the `buyer` role. To access the `/admin` moderation routes, you must elevate an account's privileges.
+
+1. Sign up for an account through the standard `/signup` UI.
+2. Go to your Supabase Dashboard > **Table Editor** > `profiles` table.
+3. Locate your newly created user row and change the `role` column text from `buyer` to `admin`.
+4. Refresh your local application, and you will now have full access to the Admin Dashboard routes.
+
+## 🚢 Deployment (Vercel)
+
+This project is optimized for deployment on Vercel. 
+
+1. Push your code to a GitHub repository.
+2. Import the repository into Vercel.
+3. **Important:** Remember to add your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to the **Environment Variables** section in the Vercel deployment settings before building.
+4. Deploy!
