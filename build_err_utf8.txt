@@ -1,0 +1,1996 @@
+﻿
+> prompt-app@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+node.exe : ΓÜá The 
+"middleware" file 
+convention is 
+deprecated. Please 
+use "proxy" instead. 
+Learn more: https://ne
+xtjs.org/docs/messages
+/middleware-to-proxy
+At C:\Program Files\no
+dejs\npm.ps1:29 char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (ΓÜá The "m   
+ iddle...leware-to    
+-proxy:String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack 
+build failed with 19 
+errors:
+./src/app/admin/page.t
+sx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/badge'
+[0m [90m 2 |[39m 
+[36mimport[39m { 
+redirect } 
+[36mfrom[39m [32m'n
+ext/navigation'[39m
+ [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mBadge[39m } 
+[36mfrom[39m [32m'@
+/components/ui/badge'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m { app
+roveUser[33m,[39m up
+datePromptStatus[33m,
+[39m deletePrompt[33
+m,[39m makeSeller } 
+[36mfrom[39m [32m'@
+/app/actions/admin'[3
+9m
+ [90m 6 |[39m
+ [90m 7 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m 
+[33mAdminPage[39m() 
+{[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/badge' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/prompt/[id]/
+page.tsx:3:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/badge'
+[0m [90m 1 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m'@
+/utils/supabase/server
+'[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+notFound } 
+[36mfrom[39m [32m'n
+ext/navigation'[39m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+[33mBadge[39m } 
+[36mfrom[39m [32m'@
+/components/ui/badge'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 4 |[39m 
+[36mimport[39m [33m
+RevealPrompt[39m 
+[36mfrom[39m [32m'@
+/components/RevealProm
+pt'[39m
+ [90m 5 |[39m
+ [90m 6 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m [3
+3mPromptDetailPage[39
+m({[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/badge' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/components/Promp
+tCard.tsx:3:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/badge'
+[0m [90m 1 |[39m 
+[36mimport[39m 
+[33mLink[39m 
+[36mfrom[39m 
+[32m'next/link'[39m
+ [90m 2 |[39m 
+[36mimport[39m { [3
+3mCard[39m[33m,[39m
+ [33mCardContent[39m
+[33m,[39m [33mCardF
+ooter[39m[33m,[39m 
+[33mCardHeader[39m[
+33m,[39m 
+[33mCardTitle[39m } 
+[36mfrom[39m [32m'@
+/components/ui/card'[
+39m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+[33mBadge[39m } 
+[36mfrom[39m [32m'@
+/components/ui/badge'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 4 |[39m
+ [90m 5 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [3
+3mPromptCard[39m({ 
+prompt }[33m:[39m { 
+prompt[33m:[39m any 
+}) {
+ [90m 6 |[39m     
+[36mreturn[39m ([0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/badge' 
+inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/components/P
+romptCard.tsx
+    ./src/app/page.tsx
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/admin/page.t
+sx:3:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 1 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m'@
+/utils/supabase/server
+'[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+redirect } 
+[36mfrom[39m [32m'n
+ext/navigation'[39m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mBadge[39m } 
+[36mfrom[39m [32m'@
+/components/ui/badge'
+[39m
+ [90m 5 |[39m 
+[36mimport[39m { app
+roveUser[33m,[39m up
+datePromptStatus[33m,
+[39m deletePrompt[33
+m,[39m makeSeller } 
+[36mfrom[39m [32m'@
+/app/actions/admin'[3
+9m
+ [90m 6 |[39m[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/login/page.t
+sx:3:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 1 |[39m 
+[36mimport[39m 
+[33mLink[39m 
+[36mfrom[39m 
+[32m'next/link'[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+login } 
+[36mfrom[39m [32m'@
+/app/actions/auth'[39
+m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m 6 |[39m[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/page.tsx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 2 |[39m 
+[36mimport[39m 
+[33mPromptCard[39m 
+[36mfrom[39m [32m'@
+/components/PromptCard
+'[39m
+ [90m 3 |[39m 
+[36mimport[39m 
+[33mLink[39m 
+[36mfrom[39m 
+[32m'next/link'[39m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m 
+[33mIndex[39m({
+ [90m 7 |[39m   sear
+chParams[33m,[39m[0
+m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/signup/page.
+tsx:3:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 1 |[39m 
+[36mimport[39m 
+[33mLink[39m 
+[36mfrom[39m 
+[32m'next/link'[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+signup } 
+[36mfrom[39m [32m'@
+/app/actions/auth'[39
+m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m 6 |[39m[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/submit/page.
+tsx:3:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 1 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m'@
+/utils/supabase/server
+'[39m
+ [90m 2 |[39m 
+[36mimport[39m { 
+redirect } 
+[36mfrom[39m [32m'n
+ext/navigation'[39m
+[31m[1m>[22m[39m[
+90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+[33mTextarea[39m } 
+[36mfrom[39m [32m'@
+/components/ui/textare
+a'[39m[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/components/Revea
+lPrompt.tsx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 2 |[39m
+ [90m 3 |[39m 
+[36mimport[39m { 
+useState } 
+[36mfrom[39m 
+[32m'react'[39m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [3
+3mRevealPrompt[39m({ 
+fullPrompt 
+}[33m:[39m { 
+fullPrompt[33m:[39m 
+string }) {
+ [90m 7 |[39m     
+[36mconst[39m 
+[revealed[33m,[39m 
+setRevealed] 
+[33m=[39m useState(
+[36mfalse[39m)[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/components/R
+evealPrompt.tsx
+    ./src/app/prompt/[
+id]/page.tsx
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/components/Revea
+lPrompt.tsx:5:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 3 |[39m 
+[36mimport[39m { c 
+[36mas[39m _c } 
+[36mfrom[39m [32m"r
+eact/compiler-runtime"
+[39m[33m;[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+useState } 
+[36mfrom[39m [32m'r
+eact'[39m[33m;[39m
+[31m[1m>[22m[39m[
+90m 5 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m[33m;[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m
+ [90m 6 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [3
+3mRevealPrompt[39m(t0
+) {
+ [90m 7 |[39m   
+[36mconst[39m $ 
+[33m=[39m _c([35m5
+[39m)[33m;[39m
+ [90m 8 |[39m   
+[36mconst[39m {[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/components/R
+evealPrompt.tsx
+    ./src/app/prompt/[
+id]/page.tsx
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/components/navba
+r.tsx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/button'
+[0m [90m 2 |[39m 
+[36mimport[39m { 
+createClient } 
+[36mfrom[39m [32m'@
+/utils/supabase/server
+'[39m
+ [90m 3 |[39m 
+[36mimport[39m { 
+signout } 
+[36mfrom[39m [32m'@
+/app/actions/auth'[39
+m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 5 |[39m
+ [90m 6 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m 
+[33mNavbar[39m() {
+ [90m 7 |[39m     
+[36mconst[39m 
+supabase [33m=[39m 
+[36mawait[39m 
+createClient()[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/button' 
+inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/components/n
+avbar.tsx
+    
+./src/app/layout.tsx
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/components/Promp
+tCard.tsx:2:1
+Module not found: 
+Can't resolve 
+'@/components/ui/card'
+[0m [90m 1 |[39m 
+[36mimport[39m 
+[33mLink[39m 
+[36mfrom[39m 
+[32m'next/link'[39m
+[31m[1m>[22m[39m[
+90m 2 |[39m 
+[36mimport[39m { [3
+3mCard[39m[33m,[39m
+ [33mCardContent[39m
+[33m,[39m [33mCardF
+ooter[39m[33m,[39m 
+[33mCardHeader[39m[
+33m,[39m 
+[33mCardTitle[39m } 
+[36mfrom[39m [32m'@
+/components/ui/card'[
+39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m
+ [90m 3 |[39m 
+[36mimport[39m { 
+[33mBadge[39m } 
+[36mfrom[39m [32m'@
+/components/ui/badge'
+[39m
+ [90m 4 |[39m
+ [90m 5 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36mfunction[39m [3
+3mPromptCard[39m({ 
+prompt }[33m:[39m { 
+prompt[33m:[39m any 
+}) {[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/card' 
+inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./src/components/P
+romptCard.tsx
+    ./src/app/page.tsx
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/login/page.t
+sx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/input'
+[0m [90m 2 |[39m 
+[36mimport[39m { 
+login } 
+[36mfrom[39m [32m'@
+/app/actions/auth'[39
+m
+ [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m 6 |[39m
+ [90m 7 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m [3
+3mLoginPage[39m({[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/input' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/signup/page.
+tsx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/input'
+[0m [90m 2 |[39m 
+[36mimport[39m { 
+signup } 
+[36mfrom[39m [32m'@
+/app/actions/auth'[39
+m
+ [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m 6 |[39m
+ [90m 7 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m [3
+3mSignupPage[39m({[0
+m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/input' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/submit/page.
+tsx:4:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/input'
+[0m [90m 2 |[39m 
+[36mimport[39m { 
+redirect } 
+[36mfrom[39m [32m'n
+ext/navigation'[39m
+ [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+[31m[1m>[22m[39m[
+90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+[33mTextarea[39m } 
+[36mfrom[39m [32m'@
+/components/ui/textare
+a'[39m
+ [90m 7 |[39m 
+[36mimport[39m { 
+submitPrompt } 
+[36mfrom[39m [32m'@
+/app/actions/prompts'
+[39m[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/input' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/login/page.t
+sx:5:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/label'
+[0m [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+[31m[1m>[22m[39m[
+90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 6 |[39m
+ [90m 7 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m 
+[33mLoginPage[39m({
+ [90m 8 |[39m     se
+archParams[33m,[39m
+[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/label' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/signup/page.
+tsx:5:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/label'
+[0m [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+[31m[1m>[22m[39m[
+90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 6 |[39m
+ [90m 7 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m 
+[33mSignupPage[39m({
+ [90m 8 |[39m     se
+archParams[33m,[39m
+[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/label' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/submit/page.
+tsx:5:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/label'
+[0m [90m 3 |[39m 
+[36mimport[39m { 
+[33mButton[39m } 
+[36mfrom[39m [32m'@
+/components/ui/button'
+[39m
+ [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+[31m[1m>[22m[39m[
+90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m
+ [90m 6 |[39m 
+[36mimport[39m { 
+[33mTextarea[39m } 
+[36mfrom[39m [32m'@
+/components/ui/textare
+a'[39m
+ [90m 7 |[39m 
+[36mimport[39m { 
+submitPrompt } 
+[36mfrom[39m [32m'@
+/app/actions/prompts'
+[39m
+ [90m 8 |[39m[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/label' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+./src/app/submit/page.
+tsx:6:1
+Module not found: 
+Can't resolve '@/compo
+nents/ui/textarea'
+[0m [90m 4 |[39m 
+[36mimport[39m { 
+[33mInput[39m } 
+[36mfrom[39m [32m'@
+/components/ui/input'
+[39m
+ [90m 5 |[39m 
+[36mimport[39m { 
+[33mLabel[39m } 
+[36mfrom[39m [32m'@
+/components/ui/label'
+[39m
+[31m[1m>[22m[39m[
+90m 6 |[39m 
+[36mimport[39m { 
+[33mTextarea[39m } 
+[36mfrom[39m [32m'@
+/components/ui/textare
+a'[39m
+ [90m   |[39m [31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m[31m[1m^[22m[39m
+[31m[1m^[22m[39m[
+31m[1m^[22m[39m[31
+m[1m^[22m[39m[31m
+[1m^[22m[39m[31m[1
+m^[22m[39m[31m[1m^
+[22m[39m[31m[1m^[
+22m[39m[31m[1m^[22
+m[39m[31m[1m^[22m
+[39m[31m[1m^[22m[3
+9m
+ [90m 7 |[39m 
+[36mimport[39m { 
+submitPrompt } 
+[36mfrom[39m [32m'@
+/app/actions/prompts'
+[39m
+ [90m 8 |[39m
+ [90m 9 |[39m 
+[36mexport[39m 
+[36mdefault[39m 
+[36masync[39m 
+[36mfunction[39m [3
+3mSubmitPage[39m() 
+{[0m
+
+Import map: aliased 
+to relative './src/com
+ponents/ui/textarea' 
+inside of [project]/
+
+
+https://nextjs.org/doc
+s/messages/module-not-
+found
+
+
+    at <unknown> (./sr
+c/app/admin/page.tsx:4
+:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/prompt/[id]/page
+.tsx:3:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/components/PromptCar
+d.tsx:3:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/admin/page.tsx:3
+:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/login/page.tsx:3
+:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/page.tsx:4:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/signup/page.tsx:
+3:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/submit/page.tsx:
+3:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/components/RevealPro
+mpt.tsx:4:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/components/RevealPro
+mpt.tsx:5:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/components/navbar.ts
+x:4:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/components/PromptCar
+d.tsx:2:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/login/page.tsx:4
+:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/signup/page.tsx:
+4:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/submit/page.tsx:
+4:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/login/page.tsx:5
+:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/signup/page.tsx:
+5:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/submit/page.tsx:
+5:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)
+    at <unknown> (./sr
+c/app/submit/page.tsx:
+6:1)
+    at <unknown> (http
+s://nextjs.org/docs/me
+ssages/module-not-foun
+d)

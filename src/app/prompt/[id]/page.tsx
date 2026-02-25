@@ -1,0 +1,186 @@
+import { createClient } from '@/utils/supabase/server'
+import { notFound } from 'next/navigation'
+import { Badge } from '@/components/ui/badge'
+import RevealPrompt from '@/components/RevealPrompt'
+import ImageGallery from '@/components/ImageGallery'
+import PromptCard from '@/components/PromptCard'
+import Comments from '@/components/Comments'
+
+export default async function PromptDetailPage({
+    params,
+}: {
+    params: Promise<{ id: string }>
+}) {
+    const resolvedParams = await params
+    const id = resolvedParams.id
+    const supabase = await createClient()
+
+    const { data: prompt } = await supabase
+        .from('prompts')
+        .select('*, profiles(name)')
+        .eq('id', id)
+        .single()
+
+    // Fetch similar prompts in the same category
+    const { data: similarPrompts } = await supabase
+        .from('prompts')
+        .select('*, profiles(name)')
+        .eq('status', 'approved')
+        .eq('category', prompt?.category)
+        .neq('id', prompt?.id)
+        .order('created_at', { ascending: false })
+        .limit(4)
+
+    // Fetch comments
+    const { data: rawComments } = await supabase
+        .from('comments')
+        .select('id, content, created_at, profiles(name)')
+        .eq('prompt_id', prompt?.id)
+        .order('created_at', { ascending: false })
+
+    const comments = (rawComments || []).map((c: any) => ({
+        id: c.id,
+        content: c.content,
+        created_at: c.created_at,
+        profiles: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles
+    }))
+
+    const { data: { user } } = await supabase.auth.getUser()
+    // For optimistic UI, get user profile
+    let currentUserProfile = null
+    if (user) {
+        const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single()
+        currentUserProfile = { ...user, user_metadata: { name: profile?.name } }
+    }
+
+    // For admins, we might want them to see pending ones, but for now we enforce 'approved'
+    // Or we can let anyone with the exact ID see it, but Phase 1 rule: Only approved prompts are publicly visible.
+    if (!prompt || prompt.status !== 'approved') {
+        let canView = false
+
+        if (user) {
+            if (prompt?.seller_id === user.id) canView = true
+            else {
+                const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+                if (profile?.role === 'admin') canView = true
+            }
+        }
+
+        if (!canView) {
+            notFound()
+        }
+    }
+
+    let canEdit = false
+    if (user) {
+        if (prompt.seller_id === user.id) canEdit = true
+        else {
+            const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+            if (profile?.role === 'admin') canEdit = true
+        }
+    }
+
+    return (
+        <div className="w-full min-h-screen flex flex-col items-center">
+            <div className="w-full max-w-7xl mx-auto px-5 py-8 md:py-12 flex-1">
+                <div className="flex flex-col lg:flex-row gap-10 xl:gap-16">
+
+                    {/* Left Column: Image Gallery & Content */}
+                    <div className="w-full lg:w-3/5 flex flex-col gap-10">
+                        <ImageGallery
+                            images={prompt.preview_images || (prompt.preview_image ? [prompt.preview_image] : [])}
+                            title={prompt.title}
+                        />
+
+                        {/* Move Description here, below images like PromptBase */}
+                        <div className="flex flex-col gap-3">
+                            <h2 className="text-xl font-bold border-b pb-2">About this Prompt</h2>
+                            <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed text-[15px]">
+                                {prompt.description}
+                            </p>
+                        </div>
+
+                        {/* Discussion / Comments Section */}
+                        <div className="mt-8 pt-8 border-t">
+                            <Comments
+                                promptId={prompt.id}
+                                initialComments={comments || []}
+                                currentUser={currentUserProfile}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Right Column: Details & Actions (Sticky) */}
+                    <div className="w-full lg:w-2/5 flex flex-col items-start gap-8">
+                        <div className="sticky top-24 w-full flex flex-col gap-8">
+
+                            {/* Header Info */}
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-3 flex-wrap">
+                                    <Badge variant="secondary" className="px-3 py-1 rounded-full text-sm">{prompt.category || 'Models'}</Badge>
+                                    <Badge variant="outline" className="px-3 py-1 rounded-full text-sm">{prompt.subcategory}</Badge>
+                                    {prompt.status !== 'approved' && (
+                                        <Badge variant="destructive" className="ml-auto">
+                                            Pending Approval
+                                        </Badge>
+                                    )}
+                                </div>
+
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                                    {prompt.title}
+                                </h1>
+
+                                <div className="flex items-center gap-2 text-muted-foreground mt-2">
+                                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-foreground border">
+                                        {prompt.profiles?.name?.charAt(0).toUpperCase() || '?'}
+                                    </div>
+                                    <span>by <span className="font-semibold text-foreground">{prompt.profiles?.name || 'Unknown Seller'}</span></span>
+                                </div>
+                            </div>
+
+                            {/* Price & Action */}
+                            <div className="flex flex-col gap-4 p-6 border rounded-2xl bg-card shadow-sm">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl font-black">{prompt.price ? `$${prompt.price}` : 'Free'}</span>
+                                    <span className="text-muted-foreground text-sm">one-time payment</span>
+                                </div>
+                                <RevealPrompt fullPrompt={prompt.full_prompt} />
+                                <p className="text-xs text-center text-muted-foreground mt-2">
+                                    Secure transaction handled by PromptWithSinu.
+                                </p>
+                            </div>
+
+                            {/* Owner Actions */}
+                            {canEdit && (
+                                <div className="flex w-full">
+                                    <a href={`/edit/${prompt.id}`} className="w-full">
+                                        <button className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 transition-colors font-semibold shadow-sm">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                            Edit Prompt Details
+                                        </button>
+                                    </a>
+                                </div>
+                            )}
+
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Similar Prompts Section */}
+                {similarPrompts && similarPrompts.length > 0 && (
+                    <div className="w-full mt-20 md:mt-32 flex flex-col gap-8 pb-12 border-t pt-12">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-bold tracking-tight">Similar Prompts</h2>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-start">
+                            {similarPrompts.map((p: any) => (
+                                <PromptCard key={p.id} prompt={p} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}

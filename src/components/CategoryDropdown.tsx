@@ -1,0 +1,123 @@
+'use client'
+
+import { useState, useRef } from 'react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+
+const CATEGORIES: Record<string, { label: string, items: string[] }> = {
+    'Models': {
+        label: 'Models',
+        items: ['ChatGPT Prompts', 'Claude Prompts', 'Gemini Prompts', 'DeepSeek Prompts', 'MidJourney Prompts', 'DALL‑E Prompts', 'Stable Diffusion Prompts', 'Other AI Models']
+    },
+    'Art & Illustrations': {
+        label: 'Art & Illustrations',
+        items: ['Drawing & Sketches', 'Cartoons & Comics', 'Painting Styles (gouache, pop art, surrealism)', 'Character & Portrait Art', 'Fantasy & Surrealism', 'Decorative Art (coloring books, posters, stickers)', 'Experimental & Mixed Media']
+    },
+    'Logos & Icons': {
+        label: 'Logos & Icons',
+        items: ['All']
+    },
+    'Graphics & Design': {
+        label: 'Graphics & Design',
+        items: ['Posters & Flyers', 'Infographics', 'UI/UX Elements', 'Profile Picture']
+    },
+    'Productivity & Writing': {
+        label: 'Productivity & Writing',
+        items: ['Copywriting Prompts', 'Blog/Article Generation', 'Email Templates', 'Task Management & Workflow Prompts']
+    },
+    'Marketing & Business': {
+        label: 'Marketing & Business',
+        items: ['Social Media Content', 'Ad Copy Generation', 'Branding Concepts', 'Business Pitch Decks']
+    },
+    'Photography': {
+        label: 'Photography',
+        items: ['Portrait Styles', 'Landscape Prompts', 'Product Photography', 'Cinematic Photography']
+    },
+    'Games & 3D': {
+        label: 'Games & 3D',
+        items: ['Character Models', 'Environment/World Design', 'Game Asset Packs', '3D Object Rendering']
+    }
+}
+
+export default function CategoryDropdown() {
+    const [isOpen, setIsOpen] = useState(false)
+    const [activeCategory, setActiveCategory] = useState<string>('Models')
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+    const handleMouseEnter = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        setIsOpen(true)
+    }
+
+    const handleMouseLeave = () => {
+        timeoutRef.current = setTimeout(() => {
+            setIsOpen(false)
+        }, 150)
+    }
+
+    return (
+        <div
+            className="relative hidden md:block z-50 ml-2"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
+            <Button variant="ghost" className="hidden lg:flex items-center gap-1 font-medium text-muted-foreground hover:text-foreground">
+                Categories
+                <svg className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            </Button>
+
+            {isOpen && (
+                <div className="absolute top-full left-0 mt-2 w-[650px] bg-background border rounded-xl shadow-xl overflow-hidden flex animate-in fade-in slide-in-from-top-2 duration-200 select-none">
+
+                    {/* Left Sidebar: Main Categories */}
+                    <div className="w-2/5 bg-muted/30 border-r p-2 flex flex-col gap-1">
+                        <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Categories
+                        </div>
+                        {Object.keys(CATEGORIES).map((cat) => (
+                            <div
+                                key={cat}
+                                onMouseEnter={() => setActiveCategory(cat)}
+                                className={`px-3 py-2 text-sm rounded-md cursor-pointer transition-colors ${activeCategory === cat
+                                        ? 'bg-primary text-primary-foreground font-medium'
+                                        : 'hover:bg-muted text-foreground/80 hover:text-foreground'
+                                    }`}
+                            >
+                                {CATEGORIES[cat].label}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Right Content: Subcategories */}
+                    <div className="w-3/5 p-4 flex flex-col bg-background">
+                        <div className="flex items-center justify-between mb-3 border-b pb-2">
+                            <h3 className="font-semibold text-foreground">
+                                {CATEGORIES[activeCategory].label}
+                            </h3>
+                            <Link
+                                href={`/?category=${encodeURIComponent(activeCategory)}`}
+                                onClick={() => setIsOpen(false)}
+                                className="text-xs text-primary hover:underline"
+                            >
+                                View All
+                            </Link>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                            {CATEGORIES[activeCategory].items.map((sub) => (
+                                <Link
+                                    key={sub}
+                                    href={`/?category=${encodeURIComponent(activeCategory)}&subcategory=${encodeURIComponent(sub)}`}
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-sm text-muted-foreground hover:text-primary hover:underline decoration-primary/30 py-1"
+                                >
+                                    {sub}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+}
