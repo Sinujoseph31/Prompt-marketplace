@@ -55,9 +55,9 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
                     )}
                 </div>
 
-                {/* Pop-up Hover Gallery (Visible only on hover if multiple images) */}
+                {/* Pop-up Hover Gallery (Visible only on desktop hover if multiple images) */}
                 {prompt.preview_images && prompt.preview_images.length > 1 && (
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl overflow-hidden bg-black pointer-events-none group-hover:pointer-events-auto shadow-2xl border border-primary/20 scale-100 group-hover:scale-[1.03] z-20 flex flex-col">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl overflow-hidden bg-black pointer-events-none group-hover:pointer-events-auto shadow-2xl border border-primary/20 scale-100 group-hover:scale-[1.03] z-20 hidden md:flex flex-col">
 
                         <div
                             ref={scrollContainerRef}

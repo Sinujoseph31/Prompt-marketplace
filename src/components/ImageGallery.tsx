@@ -16,19 +16,21 @@ export default function ImageGallery({ images, title }: { images: string[], titl
     return (
         <div className="flex flex-col gap-4">
             {/* Main Hero Image(s) - Horizontally scrollable on mobile, single active image on desktop */}
-            <div className="w-full bg-muted rounded-xl overflow-x-auto snap-x snap-mandatory flex [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border border-border/50 relative">
-                {images.map((imgUrl, idx) => (
-                    <img
-                        key={idx}
-                        src={imgUrl}
-                        alt={`${title} - Preview ${idx + 1}`}
-                        className={`w-full h-auto max-h-[85vh] object-cover shrink-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'block' : 'block md:hidden'}`}
-                    />
-                ))}
+            <div className="relative w-full">
+                <div className="w-full bg-muted rounded-xl overflow-x-auto snap-x snap-mandatory flex [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border border-border/50">
+                    {images.map((imgUrl, idx) => (
+                        <img
+                            key={idx}
+                            src={imgUrl}
+                            alt={`${title} - Preview ${idx + 1}`}
+                            className={`w-full h-auto max-h-[85vh] object-cover shrink-0 snap-center transition-opacity duration-300 ${activeIndex === idx ? 'block' : 'block md:hidden'}`}
+                        />
+                    ))}
+                </div>
 
                 {/* Mobile scroll indicator */}
                 {images.length > 1 && (
-                    <div className="md:hidden absolute bottom-4 right-4 bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full backdrop-blur-md shadow-sm pointer-events-none z-10 sticky left-full">
+                    <div className="md:hidden absolute bottom-4 right-4 bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full backdrop-blur-md shadow-sm pointer-events-none z-10">
                         {images.length} Images
                     </div>
                 )}
