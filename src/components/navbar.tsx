@@ -38,7 +38,14 @@ export default async function Navbar() {
                 </div>
 
                 {/* Right Actions */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <Link href="/ai-tools/image-to-prompt">
+                        <Button variant="secondary" className="rounded-full shadow-sm px-3 md:px-4 flex items-center gap-1 border border-primary/10 hover:border-primary/30" size="sm">
+                            <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            <span className="hidden md:inline font-semibold">AI Assistant</span>
+                        </Button>
+                    </Link>
+
                     {user ? (
                         <div className="flex items-center gap-2 sm:gap-4">
                             {profile?.role === 'admin' && (
