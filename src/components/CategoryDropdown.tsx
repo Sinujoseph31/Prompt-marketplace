@@ -57,20 +57,20 @@ export default function CategoryDropdown() {
 
     return (
         <div
-            className="relative hidden md:block z-50 ml-2"
+            className="relative z-50 ml-0 md:ml-2"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <Button variant="ghost" className="hidden lg:flex items-center gap-1 font-medium text-muted-foreground hover:text-foreground">
-                Categories
+            <Button variant="ghost" className="flex items-center gap-1 font-medium text-muted-foreground hover:text-foreground px-2 md:px-4">
+                <span className="hidden sm:inline">Categories</span>
                 <svg className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
             </Button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[650px] bg-background border rounded-xl shadow-xl overflow-hidden flex animate-in fade-in slide-in-from-top-2 duration-200 select-none">
+                <div className="absolute top-full left-0 mt-2 w-[calc(100vw-40px)] md:w-[650px] max-w-[650px] bg-background border rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-2 duration-200 select-none">
 
                     {/* Left Sidebar: Main Categories */}
-                    <div className="w-2/5 bg-muted/30 border-r p-2 flex flex-col gap-1">
+                    <div className="w-full md:w-2/5 bg-muted/30 border-b md:border-b-0 md:border-r p-2 flex flex-col gap-1 max-h-[40vh] md:max-h-none overflow-y-auto">
                         <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             Categories
                         </div>
@@ -79,8 +79,8 @@ export default function CategoryDropdown() {
                                 key={cat}
                                 onMouseEnter={() => setActiveCategory(cat)}
                                 className={`px-3 py-2 text-sm rounded-md cursor-pointer transition-colors ${activeCategory === cat
-                                        ? 'bg-primary text-primary-foreground font-medium'
-                                        : 'hover:bg-muted text-foreground/80 hover:text-foreground'
+                                    ? 'bg-primary text-primary-foreground font-medium'
+                                    : 'hover:bg-muted text-foreground/80 hover:text-foreground'
                                     }`}
                             >
                                 {CATEGORIES[cat].label}
@@ -89,7 +89,7 @@ export default function CategoryDropdown() {
                     </div>
 
                     {/* Right Content: Subcategories */}
-                    <div className="w-3/5 p-4 flex flex-col bg-background">
+                    <div className="w-full md:w-3/5 p-4 flex flex-col bg-background max-h-[50vh] md:max-h-none overflow-y-auto">
                         <div className="flex items-center justify-between mb-3 border-b pb-2">
                             <h3 className="font-semibold text-foreground">
                                 {CATEGORIES[activeCategory].label}

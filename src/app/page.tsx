@@ -58,7 +58,7 @@ export default async function Index({
     <div className="w-full flex flex-col min-h-screen items-center">
       {/* Conditional Header / Hero Section */}
       {!category && !searchQuery ? (
-        <section className="w-full max-w-7xl px-5 py-16 md:py-24 flex flex-col items-center text-center gap-6">
+        <section className="w-full max-w-7xl px-5 py-10 md:py-24 flex flex-col items-center text-center gap-4 md:gap-6">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-3xl">
             Find the best AI Prompts.
           </h1>
@@ -67,7 +67,7 @@ export default async function Index({
           </p>
         </section>
       ) : (
-        <section className="w-full max-w-7xl px-5 py-8 md:py-12 flex flex-col gap-2">
+        <section className="w-full max-w-7xl px-5 py-6 md:py-12 flex flex-col gap-2">
           <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
             {searchQuery
               ? `Search Results for "${searchQuery}"`
@@ -102,7 +102,7 @@ export default async function Index({
       />
 
       {/* Prompts Grid */}
-      <div className="w-full max-w-7xl px-5 py-12 flex-1">
+      <div className="w-full max-w-7xl px-5 py-6 md:py-12 flex-1">
         {prompts?.length === 0 ? (
           <div className="py-24 text-center text-muted-foreground flex flex-col items-center gap-4">
             <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">

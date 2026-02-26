@@ -37,17 +37,17 @@ export default function PopularPromptsCarousel({ title = "Popular Prompts", prom
     if (!prompts || prompts.length === 0) return null
 
     return (
-        <section className="w-full max-w-7xl mx-auto px-5 pb-8 flex flex-col gap-4 relative">
+        <section className="w-full max-w-7xl mx-auto px-5 pb-4 md:pb-8 flex flex-col gap-3 md:gap-4 relative">
             <h2 className="text-2xl font-bold tracking-tight px-1">{title}</h2>
 
             <div className="relative group">
                 <div
                     ref={scrollContainerRef}
                     onScroll={checkScroll}
-                    className="flex overflow-x-auto gap-4 md:gap-6 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1 pt-1"
+                    className="flex overflow-x-auto gap-3 md:gap-6 pb-2 md:pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1 pt-1"
                 >
                     {prompts.map((prompt) => (
-                        <div key={prompt.id} className="w-[calc((100%-4rem)/5)] shrink-0 snap-start">
+                        <div key={prompt.id} className="w-[75vw] sm:w-64 md:w-72 lg:w-[calc((100%-4rem)/5)] shrink-0 snap-start">
                             <PromptCard prompt={prompt} forceAspectSquare={true} />
                         </div>
                     ))}

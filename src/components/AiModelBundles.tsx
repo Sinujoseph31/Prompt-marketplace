@@ -13,8 +13,8 @@ const AI_MODELS = [
 
 export default function AiModelBundles() {
     return (
-        <section className="w-full max-w-7xl mx-auto px-5 py-8 md:py-16 flex flex-col gap-6 md:gap-10 relative">
-            <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 px-2 border-b border-border/40 pb-4">
+        <section className="w-full max-w-7xl mx-auto px-5 py-4 md:py-16 flex flex-col gap-4 md:gap-10 relative">
+            <div className="flex flex-col md:flex-row items-baseline justify-between gap-2 md:gap-4 px-2 border-b border-border/40 pb-2 md:pb-4">
                 <div className="flex flex-col gap-1">
                     <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">AI Prompts</h2>
                     <p className="text-muted-foreground text-sm md:text-base">Shop by your preferred AI model</p>
@@ -24,7 +24,7 @@ export default function AiModelBundles() {
                 </Link>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 px-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 lg:gap-8 px-2">
                 {AI_MODELS.map((model) => (
                     <Link
                         key={model.name}

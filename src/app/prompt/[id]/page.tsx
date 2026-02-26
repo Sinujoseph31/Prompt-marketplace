@@ -83,16 +83,20 @@ export default async function PromptDetailPage({
     return (
         <div className="w-full min-h-screen flex flex-col items-center">
             <div className="w-full max-w-7xl mx-auto px-5 py-8 md:py-12 flex-1">
-                <div className="flex flex-col lg:flex-row gap-10 xl:gap-16">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-10 xl:gap-x-16">
 
-                    {/* Left Column: Image Gallery & Content */}
-                    <div className="w-full lg:w-3/5 flex flex-col gap-10">
+                    {/* Image Gallery */}
+                    <div className="lg:col-span-7 order-1 flex flex-col gap-10">
                         <ImageGallery
                             images={prompt.preview_images || (prompt.preview_image ? [prompt.preview_image] : [])}
                             title={prompt.title}
                         />
+                    </div>
 
-                        {/* Move Description here, below images like PromptBase */}
+                    {/* Description & Comments */}
+                    <div className="lg:col-span-7 order-3 flex flex-col gap-10">
+
+                        {/* Description */}
                         <div className="flex flex-col gap-3">
                             <h2 className="text-xl font-bold border-b pb-2">About this Prompt</h2>
                             <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed text-[15px]">
@@ -111,7 +115,7 @@ export default async function PromptDetailPage({
                     </div>
 
                     {/* Right Column: Details & Actions (Sticky) */}
-                    <div className="w-full lg:w-2/5 flex flex-col items-start gap-8">
+                    <div className="lg:col-span-5 order-2 lg:row-span-2 flex flex-col items-start gap-8">
                         <div className="sticky top-24 w-full flex flex-col gap-8">
 
                             {/* Header Info */}
