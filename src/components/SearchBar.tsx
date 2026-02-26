@@ -24,7 +24,7 @@ export default function SearchBar() {
             } else {
                 currentParams.delete('q')
             }
-            router.push(`/?${currentParams.toString()}`)
+            router.push(`/search?${currentParams.toString()}`)
         }, 300)
 
         return () => clearTimeout(timer)
@@ -45,7 +45,7 @@ export default function SearchBar() {
         } else {
             currentParams.delete('q')
         }
-        router.push(`/?${currentParams.toString()}`)
+        router.push(`/search?${currentParams.toString()}`)
     }
 
     return (

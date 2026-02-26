@@ -19,7 +19,7 @@ export default function AiModelBundles() {
                     <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">AI Prompts</h2>
                     <p className="text-muted-foreground text-sm md:text-base">Shop by your preferred AI model</p>
                 </div>
-                <Link href="/?category=Models" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1 group">
+                <Link href="/search?category=Models" className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1 group">
                     View all models <span aria-hidden="true" className="group-hover:translate-x-1 transition-transform">&rarr;</span>
                 </Link>
             </div>
@@ -28,7 +28,7 @@ export default function AiModelBundles() {
                 {AI_MODELS.map((model) => (
                     <Link
                         key={model.name}
-                        href={`/?category=Models&subcategory=${encodeURIComponent(model.name)}`}
+                        href={`/search?category=Models&subcategory=${encodeURIComponent(model.name)}`}
                         className="group flex flex-col items-center justify-center rounded-3xl border border-border/10 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden h-36 md:h-44 bg-muted/20"
                     >
                         {/* Background Image */}

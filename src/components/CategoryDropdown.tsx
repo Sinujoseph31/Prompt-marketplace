@@ -95,7 +95,7 @@ export default function CategoryDropdown() {
                                 {CATEGORIES[activeCategory].label}
                             </h3>
                             <Link
-                                href={`/?category=${encodeURIComponent(activeCategory)}`}
+                                href={`/search?category=${encodeURIComponent(activeCategory)}`}
                                 onClick={() => setIsOpen(false)}
                                 className="text-xs text-primary hover:underline"
                             >
@@ -107,9 +107,9 @@ export default function CategoryDropdown() {
                             {CATEGORIES[activeCategory].items.map((sub) => (
                                 <Link
                                     key={sub}
-                                    href={`/?category=${encodeURIComponent(activeCategory)}&subcategory=${encodeURIComponent(sub)}`}
+                                    href={`/search?category=${encodeURIComponent(activeCategory)}&subcategory=${encodeURIComponent(sub)}`}
                                     onClick={() => setIsOpen(false)}
-                                    className="text-sm text-muted-foreground hover:text-primary hover:underline decoration-primary/30 py-1"
+                                    className="px-3 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-muted/50 rounded-md transition-colors"
                                 >
                                     {sub}
                                 </Link>

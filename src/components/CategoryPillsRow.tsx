@@ -74,7 +74,7 @@ export default function CategoryPillsRow({ category, subcategory, mainCategories
                                 <Button variant="default" className="rounded-full px-6 shadow-sm">All Prompts</Button>
                             </Link>
                             {mainCategories.map((cat) => (
-                                <Link key={cat} href={`/?category=${encodeURIComponent(cat)}`} className="whitespace-nowrap shrink-0">
+                                <Link key={cat} href={`/search?category=${encodeURIComponent(cat)}`} className="whitespace-nowrap shrink-0">
                                     <Button variant="outline" className="rounded-full px-6 bg-background">
                                         {cat}
                                     </Button>
@@ -93,14 +93,14 @@ export default function CategoryPillsRow({ category, subcategory, mainCategories
 
                             <div className="w-px h-6 bg-border/50 mx-1 shrink-0" />
 
-                            <Link href={`/?category=${encodeURIComponent(category || '')}`} className="whitespace-nowrap shrink-0">
+                            <Link href={`/search?category=${encodeURIComponent(category || '')}`} className="whitespace-nowrap shrink-0">
                                 <Button variant={!subcategory ? "default" : "outline"} className={`rounded-full px-5 ${subcategory ? 'bg-background' : ''}`}>
                                     All {category}
                                 </Button>
                             </Link>
 
                             {activeSubcategories.map((sub) => (
-                                <Link key={sub} href={`/?category=${encodeURIComponent(category || '')}&subcategory=${encodeURIComponent(sub)}`} className="whitespace-nowrap shrink-0">
+                                <Link key={sub} href={`/search?category=${encodeURIComponent(category || '')}&subcategory=${encodeURIComponent(sub)}`} className="whitespace-nowrap shrink-0">
                                     <Button variant={subcategory === sub ? "default" : "outline"} className={`rounded-full px-5 ${subcategory !== sub ? 'bg-background' : ''}`}>
                                         {sub}
                                     </Button>
