@@ -89,6 +89,7 @@ export default async function PromptDetailPage({
                     <div className="lg:col-span-7 order-1 flex flex-col gap-10">
                         <ImageGallery
                             images={prompt.preview_images || (prompt.preview_image ? [prompt.preview_image] : [])}
+                            video={prompt.preview_video}
                             title={prompt.title}
                         />
                     </div>

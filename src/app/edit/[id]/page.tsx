@@ -79,6 +79,14 @@ export default async function EditPage({ params }: { params: Promise<{ id: strin
                     <ImageUploadField />
                 </div>
 
+                <div className="grid gap-2 border p-4 rounded-xl bg-muted/10 shadow-sm border-dashed">
+                    <Label htmlFor="preview_video_file" className="text-foreground">Upload Video Preview (Optional)</Label>
+                    <Input id="preview_video_file" name="preview_video_file" type="file" accept="video/mp4,video/webm" className="cursor-pointer bg-background" />
+                    <p className="text-xs text-muted-foreground">
+                        {prompt.preview_video ? "You currently have a video saved. Uploading a new one replaces it." : "Max 10MB. MP4 or WebM formats supported. Plays automatically on marketplace hover."}
+                    </p>
+                </div>
+
                 <div className="grid gap-2">
                     <Label htmlFor="full_prompt">The Prompt Itself</Label>
                     <Textarea id="full_prompt" name="full_prompt" required defaultValue={prompt.full_prompt} rows={6} className="font-mono text-sm" />

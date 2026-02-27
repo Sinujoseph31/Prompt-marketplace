@@ -73,6 +73,29 @@ export async function submitPrompt(formData: FormData) {
         ]
     }
 
+    // Process video file
+    let preview_video = null;
+    const preview_video_file = formData.get('preview_video_file') as File;
+
+    if (preview_video_file && preview_video_file.size > 0 && preview_video_file.name) {
+        const fileExt = preview_video_file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}_video.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: videoUploadError } = await supabase.storage
+            .from('prompt-images')
+            .upload(filePath, preview_video_file);
+
+        if (!videoUploadError) {
+            const { data: { publicUrl } } = supabase.storage
+                .from('prompt-images')
+                .getPublicUrl(filePath);
+            preview_video = publicUrl;
+        } else {
+            console.error('Video upload error:', videoUploadError);
+        }
+    }
+
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
 
     const { data: newPrompt, error } = await supabase.from('prompts').insert({
@@ -83,6 +106,7 @@ export async function submitPrompt(formData: FormData) {
         price,
         preview_image: allPreviewImages.length > 0 ? allPreviewImages[0] : null,
         preview_images: allPreviewImages,
+        preview_video,
         status: profile?.role === 'admin' ? 'approved' : 'pending'
     }).select('id').single()
 
@@ -155,6 +179,31 @@ export async function updatePrompt(formData: FormData) {
 
     if (manualUrls.length > 0) hasNewImages = true
 
+    // Process video file
+    const preview_video_file = formData.get('preview_video_file') as File;
+    let new_preview_video: string | null = null;
+    let hasNewVideo = false;
+
+    if (preview_video_file && preview_video_file.size > 0 && preview_video_file.name) {
+        hasNewVideo = true;
+        const fileExt = preview_video_file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}_video.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: videoUploadError } = await supabase.storage
+            .from('prompt-images')
+            .upload(filePath, preview_video_file);
+
+        if (!videoUploadError) {
+            const { data: { publicUrl } } = supabase.storage
+                .from('prompt-images')
+                .getPublicUrl(filePath);
+            new_preview_video = publicUrl;
+        } else {
+            console.error('Video upload error:', videoUploadError);
+        }
+    }
+
     // Prepare update payload
     const updateData: any = {
         title,
@@ -162,6 +211,10 @@ export async function updatePrompt(formData: FormData) {
         subcategory,
         full_prompt,
         price,
+    }
+
+    if (hasNewVideo && new_preview_video) {
+        updateData.preview_video = new_preview_video;
     }
 
     // Only update images if the user provided new ones; otherwise, leave them alone

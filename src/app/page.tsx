@@ -12,7 +12,7 @@ export default async function Index() {
   // Fetch Latest
   const { data: latestPrompts } = await supabase
     .from('prompts')
-    .select('id, title, description, category, subcategory, price, preview_image, preview_images, profiles(name)')
+    .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name)')
     .eq('status', 'approved')
     .order('created_at', { ascending: false })
     .limit(10)
@@ -20,7 +20,7 @@ export default async function Index() {
   // Fetch Popular
   const { data: popularPrompts } = await supabase
     .from('prompts')
-    .select('id, title, description, category, subcategory, price, preview_image, preview_images, profiles(name)')
+    .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name)')
     .eq('status', 'approved')
     .order('price', { ascending: false })
     .limit(10)

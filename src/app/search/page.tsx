@@ -29,7 +29,7 @@ export default async function SearchPage({
     // 1. Fetch Exact Matches
     let query = supabase
         .from('prompts')
-        .select('id, title, description, category, subcategory, price, preview_image, preview_images, profiles(name)')
+        .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name)')
         .eq('status', 'approved')
         .order('created_at', { ascending: false })
 
@@ -50,7 +50,7 @@ export default async function SearchPage({
 
         let relatedQuery = supabase
             .from('prompts')
-            .select('id, title, description, category, subcategory, price, preview_image, preview_images, profiles(name)')
+            .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name)')
             .eq('status', 'approved')
             .eq('category', category)
             .order('created_at', { ascending: false })
@@ -67,7 +67,7 @@ export default async function SearchPage({
 
         let relatedQuery = supabase
             .from('prompts')
-            .select('id, title, description, category, subcategory, price, preview_image, preview_images, profiles(name)')
+            .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name)')
             .eq('status', 'approved')
             .eq('category', firstResultCategory)
             .order('created_at', { ascending: false })

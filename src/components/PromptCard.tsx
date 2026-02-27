@@ -27,16 +27,32 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
     }
 
     return (
-        <div onClick={handleCardClick} className="group flex flex-col gap-3 cursor-pointer">
+        <div
+            onClick={handleCardClick}
+            className="group flex flex-col gap-3 cursor-pointer"
+        >
             {/* Dynamic height or fixed square image container */}
             <div className={`w-full relative rounded-xl shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:-translate-y-1 z-0 group-hover:z-10 group bg-muted border border-border/50 overflow-hidden ${forceAspectSquare ? 'aspect-square' : ''}`}>
 
-                {prompt.preview_images?.[0] || prompt.preview_image ? (
-                    <img
-                        src={prompt.preview_images?.[0] || prompt.preview_image}
-                        alt={prompt.title}
-                        className={`w-full object-cover transition-transform duration-500 group-hover:scale-105 block ${forceAspectSquare ? 'h-full absolute inset-0' : 'h-auto'}`}
-                    />
+                {prompt.preview_images?.[0] || prompt.preview_image || prompt.preview_video ? (
+                    !prompt.preview_video ? (
+                        <img
+                            src={prompt.preview_images?.[0] || prompt.preview_image}
+                            alt={prompt.title}
+                            className={`w-full object-cover transition-all duration-500 group-hover:scale-105 block ${forceAspectSquare ? 'h-full absolute inset-0' : 'h-auto aspect-square'}`}
+                            style={{ aspectRatio: forceAspectSquare ? undefined : '1/1' }}
+                        />
+                    ) : (
+                        <video
+                            src={prompt.preview_video}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className={`w-full bg-black object-contain transition-all duration-500 group-hover:scale-105 block ${forceAspectSquare ? 'h-full absolute inset-0' : 'h-auto aspect-square'}`}
+                            style={{ aspectRatio: forceAspectSquare ? undefined : '1/1' }}
+                        />
+                    )
                 ) : (
                     <div className={`w-full flex items-center justify-center text-muted-foreground bg-muted/50 ${forceAspectSquare ? 'h-full absolute inset-0' : 'aspect-square'}`}>
                         No Image
@@ -55,8 +71,8 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
                     )}
                 </div>
 
-                {/* Pop-up Hover Gallery (Visible only on desktop hover if multiple images) */}
-                {prompt.preview_images && prompt.preview_images.length > 1 && (
+                {/* Pop-up Hover Gallery (Visible only on desktop hover if multiple images and no video) */}
+                {!prompt.preview_video && prompt.preview_images && prompt.preview_images.length > 1 && (
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl overflow-hidden bg-black pointer-events-none group-hover:pointer-events-auto shadow-2xl border border-primary/20 scale-100 group-hover:scale-[1.03] z-20 hidden md:flex flex-col">
 
                         <div
