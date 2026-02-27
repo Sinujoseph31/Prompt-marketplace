@@ -14,20 +14,26 @@ export async function POST(req: Request) {
         // Using gemini-2.5-flash since 1.5 is deprecated/hidden for this API tier
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
-        const { imageBase64 } = await req.json()
+        const { imageBase64, category } = await req.json()
 
         if (!imageBase64) {
             return new Response(JSON.stringify({ error: 'No image provided' }), { status: 400 })
+        }
+
+        let categoryContext = '';
+        if (category && category !== 'Any') {
+            categoryContext = `The user specifically wants prompts tailored for the category/theme: "${category}". Please ensure all generated prompts strongly align with this specific theme.`;
         }
 
         // The exact prompt to force structural JSON back from Gemini natively
         const promptText = `
             Analyze the attached image.
             First, describe the image in detail: objects, subjects, and core composition.
+            ${categoryContext}
             Then, generate 5 to 7 highly aesthetic, trending text-to-image AI prompts that recreate the core subject/composition of this image in drastically different, beautiful styles.
             Each prompt MUST be highly detailed, comma-separated keywords, and optimized for image generators like Midjourney or Stable Diffusion. 
-            Styles should include trending aesthetics like: Cinematic, Cyberpunk, Watercolor, 3D Render, Anime/Studio Ghibli, Dark Fantasy, or Minimalist Line Art.
-            Prefix each prompt with the style name for clarity (e.g., "Cyberpunk Style: A futuristic glowing...").
+            Styles should include trending aesthetics like: Cinematic, Cyberpunk, Watercolor, 3D Render, Anime/Studio Ghibli, Dark Fantasy, or Minimalist Line Art (unless a specific theme was requested above, in which case prioritize that theme).
+            Prefix each prompt with the style name for clarity (e.g., "Style: A detailed...").
 
             Return EXACTLY a valid JSON object with the following structure, and nothing else (no markdown blocks like \`\`\`json):
             {
