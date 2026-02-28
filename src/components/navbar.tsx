@@ -4,6 +4,7 @@ import { signout } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import SearchBar from '@/components/SearchBar'
 import CategoryDropdown from '@/components/CategoryDropdown'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function Navbar() {
     const supabase = await createClient()
@@ -77,6 +78,7 @@ export default async function Navbar() {
                             </Link>
                         </div>
                     )}
+                    <ThemeToggle />
                 </div>
             </div>
         </nav>

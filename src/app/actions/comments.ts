@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function addComment(promptId: string, content: string) {
+export async function addComment(promptId: string, content: string, rating: number = 5) {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -18,7 +18,8 @@ export async function addComment(promptId: string, content: string) {
     const { error } = await supabase.from('comments').insert({
         prompt_id: promptId,
         user_id: user.id,
-        content: content.trim()
+        content: content.trim(),
+        rating: rating
     })
 
     if (error) {

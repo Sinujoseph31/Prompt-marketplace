@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export async function submitPrompt(formData: FormData) {
     const supabase = await createClient()
@@ -11,6 +12,7 @@ export async function submitPrompt(formData: FormData) {
     if (!user) redirect('/login')
 
     const title = formData.get('title') as string
+    const description = formData.get('description') as string
     const category = formData.get('category') as string
     const subcategory = formData.get('subcategory') as string
     const full_prompt = formData.get('full_prompt') as string
@@ -98,8 +100,38 @@ export async function submitPrompt(formData: FormData) {
 
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
 
+    // Gemini AI Moderation (Basic check for NSFW/Dangerous content)
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    if (apiKey) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey)
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+
+            const moderationPrompt = `
+            Analyze this prompt listing for a marketplace. If it contains highly offensive, explicit NSFW, illegal acts, or dangerous content, respond strictly with 'UNSAFE'. Otherwise respond with 'SAFE'. 
+            Title: ${title}
+            Description: ${description.replace(/<[^>]*>?/gm, '')}
+            Prompt text: ${full_prompt}
+            `
+
+            const response = await model.generateContent(moderationPrompt)
+            const text = response.response.text();
+
+            if (text.includes('UNSAFE')) {
+                // Return them to submit page with a specific error
+                redirect('/submit?message=Violation: Your prompt contains unsafe content flagged by moderation.')
+            }
+        } catch (error: any) {
+            console.error('Moderation Failed:', error);
+            // If moderation logic fails, we can let it proceed to "pending" or block it. 
+            // We'll proceed to pending so human admin can review.
+        }
+    }
+
     const { data: newPrompt, error } = await supabase.from('prompts').insert({
         seller_id: user.id,
+        title,
+        description,
         category,
         subcategory,
         full_prompt,
@@ -139,6 +171,7 @@ export async function updatePrompt(formData: FormData) {
     }
 
     const title = formData.get('title') as string
+    const description = formData.get('description') as string
     const category = formData.get('category') as string
     const subcategory = formData.get('subcategory') as string
     const full_prompt = formData.get('full_prompt') as string
@@ -207,6 +240,7 @@ export async function updatePrompt(formData: FormData) {
     // Prepare update payload
     const updateData: any = {
         title,
+        description,
         category,
         subcategory,
         full_prompt,

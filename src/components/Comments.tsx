@@ -4,17 +4,21 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { addComment } from '@/app/actions/comments'
+import { Star } from 'lucide-react'
 
 type Comment = {
     id: string
     content: string
     created_at: string
+    rating: number
     profiles: { name: string }
 }
 
 export default function Comments({ promptId, initialComments, currentUser }: { promptId: string, initialComments: Comment[], currentUser: any }) {
     const [comments, setComments] = useState<Comment[]>(initialComments || [])
     const [newComment, setNewComment] = useState('')
+    const [rating, setRating] = useState(5)
+    const [hoveredRating, setHoveredRating] = useState(0)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState('')
 
@@ -26,18 +30,20 @@ export default function Comments({ promptId, initialComments, currentUser }: { p
         setError('')
 
         try {
-            await addComment(promptId, newComment)
+            await addComment(promptId, newComment, rating)
 
             // Optimistically add to UI
             const newCommentObj: Comment = {
                 id: Math.random().toString(), // temporary id
                 content: newComment.trim(),
                 created_at: new Date().toISOString(),
+                rating: rating,
                 profiles: { name: currentUser?.user_metadata?.name || 'You' }
             }
 
             setComments([newCommentObj, ...comments])
             setNewComment('')
+            setRating(5)
         } catch (err: any) {
             setError(err.message || 'Failed to post comment')
         } finally {
@@ -52,8 +58,22 @@ export default function Comments({ promptId, initialComments, currentUser }: { p
             {/* Comment Form */}
             {currentUser ? (
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    <div className="flex items-center gap-1 mb-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                                key={star}
+                                className={`w-6 h-6 cursor-pointer transition-colors ${(hoveredRating || rating) >= star
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-muted-foreground/30'
+                                    }`}
+                                onMouseEnter={() => setHoveredRating(star)}
+                                onMouseLeave={() => setHoveredRating(0)}
+                                onClick={() => setRating(star)}
+                            />
+                        ))}
+                    </div>
                     <Textarea
-                        placeholder="Leave a comment or question..."
+                        placeholder="Leave a review or comment..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         className="min-h-[100px] resize-y"
@@ -84,8 +104,18 @@ export default function Comments({ promptId, initialComments, currentUser }: { p
                                     {comment.profiles?.name?.charAt(0).toUpperCase() || '?'}
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="font-semibold text-sm leading-tight">{comment.profiles?.name || 'Unknown User'}</span>
-                                    <span className="text-xs text-muted-foreground">{new Date(comment.created_at).toLocaleDateString()}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-semibold text-sm leading-tight">{comment.profiles?.name || 'Unknown User'}</span>
+                                        <div className="flex items-center gap-0.5">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={`w-3 h-3 ${comment.rating >= star ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <span suppressHydrationWarning className="text-xs text-muted-foreground">{new Date(comment.created_at).toLocaleDateString()}</span>
                                 </div>
                             </div>
                             <p className="text-sm text-foreground/90 whitespace-pre-wrap pl-10">

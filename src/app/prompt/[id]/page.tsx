@@ -24,7 +24,7 @@ export default async function PromptDetailPage({
     // Fetch similar prompts in the same category
     const { data: similarPrompts } = await supabase
         .from('prompts')
-        .select('*, profiles(name)')
+        .select('*, profiles(name), comments(rating)')
         .eq('status', 'approved')
         .eq('category', prompt?.category)
         .neq('id', prompt?.id)
@@ -34,7 +34,7 @@ export default async function PromptDetailPage({
     // Fetch comments
     const { data: rawComments } = await supabase
         .from('comments')
-        .select('id, content, created_at, profiles(name)')
+        .select('id, content, created_at, rating, profiles(name)')
         .eq('prompt_id', prompt?.id)
         .order('created_at', { ascending: false })
 
@@ -42,6 +42,7 @@ export default async function PromptDetailPage({
         id: c.id,
         content: c.content,
         created_at: c.created_at,
+        rating: c.rating,
         profiles: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles
     }))
 
@@ -100,9 +101,10 @@ export default async function PromptDetailPage({
                         {/* Description */}
                         <div className="flex flex-col gap-3">
                             <h2 className="text-xl font-bold border-b pb-2">About this Prompt</h2>
-                            <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed text-[15px]">
-                                {prompt.description}
-                            </p>
+                            <div
+                                className="text-muted-foreground leading-relaxed text-[15px] prose prose-sm sm:prose-base dark:prose-invert max-w-none"
+                                dangerouslySetInnerHTML={{ __html: prompt.description }}
+                            />
                         </div>
 
                         {/* Discussion / Comments Section */}
@@ -149,7 +151,7 @@ export default async function PromptDetailPage({
                                     <span className="text-4xl font-black">{prompt.price ? `$${prompt.price}` : 'Free'}</span>
                                     <span className="text-muted-foreground text-sm">one-time payment</span>
                                 </div>
-                                <RevealPrompt fullPrompt={prompt.full_prompt} />
+                                <RevealPrompt fullPrompt={prompt.full_prompt} category={prompt.category} />
                                 <p className="text-xs text-center text-muted-foreground mt-2">
                                     Secure transaction handled by PromptWithSinu.
                                 </p>

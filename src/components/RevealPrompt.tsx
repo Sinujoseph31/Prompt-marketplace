@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import TestPromptPlayground from './TestPromptPlayground'
 
-export default function RevealPrompt({ fullPrompt }: { fullPrompt: string }) {
+export default function RevealPrompt({ fullPrompt, category }: { fullPrompt: string, category: string }) {
     const [revealed, setRevealed] = useState(false)
     const [isCopied, setIsCopied] = useState(false)
 
@@ -56,6 +57,8 @@ export default function RevealPrompt({ fullPrompt }: { fullPrompt: string }) {
                     {fullPrompt}
                 </pre>
             </div>
+
+            <TestPromptPlayground fullPrompt={fullPrompt} category={category} />
         </div>
     )
 }

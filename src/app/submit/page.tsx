@@ -1,4 +1,8 @@
-import { createClient } from '@/utils/supabase/server'
+'use client'
+
+import { createClient } from '@/utils/supabase/client'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,21 +10,29 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { submitPrompt } from '@/app/actions/prompts'
 import ImageUploadField from '@/components/ImageUploadField'
+import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
+import AiPromptEnhancer from '@/components/AiPromptEnhancer'
 
-export default async function SubmitPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+export default function SubmitPage() {
+    const supabase = createClient()
+    const router = useRouter()
+    const [user, setUser] = useState<any>(null)
+    const [fullPrompt, setFullPrompt] = useState('')
 
-    if (!user) {
-        redirect('/login')
-    }
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                router.push('/login')
+            } else {
+                setUser(user)
+            }
+        }
+        fetchUser()
+    }, [router, supabase.auth])
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+    if (!user) return null;
 
     // We no longer block buyers from submitting prompts.
     // They will be set to 'pending' automatically by the server action.
@@ -41,8 +53,8 @@ export default async function SubmitPage() {
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" name="description" required placeholder="Briefly describe what this prompt does..." rows={3} />
+                    <Label htmlFor="description">Description (Explain your prompt in detail)</Label>
+                    <RichTextEditor name="description" />
                 </div>
 
                 <ModelCategorySelector />
@@ -62,7 +74,17 @@ export default async function SubmitPage() {
 
                 <div className="grid gap-2">
                     <Label htmlFor="full_prompt">The Prompt Itself</Label>
-                    <Textarea id="full_prompt" name="full_prompt" required placeholder="Enter the exact prompt text here..." rows={6} className="font-mono text-sm" />
+                    <Textarea
+                        id="full_prompt"
+                        name="full_prompt"
+                        required
+                        placeholder="Enter the exact prompt text here..."
+                        rows={6}
+                        className="font-mono text-sm"
+                        value={fullPrompt}
+                        onChange={(e) => setFullPrompt(e.target.value)}
+                    />
+                    <AiPromptEnhancer fullPrompt={fullPrompt} onUpdate={setFullPrompt} />
                 </div>
 
                 <Button type="submit" size="lg" className="w-full">

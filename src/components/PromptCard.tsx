@@ -3,10 +3,18 @@
 import { useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
+import { Star } from 'lucide-react'
 
 export default function PromptCard({ prompt, forceAspectSquare = false }: { prompt: any, forceAspectSquare?: boolean }) {
     const router = useRouter()
     const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+    let avgRating = 0
+    let reviewCount = 0
+    if (prompt.comments && Array.isArray(prompt.comments) && prompt.comments.length > 0) {
+        reviewCount = prompt.comments.length
+        avgRating = prompt.comments.reduce((acc: number, c: any) => acc + (c.rating || 5), 0) / reviewCount
+    }
 
     const scrollLeft = (e: React.MouseEvent) => {
         e.stopPropagation()
@@ -135,11 +143,20 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
                         {prompt.price ? `$${prompt.price}` : 'Free'}
                     </span>
                 </div>
-                {prompt.profiles?.name && (
-                    <p className="text-sm text-muted-foreground line-clamp-1">
-                        By {prompt.profiles.name}
-                    </p>
-                )}
+                <div className="flex items-center justify-between">
+                    {prompt.profiles?.name && (
+                        <p className="text-sm text-muted-foreground line-clamp-1">
+                            By {prompt.profiles.name}
+                        </p>
+                    )}
+                    {reviewCount > 0 && (
+                        <div className="flex items-center gap-1 text-xs font-medium text-foreground/80">
+                            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                            <span>{avgRating.toFixed(1)}</span>
+                            <span className="text-muted-foreground">({reviewCount})</span>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     )

@@ -61,7 +61,7 @@ export async function signup(formData: FormData) {
     }
 
     revalidatePath('/', 'layout')
-    redirect('/login?message=Check email to continue sign in process')
+    redirect('/login?message=Account created successfully. Please log in to continue.')
 }
 
 export async function signout() {
