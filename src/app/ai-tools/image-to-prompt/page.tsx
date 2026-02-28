@@ -170,7 +170,7 @@ export default function ImageToPromptPage() {
             <div className="w-full max-w-5xl px-5 pt-8 md:pt-16 flex flex-col gap-10">
 
                 {/* Header Section */}
-                <div className="flex flex-col gap-4 text-center items-center relative z-10">
+                <div className="flex flex-col gap-4 text-center items-center">
                     <Badge variant="secondary" className="px-4 py-1.5 bg-primary/10 text-primary border-primary/20 shadow-sm uppercase tracking-widest text-[10px] sm:text-xs">
                         <Wand2 className="w-3.5 h-3.5 mr-2" />
                         Next-Gen Prompt Lab
