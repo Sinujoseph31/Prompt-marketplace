@@ -297,20 +297,21 @@ export default function ReverseEngineerPage() {
                             </div>
                         )}
 
-                        <div className="flex gap-4 w-full">
+                        <div className="grid grid-cols-2 md:flex gap-4 w-full">
                             {previewUrl && !isAnalyzing && (
                                 <>
                                     <Button
                                         variant="outline"
                                         onClick={resetAnalysis}
-                                        className="h-14 flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
+                                        className="h-14 md:flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
                                     >
-                                        <RefreshCw className="w-4 h-4" />
+                                        <RefreshCw className="w-4 h-4 mr-2" />
+                                        <span className="md:hidden">Clear</span>
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => setCropModalOpen(true)}
-                                        className="h-14 flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
+                                        className="h-14 md:flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
                                     >
                                         <CropIcon className="w-4 h-4 mr-2" />
                                         Crop
@@ -320,7 +321,7 @@ export default function ReverseEngineerPage() {
                             <Button
                                 onClick={handleAnalyze}
                                 disabled={!file || isAnalyzing}
-                                className={`h-14 font-black text-lg uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'flex-[3]' : 'w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
+                                className={`h-14 font-black text-lg uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'col-span-2 md:flex-[3]' : 'col-span-2 md:w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
                             >
                                 {isAnalyzing ? 'Analyzing...' : 'Reverse Engineer'}
                             </Button>
