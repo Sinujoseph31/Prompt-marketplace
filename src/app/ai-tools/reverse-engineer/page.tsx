@@ -3,7 +3,16 @@
 import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint } from 'lucide-react'
+import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint, Crop as CropIcon } from 'lucide-react'
+import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
+import 'react-image-crop/dist/ReactCrop.css'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog"
 
 type ReconstructionResult = {
     reconstructed_prompt: string;
@@ -21,6 +30,12 @@ export default function ReverseEngineerPage() {
     const [result, setResult] = useState<ReconstructionResult | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
+
+    // Cropping State
+    const [cropModalOpen, setCropModalOpen] = useState(false)
+    const [crop, setCrop] = useState<Crop>()
+    const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null)
+    const imgRef = useRef<HTMLImageElement>(null)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -40,7 +55,87 @@ export default function ReverseEngineerPage() {
         setPreviewUrl(URL.createObjectURL(selectedFile))
         setError(null)
         setResult(null)
+
+        // Reset cropper state and open modal
+        setCrop(undefined)
+        setCompletedCrop(null)
+        setCropModalOpen(true)
     }, [])
+
+    function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+        const { width, height } = e.currentTarget
+        const initialCrop = centerCrop(
+            makeAspectCrop(
+                {
+                    unit: '%',
+                    width: 70,
+                },
+                1,
+                width,
+                height
+            ),
+            width,
+            height
+        )
+        setCrop(initialCrop)
+    }
+
+    const handleCropComplete = async () => {
+        if (!completedCrop || !imgRef.current || !previewUrl) {
+            setCropModalOpen(false)
+            return
+        }
+
+        try {
+            const image = imgRef.current
+            const canvas = document.createElement('canvas')
+            const scaleX = image.naturalWidth / image.width
+            const scaleY = image.naturalHeight / image.height
+            const ctx = canvas.getContext('2d')
+
+            if (!ctx) {
+                throw new Error('No 2d context')
+            }
+
+            const pixelRatio = window.devicePixelRatio
+            canvas.width = Math.floor(completedCrop.width * scaleX * pixelRatio)
+            canvas.height = Math.floor(completedCrop.height * scaleY * pixelRatio)
+
+            ctx.scale(pixelRatio, pixelRatio)
+            ctx.imageSmoothingQuality = 'high'
+
+            const cropX = completedCrop.x * scaleX
+            const cropY = completedCrop.y * scaleY
+            const cropWidth = completedCrop.width * scaleX
+            const cropHeight = completedCrop.height * scaleY
+
+            ctx.drawImage(
+                image,
+                cropX,
+                cropY,
+                cropWidth,
+                cropHeight,
+                0,
+                0,
+                cropWidth,
+                cropHeight
+            )
+
+            const blob = await new Promise<Blob | null>((resolve) => {
+                canvas.toBlob((b) => resolve(b), file?.type || 'image/jpeg', 1)
+            })
+
+            if (blob) {
+                const croppedFile = new File([blob], file?.name || 'cropped-image.jpg', { type: file?.type || 'image/jpeg' })
+                setFile(croppedFile)
+                setPreviewUrl(URL.createObjectURL(croppedFile)) // Update preview with new cropped image
+            }
+        } catch (e) {
+            console.error("Failed to crop image", e)
+        }
+
+        setCropModalOpen(false)
+    }
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault()
@@ -204,19 +299,28 @@ export default function ReverseEngineerPage() {
 
                         <div className="flex gap-4 w-full">
                             {previewUrl && !isAnalyzing && (
-                                <Button
-                                    variant="outline"
-                                    onClick={resetAnalysis}
-                                    className="h-14 flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
-                                >
-                                    <RefreshCw className="w-4 h-4 mr-2" />
-                                    Clear
-                                </Button>
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        onClick={resetAnalysis}
+                                        className="h-14 flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
+                                    >
+                                        <RefreshCw className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setCropModalOpen(true)}
+                                        className="h-14 flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
+                                    >
+                                        <CropIcon className="w-4 h-4 mr-2" />
+                                        Crop
+                                    </Button>
+                                </>
                             )}
                             <Button
                                 onClick={handleAnalyze}
                                 disabled={!file || isAnalyzing}
-                                className={`h-14 font-black text-lg uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'flex-[2]' : 'w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
+                                className={`h-14 font-black text-lg uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'flex-[3]' : 'w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
                             >
                                 {isAnalyzing ? 'Analyzing...' : 'Reverse Engineer'}
                             </Button>
@@ -298,6 +402,57 @@ export default function ReverseEngineerPage() {
 
                 </div>
             </div>
+
+            {/* Cropper Modal */}
+            <Dialog open={cropModalOpen} onOpenChange={setCropModalOpen}>
+                <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-800 text-zinc-100 p-4 sm:p-6 rounded-2xl flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="font-mono text-xl uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                            <CropIcon className="w-5 h-5" />
+                            Target Selection
+                        </DialogTitle>
+                        <p className="text-zinc-400 text-sm font-mono mt-2">
+                            Drag to select the specific region of the image you want the AI to analyze. Click "Confirm Cropping" to apply.
+                        </p>
+                    </DialogHeader>
+
+                    <div className="relative w-full overflow-hidden rounded-xl border border-zinc-800 bg-black/50 flex justify-center items-center p-2 sm:p-4 min-h-[300px] flex-1">
+                        {previewUrl && (
+                            <ReactCrop
+                                crop={crop}
+                                onChange={(_, percentCrop) => setCrop(percentCrop)}
+                                onComplete={(c) => setCompletedCrop(c)}
+                                className="flex items-center justify-center max-h-full max-w-full"
+                            >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    ref={imgRef}
+                                    alt="Crop me"
+                                    src={previewUrl}
+                                    onLoad={onImageLoad}
+                                    style={{ maxHeight: '60vh', maxWidth: '100%', objectFit: 'contain' }}
+                                />
+                            </ReactCrop>
+                        )}
+                    </div>
+
+                    <DialogFooter className="mt-6 flex gap-3 sm:gap-0">
+                        <Button
+                            variant="outline"
+                            onClick={() => setCropModalOpen(false)}
+                            className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                        >
+                            Skip Cropping
+                        </Button>
+                        <Button
+                            onClick={handleCropComplete}
+                            className="bg-emerald-500 text-emerald-950 hover:bg-emerald-400 font-bold tracking-wide"
+                        >
+                            Confirm Cropping
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
