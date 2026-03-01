@@ -30,9 +30,9 @@ export default function ReverseEngineerPage() {
             return
         }
 
-        // Check size (e.g. max 5MB)
-        if (selectedFile.size > 5 * 1024 * 1024) {
-            setError("Image size must be less than 5MB.")
+        // Check size (e.g. max 20MB)
+        if (selectedFile.size > 20 * 1024 * 1024) {
+            setError("Image size must be less than 20MB.")
             return
         }
 
@@ -190,7 +190,7 @@ export default function ReverseEngineerPage() {
                                 <div className="flex flex-col items-center justify-center p-8 text-center pointer-events-none">
                                     <UploadCloud className="w-12 h-12 text-zinc-600 mb-4" />
                                     <h3 className="text-xl font-bold text-zinc-300 mb-2 font-mono uppercase">Drop Image Here</h3>
-                                    <p className="text-sm text-zinc-500 max-w-xs leading-relaxed">Supports JPEG, PNG, WEBP up to 5MB. Click to browse files.</p>
+                                    <p className="text-sm text-zinc-500 max-w-xs leading-relaxed">Supports JPEG, PNG, WEBP up to 20MB. Click to browse files.</p>
                                 </div>
                             )}
                         </div>
