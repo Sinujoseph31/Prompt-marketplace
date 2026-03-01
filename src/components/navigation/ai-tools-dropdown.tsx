@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar } from "lucide-react"
+import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -58,20 +58,13 @@ export function AIToolsDropdown() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="font-semibold px-3 hidden sm:flex">
-                    <Sparkles className="w-4 h-4 mr-2 text-primary" />
-                    AI Labs
+                <Button variant="ghost" className="font-semibold px-2 sm:px-3">
+                    <Sparkles className="w-4 h-4 sm:mr-2 text-primary" />
+                    <span className="hidden sm:inline">AI Labs</span>
                 </Button>
             </DropdownMenuTrigger>
 
-            {/* Mobile Trigger Alternative */}
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="sm:hidden text-primary">
-                    <Sparkles className="w-5 h-5" />
-                </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="z-[100] w-[320px] sm:w-[380px] p-2 rounded-2xl shadow-2xl mt-2 border border-border/50 bg-background/95 backdrop-blur-xl">
+            <DropdownMenuContent align="end" alignOffset={-10} className="z-[100] w-[320px] sm:w-[380px] p-2 rounded-2xl shadow-2xl mt-2 border border-border/50 bg-background/95 backdrop-blur-xl">
                 <div className="flex flex-col gap-1 w-full">
                     {tools.map((tool) => (
                         <DropdownMenuItem key={tool.title} asChild className="rounded-xl cursor-pointer p-0 focus:bg-muted/60 transition-all w-full group">
