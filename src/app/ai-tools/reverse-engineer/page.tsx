@@ -86,6 +86,12 @@ export default function ReverseEngineerPage() {
             return
         }
 
+        // Prevent zero-pixel crops which throw DOM exceptions
+        if (completedCrop.width <= 0 || completedCrop.height <= 0) {
+            setCropModalOpen(false)
+            return
+        }
+
         try {
             const image = imgRef.current
             const canvas = document.createElement('canvas')
@@ -97,17 +103,18 @@ export default function ReverseEngineerPage() {
                 throw new Error('No 2d context')
             }
 
-            const pixelRatio = window.devicePixelRatio
-            canvas.width = Math.floor(completedCrop.width * scaleX * pixelRatio)
-            canvas.height = Math.floor(completedCrop.height * scaleY * pixelRatio)
+            const pixelRatio = window.devicePixelRatio || 1
+            const cropWidth = Math.max(1, Math.floor(completedCrop.width * scaleX))
+            const cropHeight = Math.max(1, Math.floor(completedCrop.height * scaleY))
+
+            canvas.width = cropWidth * pixelRatio
+            canvas.height = cropHeight * pixelRatio
 
             ctx.scale(pixelRatio, pixelRatio)
             ctx.imageSmoothingQuality = 'high'
 
             const cropX = completedCrop.x * scaleX
             const cropY = completedCrop.y * scaleY
-            const cropWidth = completedCrop.width * scaleX
-            const cropHeight = completedCrop.height * scaleY
 
             ctx.drawImage(
                 image,
@@ -121,17 +128,37 @@ export default function ReverseEngineerPage() {
                 cropHeight
             )
 
-            const blob = await new Promise<Blob | null>((resolve) => {
-                canvas.toBlob((b) => resolve(b), file?.type || 'image/jpeg', 1)
+            // Force strict JPEG output for max compatibility with Safari and HEIC image uploads from iOS
+            const targetMimeType = 'image/jpeg'
+
+            // Robust cross-browser blob generation
+            let blob = await new Promise<Blob | null>((resolve) => {
+                canvas.toBlob((b) => resolve(b), targetMimeType, 0.95)
             })
 
-            if (blob) {
-                const croppedFile = new File([blob], file?.name || 'cropped-image.jpg', { type: file?.type || 'image/jpeg' })
-                setFile(croppedFile)
-                setPreviewUrl(URL.createObjectURL(croppedFile)) // Update preview with new cropped image
+            // Safari / iOS Fallback
+            if (!blob) {
+                const dataUrl = canvas.toDataURL(targetMimeType, 0.95)
+                if (dataUrl && dataUrl !== 'data:,') {
+                    const res = await fetch(dataUrl)
+                    blob = await res.blob()
+                }
             }
-        } catch (e) {
+
+            if (blob) {
+                const originalName = file?.name || 'cropped-image.jpg'
+                // Replace any bizarre extensions (like .heic) with .jpg since we converted it
+                const safeName = originalName.includes('.') ? originalName.replace(/\.[^/.]+$/, "") + ".jpg" : 'cropped.jpg'
+
+                const croppedFile = new File([blob], safeName, { type: targetMimeType })
+                setFile(croppedFile)
+                setPreviewUrl(URL.createObjectURL(croppedFile))
+            } else {
+                setError("Failed to generate cropped image blob.")
+            }
+        } catch (e: any) {
             console.error("Failed to crop image", e)
+            setError(`Cropping failed: ${e.message || 'Unknown error'}`)
         }
 
         setCropModalOpen(false)
@@ -368,7 +395,7 @@ export default function ReverseEngineerPage() {
                                             <TerminalSquareIcon className="w-4 h-4 mr-2" />
                                             Reconstructed Prompt
                                         </h3>
-                                        <p className="font-serif text-lg md:text-xl leading-relaxed text-zinc-100 selection:bg-emerald-500/40">
+                                        <p className="font-serif text-base sm:text-lg md:text-xl leading-relaxed text-zinc-100 selection:bg-emerald-500/40">
                                             {result.reconstructed_prompt}
                                         </p>
                                     </div>
