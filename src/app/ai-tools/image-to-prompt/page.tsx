@@ -4,6 +4,8 @@ import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 import { Sparkles, UploadCloud, Copy, X, Loader2, ArrowRight, ArrowLeft, Wand2, Eye, Focus, Zap, ImageIcon } from 'lucide-react'
 
 // Trendy & Unique Styles
@@ -39,6 +41,7 @@ export default function ImageToPromptPage() {
     const [selectedStyle, setSelectedStyle] = useState<string>('cinematic')
     const [promptText, setPromptText] = useState('')
     const [imagePreview, setImagePreview] = useState<string | null>(null)
+    const [requiresImageRef, setRequiresImageRef] = useState(false)
 
     // Generation State
     const [isGenerating, setIsGenerating] = useState(false)
@@ -133,7 +136,8 @@ export default function ImageToPromptPage() {
                     text: promptText,
                     style: styleName,
                     imageBase64,
-                    mimeType
+                    mimeType,
+                    requires_image_reference: requiresImageRef
                 })
             })
 
@@ -292,11 +296,24 @@ export default function ImageToPromptPage() {
                     </div>
 
                     {/* Generate Button Wrapper */}
-                    <div className="w-full flex justify-end mt-2 border-t pt-8">
+                    <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-2 border-t pt-8">
+
+                        <div className="flex items-center space-x-3 bg-muted/50 p-3 rounded-xl border border-border w-full sm:w-auto">
+                            <Switch
+                                id="image-ref-mode"
+                                checked={requiresImageRef}
+                                onCheckedChange={setRequiresImageRef}
+                            />
+                            <Label htmlFor="image-ref-mode" className="flex items-center gap-2 cursor-pointer font-medium text-sm">
+                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                I will upload a Face/Struct Reference image later
+                            </Label>
+                        </div>
+
                         <Button
                             onClick={handleGenerate}
                             disabled={isGenerating || (!promptText.trim() && !imagePreview)}
-                            className="rounded-full h-14 px-8 text-base font-bold shadow-xl flex items-center gap-2 transition-all hover:scale-105 w-full md:w-auto overflow-hidden relative"
+                            className="rounded-full h-14 px-8 text-base font-bold shadow-xl flex items-center gap-2 transition-all hover:scale-105 w-full sm:w-auto overflow-hidden relative"
                         >
                             {isGenerating ? (
                                 <>

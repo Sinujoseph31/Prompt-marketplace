@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Sparkles, Loader2, Check } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Sparkles, Loader2, Check, ImageIcon } from 'lucide-react'
 
 export default function AiPromptEnhancer({
     fullPrompt,
@@ -15,6 +16,7 @@ export default function AiPromptEnhancer({
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [requiresImageRef, setRequiresImageRef] = useState(false)
 
     const handleEnhance = async () => {
         if (!fullPrompt.trim()) return;
@@ -27,7 +29,7 @@ export default function AiPromptEnhancer({
             const res = await fetch('/api/enhance-prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: fullPrompt })
+                body: JSON.stringify({ prompt: fullPrompt, requires_image_reference: requiresImageRef })
             });
 
             if (!res.ok) {
@@ -58,13 +60,27 @@ export default function AiPromptEnhancer({
                         Not sure if your prompt is clear enough? Let our AI rewrite and optimize it for better structural clarity.
                     </p>
                 </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 bg-muted/50 p-3 rounded-lg border border-border">
+                <div className="flex flex-1 items-center space-x-3">
+                    <Switch
+                        id="enhance-image-ref"
+                        checked={requiresImageRef}
+                        onCheckedChange={setRequiresImageRef}
+                    />
+                    <Label htmlFor="enhance-image-ref" className="flex items-center gap-2 cursor-pointer font-medium text-xs sm:text-sm">
+                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                        Add "Face/Structure Replacement" instructions
+                    </Label>
+                </div>
                 <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={handleEnhance}
                     disabled={isLoading || !fullPrompt.trim()}
-                    className={isSuccess ? "border-green-500/50 bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-600" : ""}
+                    className={isSuccess ? "border-green-500/50 bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-600 w-full sm:w-auto" : "w-full sm:w-auto"}
                 >
                     {isLoading ? (
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -76,6 +92,7 @@ export default function AiPromptEnhancer({
                     {isSuccess ? 'Optimized!' : 'Enhance Prompt'}
                 </Button>
             </div>
+
             {error && (
                 <div className="text-xs text-destructive mt-1 font-medium bg-destructive/10 p-2 rounded-md">
                     Warning: {error}

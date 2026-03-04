@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         // Using gemini-2.5-flash since 1.5 is deprecated/hidden for this API tier
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
-        const { imageBase64, category } = await req.json()
+        const { imageBase64, category, requires_image_reference } = await req.json()
 
         if (!imageBase64) {
             return new Response(JSON.stringify({ error: 'No image provided' }), { status: 400 })
@@ -34,6 +34,14 @@ export async function POST(req: Request) {
             Each prompt MUST be highly detailed, comma-separated keywords, and optimized for image generators like Midjourney or Stable Diffusion. 
             Styles should include trending aesthetics like: Cinematic, Cyberpunk, Watercolor, 3D Render, Anime/Studio Ghibli, Dark Fantasy, or Minimalist Line Art (unless a specific theme was requested above, in which case prioritize that theme).
             Prefix each prompt with the style name for clarity (e.g., "Style: A detailed...").
+
+            ${requires_image_reference ? `
+            CRITICAL MULTIMODAL INSTRUCTION: The user intends to use these generated prompts by uploading the SAME reference photo into ChatGPT or Gemini to manipulate the subject. 
+            THEREFORE, you MUST literally start EVERY SINGLE generated prompt exactly with this text:
+            "**[ACTION REQUIRED: Upload the reference photo of the subject first]**. Using the attached image as an absolute structural framework, analyze and lock in the exact facial features, proportions, and bone structure tracking. Render the person seamlessly in the following scenario: "
+            
+            ...and then follow it gracefully with the highly detailed prompt focusing on the style, lighting, and scenario requested. Prioritize instructing the AI to preserve facial accuracy above all artistic liberties.`
+                : ''}
 
             Return EXACTLY a valid JSON object with the following structure, and nothing else (no markdown blocks like \`\`\`json):
             {

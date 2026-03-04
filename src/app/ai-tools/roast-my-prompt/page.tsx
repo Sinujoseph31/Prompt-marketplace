@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { Flame, Copy, Loader2, Sparkles, AlertTriangle } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { Flame, Copy, Loader2, Sparkles, AlertTriangle, Image as ImageIcon } from 'lucide-react'
 
 export default function RoastMyPromptPage() {
     const [promptText, setPromptText] = useState('')
@@ -12,6 +14,7 @@ export default function RoastMyPromptPage() {
     const [result, setResult] = useState<{ roast_score: number, savage_roast: string, god_tier_prompt: string } | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
+    const [requiresImageRef, setRequiresImageRef] = useState(false)
 
     const handleRoast = async () => {
         if (!promptText.trim()) return;
@@ -24,7 +27,7 @@ export default function RoastMyPromptPage() {
             const res = await fetch('/api/roast-prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: promptText })
+                body: JSON.stringify({ text: promptText, requires_image_reference: requiresImageRef })
             })
 
             if (!res.ok) {
@@ -87,7 +90,19 @@ export default function RoastMyPromptPage() {
                         className="min-h-[160px] resize-none text-base md:text-lg p-6 rounded-2xl border-2 border-muted bg-background focus-visible:ring-orange-500/20 focus-visible:border-orange-500 transition-colors shadow-inner"
                     />
 
-                    <div className="flex justify-end pt-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2">
+                        <div className="flex items-center space-x-3 bg-muted/50 p-3 rounded-xl border border-border">
+                            <Switch
+                                id="image-ref-mode"
+                                checked={requiresImageRef}
+                                onCheckedChange={setRequiresImageRef}
+                            />
+                            <Label htmlFor="image-ref-mode" className="flex items-center gap-2 cursor-pointer font-medium">
+                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                I will upload a Face/Struct Reference image later
+                            </Label>
+                        </div>
+
                         <Button
                             onClick={handleRoast}
                             disabled={isGenerating || !promptText.trim()}
