@@ -3,6 +3,7 @@ import PromptCard from '@/components/PromptCard'
 import CategoryPillsRow from '@/components/CategoryPillsRow'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import GoogleAd from '@/components/GoogleAd'
 
 const CATEGORIES: Record<string, string[]> = {
     'Models': ['ChatGPT Prompts', 'Claude Prompts', 'Gemini Prompts', 'DeepSeek Prompts', 'MidJourney Prompts', 'DALL‑E Prompts', 'Stable Diffusion Prompts', 'Other AI Models'],
@@ -134,6 +135,11 @@ export default async function SearchPage({
                             ))}
                         </div>
                     )}
+                </div>
+
+                {/* Mid-Page Ad Unit */}
+                <div className="w-full">
+                    <GoogleAd slot="search-mid" />
                 </div>
 
                 {/* Section 2: Related Prompts */}

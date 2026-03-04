@@ -5,6 +5,7 @@ import RevealPrompt from '@/components/RevealPrompt'
 import ImageGallery from '@/components/ImageGallery'
 import PromptCard from '@/components/PromptCard'
 import Comments from '@/components/Comments'
+import GoogleAd from '@/components/GoogleAd'
 
 export default async function PromptDetailPage({
     params,
@@ -143,6 +144,11 @@ export default async function PromptDetailPage({
                                     </div>
                                     <span>by <span className="font-semibold text-foreground">{prompt.profiles?.name || 'Unknown Seller'}</span></span>
                                 </div>
+                            </div>
+
+                            {/* Sticky Sidebar Ad Unit */}
+                            <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
+                                <GoogleAd slot="prompt-detail-sidebar" />
                             </div>
 
                             {/* Price & Action */}

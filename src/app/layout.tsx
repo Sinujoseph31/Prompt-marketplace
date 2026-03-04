@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,6 +31,14 @@ export default function RootLayout({
             {children}
           </main>
         </ThemeProvider>
+
+        {/* Google AdSense Global Script */}
+        <Script
+          id="google-adsense"
+          strategy="afterInteractive"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID}`}
+          crossOrigin="anonymous"
+        />
       </body>
     </html>
   )

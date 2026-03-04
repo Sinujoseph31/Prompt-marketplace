@@ -5,6 +5,7 @@ import AiModelBundles from '@/components/AiModelBundles'
 import CategoryPillsRow from '@/components/CategoryPillsRow'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import GoogleAd from '@/components/GoogleAd'
 
 export default async function Index() {
   const supabase = await createClient()
@@ -36,6 +37,11 @@ export default async function Index() {
           Discover, buy, and sell top-quality prompts for Midjourney, ChatGPT, DALL-E, and more.
         </p>
       </section>
+
+      {/* Primary Homepage Ad */}
+      <div className="w-full max-w-7xl px-5 mb-8">
+        <GoogleAd slot="homepage-top" className="min-h-[100px]" />
+      </div>
 
       {/* Popular Prompts Carousel */}
       {popularPrompts && popularPrompts.length > 0 && (
