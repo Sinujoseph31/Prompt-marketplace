@@ -146,11 +146,6 @@ export default async function PromptDetailPage({
                                 </div>
                             </div>
 
-                            {/* Sticky Sidebar Ad Unit */}
-                            <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
-                                <GoogleAd slot="prompt-detail-sidebar" />
-                            </div>
-
                             {/* Price & Action */}
                             <div className="flex flex-col gap-4 p-6 border rounded-2xl bg-card shadow-sm">
                                 <div className="flex items-baseline gap-2">
@@ -161,6 +156,11 @@ export default async function PromptDetailPage({
                                 <p className="text-xs text-center text-muted-foreground mt-2">
                                     Secure transaction handled by PromptWithSinu.
                                 </p>
+                            </div>
+
+                            {/* Sticky Sidebar Ad Unit - Moved below action block for better mobile flow */}
+                            <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
+                                <GoogleAd slot="prompt-detail-sidebar" />
                             </div>
 
                             {/* Owner Actions */}
