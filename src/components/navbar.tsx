@@ -47,7 +47,7 @@ export default async function Navbar() {
                     <Link href="/ai-tools/reverse-engineer" className="inline-flex shrink-0">
                         <Button variant="ghost" size="sm" className="font-bold text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-500/10 transition-colors gap-1 sm:gap-2 px-2 sm:px-3">
                             <ScanSearch className="w-4 h-4" />
-                            <span>Reverse Engineer</span>
+                            <span className="hidden sm:inline">Reverse Engineer</span>
                         </Button>
                     </Link>
 
