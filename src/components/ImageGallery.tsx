@@ -1,9 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function ImageGallery({ images, video, title }: { images: string[], video?: string | null, title: string }) {
     const [activeIndex, setActiveIndex] = useState(0)
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollContainerRef.current) {
+            const container = scrollContainerRef.current
+            const scrollAmount = container.clientWidth
+            container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
+        }
+    }
 
     const mediaList = []
     if (video) {
@@ -24,10 +34,16 @@ export default function ImageGallery({ images, video, title }: { images: string[
     return (
         <div className="flex flex-col gap-4">
             {/* Main Hero Media - Horizontally scrollable on mobile, single active item on desktop */}
-            <div className="relative w-full group">
-                <div className="w-full bg-muted rounded-xl overflow-x-auto snap-x snap-mandatory flex [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border border-border/50 shadow-sm">
+            <div className="relative w-full flex justify-center group">
+                {mediaList.length > 1 && (
+                    <button onClick={() => scroll('left')} className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-black/50 text-white rounded-full backdrop-blur-sm shadow-md">
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+                )}
+
+                <div ref={scrollContainerRef} className="w-full md:w-fit max-w-full rounded-xl overflow-x-auto snap-x snap-mandatory flex [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border border-border/50 shadow-sm relative bg-muted/20 md:bg-transparent">
                     {mediaList.map((media, idx) => (
-                        <div key={idx} className={`w-full shrink-0 snap-center transition-opacity duration-300 flex items-center justify-center bg-black/5 ${activeIndex === idx ? 'block' : 'block md:hidden'}`}>
+                        <div key={idx} className={`w-full md:w-fit shrink-0 snap-center transition-opacity duration-300 flex items-center justify-center bg-black/5 dark:bg-black/20 md:bg-transparent ${activeIndex === idx ? 'block' : 'block md:hidden'}`}>
                             {media.type === 'video' ? (
                                 <video
                                     src={media.url}
@@ -36,23 +52,29 @@ export default function ImageGallery({ images, video, title }: { images: string[
                                     loop
                                     muted
                                     playsInline
-                                    className="w-full bg-black aspect-[4/3] md:aspect-[16/10] object-contain rounded-xl"
+                                    className="w-full md:w-auto aspect-square md:aspect-auto h-auto md:max-h-[75vh] object-contain rounded-xl bg-black"
                                 />
                             ) : (
                                 <img
                                     src={media.url}
                                     alt={`${title} - Preview ${idx + 1}`}
-                                    className="w-full aspect-square md:aspect-[16/10] object-cover rounded-xl"
+                                    className="w-full md:w-auto aspect-square md:aspect-auto h-auto md:max-h-[80vh] object-cover md:object-contain rounded-xl"
                                 />
                             )}
                         </div>
                     ))}
                 </div>
 
+                {mediaList.length > 1 && (
+                    <button onClick={() => scroll('right')} className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 bg-black/50 text-white rounded-full backdrop-blur-sm shadow-md animate-pulse">
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
+                )}
+
                 {/* Mobile scroll indicator */}
                 {mediaList.length > 1 && (
-                    <div className="md:hidden absolute bottom-4 right-4 bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full backdrop-blur-md shadow-sm pointer-events-none z-10">
-                        {mediaList.length} Media
+                    <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm pointer-events-none z-10 whitespace-nowrap">
+                        Swipe ({mediaList.length} Media)
                     </div>
                 )}
             </div>

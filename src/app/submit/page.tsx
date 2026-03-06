@@ -1,8 +1,8 @@
 'use client'
 
 import { createClient } from '@/utils/supabase/client'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +13,17 @@ import ImageUploadField from '@/components/ImageUploadField'
 import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
 import AiPromptEnhancer from '@/components/AiPromptEnhancer'
+
+function FormMessages() {
+    const searchParams = useSearchParams()
+    const message = searchParams.get('message')
+    if (!message) return null
+    return (
+        <div className="p-4 bg-destructive/15 text-destructive border border-destructive/30 rounded-lg text-sm font-medium animate-in fade-in zoom-in-95 duration-300">
+            {message}
+        </div>
+    )
+}
 
 export default function SubmitPage() {
     const supabase = createClient()
@@ -47,6 +58,10 @@ export default function SubmitPage() {
             </div>
 
             <form action={submitPrompt} className="flex flex-col gap-6">
+                <Suspense fallback={null}>
+                    <FormMessages />
+                </Suspense>
+
                 <div className="grid gap-2">
                     <Label htmlFor="title">Title</Label>
                     <Input id="title" name="title" required placeholder="e.g. Masterful Blog Post Creator" />

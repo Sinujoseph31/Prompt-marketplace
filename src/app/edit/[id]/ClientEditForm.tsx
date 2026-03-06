@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,11 +12,26 @@ import ModelCategorySelector from '@/components/ModelCategorySelector'
 import AiPromptEnhancer from '@/components/AiPromptEnhancer'
 import { updatePrompt } from '@/app/actions/prompts'
 
+function FormMessages() {
+    const searchParams = useSearchParams()
+    const message = searchParams.get('message')
+    if (!message) return null
+    return (
+        <div className="p-4 bg-destructive/15 text-destructive border border-destructive/30 rounded-lg text-sm font-medium animate-in fade-in zoom-in-95 duration-300">
+            {message}
+        </div>
+    )
+}
+
 export default function ClientEditForm({ prompt }: { prompt: any }) {
     const [fullPrompt, setFullPrompt] = useState(prompt.full_prompt)
 
     return (
         <form action={updatePrompt} className="flex flex-col gap-6">
+            <Suspense fallback={null}>
+                <FormMessages />
+            </Suspense>
+
             <input type="hidden" name="prompt_id" value={prompt.id} />
 
             <div className="grid gap-2">

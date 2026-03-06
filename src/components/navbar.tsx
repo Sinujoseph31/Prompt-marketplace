@@ -40,43 +40,43 @@ export default async function Navbar() {
                     <SearchBar />
                 </div>
 
-                {/* Right Actions */}
-                <div className="flex items-center gap-1 sm:gap-4 shrink-0">
+                {/* Right Actions - Horizontally scrollable on mobile to prevent full page overflow */}
+                <div className="flex items-center gap-2 sm:gap-4 shrink-0 overflow-x-auto no-scrollbar py-1 pr-2 max-w-[60vw] md:max-w-none">
                     <AIToolsDropdown />
 
-                    <Link href="/ai-tools/reverse-engineer" className="inline-flex">
+                    <Link href="/ai-tools/reverse-engineer" className="inline-flex shrink-0">
                         <Button variant="ghost" size="sm" className="font-bold text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-500/10 transition-colors gap-1 sm:gap-2 px-2 sm:px-3">
                             <ScanSearch className="w-4 h-4" />
-                            <span className="hidden md:inline">Reverse Engineer</span>
+                            <span>Reverse Engineer</span>
                         </Button>
                     </Link>
 
-                    <Link href="/arena" className="inline-flex">
+                    <Link href="/arena" className="inline-flex shrink-0">
                         <Button variant="ghost" size="sm" className="font-bold text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 hover:bg-yellow-500/10 transition-colors gap-1 sm:gap-2 px-2 sm:px-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>
-                            <span className="hidden md:inline">Arena</span>
+                            <span>Arena</span>
                         </Button>
                     </Link>
 
                     {user ? (
-                        <div className="flex items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                             {profile?.role === 'admin' && (
-                                <Link href="/admin">
-                                    <Button variant="ghost" size="sm" className="hidden sm:inline-flex">Admin</Button>
+                                <Link href="/admin" className="shrink-0">
+                                    <Button variant="ghost" size="sm">Admin</Button>
                                 </Link>
                             )}
 
-                            <Link href="/submit">
-                                <Button className="rounded-full shadow-sm px-3 md:px-4 flex items-center gap-1" size="sm">
+                            <Link href="/submit" className="shrink-0">
+                                <Button className="rounded-full shadow-sm px-3 md:px-4 flex items-center gap-1 shrink-0" size="sm">
                                     <svg className="w-4 h-4 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                                    <span className="hidden md:inline">Create Prompt</span>
+                                    <span>Create Prompt</span>
                                 </Button>
                             </Link>
 
-                            <form action={signout}>
-                                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2" aria-label="Log out">
+                            <form action={signout} className="shrink-0 flex">
+                                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2 flex shrink-0 gap-1 items-center" aria-label="Log out">
                                     <svg className="w-4 h-4 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                                    <span className="hidden md:inline">Log out</span>
+                                    <span>Log out</span>
                                 </Button>
                             </form>
                         </div>

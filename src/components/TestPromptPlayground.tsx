@@ -14,6 +14,9 @@ export default function TestPromptPlayground({ fullPrompt, category }: { fullPro
 
     const isImageModel = category === 'DALL‑E Prompts' || category === 'MidJourney Prompts' || category === 'Stable Diffusion Prompts' || category?.includes('Art') || category?.includes('Photography') || category?.includes('Graphics') || category?.includes('Logos');
 
+    // Default to the working models
+    const [modelTarget, setModelTarget] = useState<string>(isImageModel ? 'huggingface' : 'gemini')
+
     const handleTest = async () => {
         if (!testPrompt.trim()) return;
 
@@ -23,8 +26,8 @@ export default function TestPromptPlayground({ fullPrompt, category }: { fullPro
 
         try {
             if (isImageModel) {
-                // Use Together AI route for image generation preview
-                const params = new URLSearchParams({ prompt: testPrompt });
+                // Pass the model parameter to the image generation route
+                const params = new URLSearchParams({ prompt: testPrompt, model: modelTarget });
                 const res = await fetch(`/api/generate-image?${params.toString()}`);
 
                 if (!res.ok) {
@@ -37,11 +40,11 @@ export default function TestPromptPlayground({ fullPrompt, category }: { fullPro
                 const objUrl = URL.createObjectURL(blob);
                 setResult(objUrl);
             } else {
-                // Use Gemini via a new API route for text generation preview
+                // Pass the model parameter to the text generation route
                 const res = await fetch('/api/test-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: testPrompt })
+                    body: JSON.stringify({ prompt: testPrompt, model: modelTarget })
                 });
 
                 if (!res.ok) {
@@ -61,14 +64,34 @@ export default function TestPromptPlayground({ fullPrompt, category }: { fullPro
 
     return (
         <div className="flex flex-col gap-4 mt-6 border rounded-xl overflow-hidden bg-card shadow-sm">
-            <div className="bg-muted/50 p-4 border-b flex items-center justify-between">
+            <div className="bg-muted/50 p-4 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-primary" />
                     <h3 className="font-semibold text-foreground">Playground: Test it Live</h3>
+                    <Badge variant={isImageModel ? "secondary" : "outline"} className="text-xs ml-2">
+                        {isImageModel ? 'Image Preview' : 'Text Preview'}
+                    </Badge>
                 </div>
-                <Badge variant={isImageModel ? "secondary" : "outline"} className="text-xs">
-                    {isImageModel ? 'Image Preview (FLUX)' : 'Text Preview (Gemini)'}
-                </Badge>
+                <div className="flex items-center gap-2 text-sm bg-background border px-3 py-1.5 rounded-md w-full sm:w-auto">
+                    <span className="text-muted-foreground whitespace-nowrap font-medium text-xs uppercase tracking-wider">Run with:</span>
+                    <select
+                        value={modelTarget}
+                        onChange={(e) => setModelTarget(e.target.value)}
+                        className="bg-transparent text-foreground font-semibold outline-none focus:ring-0 cursor-pointer text-sm w-full"
+                    >
+                        {isImageModel ? (
+                            <>
+                                <option value="huggingface">SDXL 1.0 (Stable Diffusion)</option>
+                                <option value="together">FLUX (Together AI)</option>
+                            </>
+                        ) : (
+                            <>
+                                <option value="gemini">Gemini 2.5 Flash</option>
+                                <option value="chatgpt">ChatGPT (GPT-4o)</option>
+                            </>
+                        )}
+                    </select>
+                </div>
             </div>
 
             <div className="p-4 flex flex-col gap-4">

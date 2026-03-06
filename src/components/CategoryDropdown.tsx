@@ -67,8 +67,7 @@ export default function CategoryDropdown() {
             </Button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[calc(100vw-40px)] md:w-[650px] max-w-[650px] bg-background border rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-2 duration-200 select-none">
-
+                <div className="fixed top-[64px] left-4 right-4 md:absolute md:top-full md:left-0 md:right-auto mt-2 md:w-[650px] md:max-w-[650px] z-50 bg-background border rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row animate-in fade-in slide-in-from-top-2 duration-200 select-none">
                     {/* Left Sidebar: Main Categories */}
                     <div className="w-full md:w-2/5 bg-muted/30 border-b md:border-b-0 md:border-r p-2 flex flex-col gap-1 max-h-[40vh] md:max-h-none overflow-y-auto">
                         <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">

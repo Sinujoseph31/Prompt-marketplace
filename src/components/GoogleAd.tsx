@@ -18,14 +18,42 @@ export default function GoogleAd({
     const adRef = useRef<HTMLModElement>(null)
 
     useEffect(() => {
-        try {
-            // Push the ad only if it hasn't been pushed yet (prevents dev double-render issues)
-            if (adRef.current && !adRef.current.hasAttribute('data-ad-status')) {
-                // @ts-ignore
-                (window.adsbygoogle = window.adsbygoogle || []).push({})
+        let isMounted = true;
+        let observer: ResizeObserver | null = null;
+        let adPushed = false;
+
+        const initAd = () => {
+            try {
+                if (isMounted && adRef.current && !adPushed) {
+                    // AdSense crashes if it tries to render in a 0-width container
+                    if (adRef.current.clientWidth > 0) {
+                        // Prevent pushing to an already populated ad slot
+                        if (adRef.current.innerHTML === '') {
+                            // @ts-ignore
+                            (window.adsbygoogle = window.adsbygoogle || []).push({})
+                            adPushed = true;
+                        }
+                    }
+                }
+            } catch (error: any) {
+                // Ignore the known "All 'ins' elements... have ads in them" error
+                if (!error.message?.includes('already have ads')) {
+                    console.error('Google Adsense Error:', error)
+                }
             }
-        } catch (error) {
-            console.error('Google Adsense Error:', error)
+        }
+
+        // Wait for the container to actually have layout width before injecting
+        if (adRef.current) {
+            observer = new ResizeObserver(() => {
+                if (!adPushed) initAd();
+            });
+            observer.observe(adRef.current);
+        }
+
+        return () => {
+            isMounted = false;
+            if (observer) observer.disconnect();
         }
     }, [])
 
