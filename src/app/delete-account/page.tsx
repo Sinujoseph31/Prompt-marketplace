@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import DeleteAccountClient from './DeleteAccountClient'
 
 export const metadata: Metadata = {
     title: 'Delete Account | Prompt4life',
@@ -26,9 +27,9 @@ export default function DeleteAccount() {
                         </ul>
                     </div>
 
-                    <h3>How to request deletion:</h3>
+                    <h3>How to request deletion manually:</h3>
                     <p>
-                        To verify your identity and ensure the security of your account, deletion requests must be sent from the email address associated with your Prompt4life account.
+                        If you are unable to log in to your account, deletion requests must be sent from the email address associated with your Prompt4life account.
                     </p>
 
                     <div className="bg-muted rounded-lg p-5 flex flex-col items-center text-center mt-6">
@@ -43,6 +44,8 @@ export default function DeleteAccount() {
                             Please include "Account Deletion Request" in the subject line. We process all deletion requests within 7-14 business days.
                         </p>
                     </div>
+
+                    <DeleteAccountClient />
                 </div>
             </div>
         </div>
