@@ -66,10 +66,10 @@ export default function DeleteAccountClient() {
                     Alternatively, send an email to our support team:
                 </p>
                 <a 
-                    href="mailto:support@prompt4life.com?subject=Account Deletion Request&body=Please delete my account and all associated data. My registered email address is: [Insert your email here]" 
+                    href="mailto:promptwithsinu@gmail.com?subject=Account Deletion Request&body=Please delete my account and all associated data. My registered email address is: [Insert your email here]" 
                     className="text-lg font-bold text-primary hover:underline"
                 >
-                    support@prompt4life.com
+                    promptwithsinu@gmail.com
                 </a>
             </div>
         )

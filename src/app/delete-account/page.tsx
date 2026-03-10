@@ -35,10 +35,10 @@ export default function DeleteAccount() {
                     <div className="bg-muted rounded-lg p-5 flex flex-col items-center text-center mt-6">
                         <p className="font-medium mb-2">Please send an email to our support team:</p>
                         <a 
-                            href="mailto:support@prompt4life.com?subject=Account Deletion Request&body=Please delete my account and all associated data. My registered email address is: [Insert your email here]" 
+                            href="mailto:promptwithsinu@gmail.com?subject=Account Deletion Request&body=Please delete my account and all associated data. My registered email address is: [Insert your email here]" 
                             className="text-lg font-bold text-primary hover:underline"
                         >
-                            support@prompt4life.com
+                            promptwithsinu@gmail.com
                         </a>
                         <p className="text-xs text-muted-foreground mt-4">
                             Please include "Account Deletion Request" in the subject line. We process all deletion requests within 7-14 business days.
