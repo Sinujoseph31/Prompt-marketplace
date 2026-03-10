@@ -5,8 +5,12 @@ const config: CapacitorConfig = {
   appName: 'Prompt4life',
   webDir: 'out',
   server: {
-    url: 'https://prompt-marketplace-d4txkenhh-merleesys-projects.vercel.app',
-    cleartext: true
+    url: 'https://prompt-marketplace-kohl.vercel.app',
+    cleartext: true,
+    allowNavigation: [
+      "*.vercel.app",
+      "*.supabase.co"
+    ]
   }
 };
 
