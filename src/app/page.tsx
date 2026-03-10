@@ -38,15 +38,16 @@ export default async function Index() {
         </p>
       </section>
 
-      {/* Primary Homepage Ad */}
-      <div className="w-full max-w-7xl px-5 mb-8">
-        <GoogleAd slot="homepage-top" className="min-h-[100px]" />
-      </div>
 
       {/* Popular Prompts Carousel */}
       {popularPrompts && popularPrompts.length > 0 && (
         <PopularPromptsCarousel title="Popular Prompts" prompts={popularPrompts} />
       )}
+
+      {/* Primary Homepage Ad — below Popular Prompts */}
+      <div className="w-full max-w-7xl px-5 mb-8">
+        <GoogleAd slot="homepage-top" className="min-h-[100px]" />
+      </div>
 
       {/* AI Model Bundles */}
       <AiModelBundles />

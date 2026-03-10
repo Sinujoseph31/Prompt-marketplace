@@ -8,6 +8,7 @@ import CategoryDropdown from '@/components/CategoryDropdown'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { AIToolsDropdown } from '@/components/navigation/ai-tools-dropdown'
 import { ScanSearch } from 'lucide-react'
+import MobileMenu from '@/components/MobileMenu'
 
 export default async function Navbar() {
     const supabase = await createClient()
@@ -42,59 +43,73 @@ export default async function Navbar() {
                     <SearchBar />
                 </div>
 
-                {/* Right Actions - Horizontally scrollable on mobile to prevent full page overflow */}
-                <div className="flex items-center gap-2 sm:gap-4 shrink-0 overflow-x-auto no-scrollbar py-1 pr-2 max-w-[60vw] md:max-w-none">
-                    <AIToolsDropdown />
+                {/* Right Actions - desktop only scrollable icon buttons */}
+                <div className="flex items-center gap-2 shrink-0">
 
-                    <Link href="/ai-tools/reverse-engineer" className="inline-flex shrink-0">
-                        <Button variant="ghost" size="sm" className="font-bold text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-500/10 transition-colors gap-1 sm:gap-2 px-2 sm:px-3">
-                            <ScanSearch className="w-4 h-4" />
-                            <span className="hidden sm:inline">Reverse Engineer</span>
-                        </Button>
-                    </Link>
+                    {/* Desktop-only nav links (hidden on mobile) */}
+                    <div className="hidden md:flex items-center gap-2">
+                        <AIToolsDropdown />
 
-                    <Link href="/arena" className="inline-flex shrink-0">
-                        <Button variant="ghost" size="sm" className="font-bold text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 hover:bg-yellow-500/10 transition-colors gap-1 sm:gap-2 px-2 sm:px-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>
-                            <span>Arena</span>
-                        </Button>
-                    </Link>
+                        <Link href="/ai-tools/reverse-engineer" className="inline-flex shrink-0">
+                            <Button variant="ghost" size="sm" className="font-bold text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-500/10 transition-colors gap-2 px-3">
+                                <ScanSearch className="w-4 h-4" />
+                                <span>Reverse Engineer</span>
+                            </Button>
+                        </Link>
 
-                    {user ? (
-                        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-                            {profile?.role === 'admin' && (
-                                <Link href="/admin" className="shrink-0">
-                                    <Button variant="ghost" size="sm">Admin</Button>
+                        <Link href="/arena" className="inline-flex shrink-0">
+                            <Button variant="ghost" size="sm" className="font-bold text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 hover:bg-yellow-500/10 transition-colors gap-2 px-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>
+                                <span>Arena</span>
+                            </Button>
+                        </Link>
+
+                        {user ? (
+                            <div className="flex items-center gap-2">
+                                {profile?.role === 'admin' && (
+                                    <Link href="/admin">
+                                        <Button variant="ghost" size="sm">Admin</Button>
+                                    </Link>
+                                )}
+                                <Link href="/submit">
+                                    <Button className="rounded-full shadow-sm px-4" size="sm">Create Prompt</Button>
                                 </Link>
-                            )}
+                                <form action={signout} className="flex">
+                                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2" aria-label="Log out">
+                                        Log out
+                                    </Button>
+                                </form>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <Link href="/login">
+                                    <Button variant="ghost" size="sm" className="px-3">Log in</Button>
+                                </Link>
+                                <Link href="/signup">
+                                    <Button size="sm" className="rounded-full shadow-sm px-4">Sign Up</Button>
+                                </Link>
+                            </div>
+                        )}
+                    </div>
 
-                            <Link href="/submit" className="shrink-0">
-                                <Button className="rounded-full shadow-sm px-3 md:px-4 flex items-center gap-1 shrink-0" size="sm">
-                                    <svg className="w-4 h-4 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                                    <span>Create Prompt</span>
-                                </Button>
-                            </Link>
-
-                            <form action={signout} className="shrink-0 flex">
-                                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2 flex shrink-0 gap-1 items-center" aria-label="Log out">
-                                    <svg className="w-4 h-4 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                                    <span>Log out</span>
-                                </Button>
-                            </form>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-1 sm:gap-2">
-                            <Link href="/login">
-                                <Button variant="ghost" size="sm" className="px-2 sm:px-3">Log in</Button>
-                            </Link>
-                            <Link href="/signup">
-                                <Button size="sm" className="rounded-full shadow-sm px-3 sm:px-4">Sign Up</Button>
-                            </Link>
-                        </div>
-                    )}
+                    {/* Theme toggle always visible */}
                     <ThemeToggle />
+
+                    {/* Mobile-only: Log in/Sign Up compact + Hamburger */}
+                    <div className="flex md:hidden items-center gap-1">
+                        {!user && (
+                            <Link href="/login">
+                                <Button variant="ghost" size="sm" className="px-2 text-sm">Log in</Button>
+                            </Link>
+                        )}
+                        <MobileMenu
+                            isLoggedIn={!!user}
+                            isAdmin={profile?.role === 'admin'}
+                            signoutAction={signout}
+                        />
+                    </div>
                 </div>
             </div>
-        </nav >
+        </nav>
     )
 }
