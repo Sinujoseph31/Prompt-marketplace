@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/server'
 import { signout } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
@@ -27,7 +28,8 @@ export default async function Navbar() {
                 {/* Logo & Dropdown */}
                 <div className="flex items-center gap-2">
                     <Link href="/" className="font-bold text-lg md:text-xl flex items-center gap-2">
-                        <span className="tracking-tight">PromptWithSinu</span>
+                        <Image src="/logo.png" alt="Prompt4life Logo" width={32} height={32} className="rounded-xl shadow-sm" priority />
+                        <span className="tracking-tight hidden sm:inline-block">Prompt4life</span>
                         {profile?.role === 'admin' && (
                             <span className="text-[10px] uppercase font-bold tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm hidden sm:inline-block">Admin</span>
                         )}

@@ -1,4 +1,4 @@
-# PromptWithSinu - AI Prompt Marketplace
+# Prompt4life
 
 A full-stack, responsive AI Prompt Marketplace built with Next.js 15 (App Router), Tailwind CSS, and Supabase.
 

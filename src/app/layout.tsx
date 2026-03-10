@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 import './globals.css'
 import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -8,7 +9,7 @@ import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Prompt Marketplace',
+  title: 'Prompt4life',
   description: 'AI Prompt Marketplace',
 }
 
@@ -30,6 +31,13 @@ export default function RootLayout({
           <main className="min-h-screen bg-background flex flex-col items-center">
             {children}
           </main>
+          
+          <footer className="w-full py-6 text-center text-sm text-muted-foreground border-t">
+            <div className="flex items-center justify-center gap-4">
+              <Link href="/privacy" className="hover:underline hover:text-foreground transition-colors">Privacy Policy</Link>
+              <span>&copy; {new Date().getFullYear()} Prompt4life. All rights reserved.</span>
+            </div>
+          </footer>
         </ThemeProvider>
 
         {/* Google AdSense Global Script */}

@@ -154,7 +154,7 @@ export default async function PromptDetailPage({
                                 </div>
                                 <RevealPrompt fullPrompt={prompt.full_prompt} category={prompt.category} />
                                 <p className="text-xs text-center text-muted-foreground mt-2">
-                                    Secure transaction handled by PromptWithSinu.
+                                    Secure transaction handled by Prompt4life.
                                 </p>
                             </div>
 

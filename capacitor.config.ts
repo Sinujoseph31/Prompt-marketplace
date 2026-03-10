@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.promptmarketplace.app',
-  appName: 'Prompt Marketplace',
+  appName: 'Prompt4life',
   webDir: 'out',
   server: {
     url: 'https://prompt-marketplace-d4txkenhh-merleesys-projects.vercel.app',
