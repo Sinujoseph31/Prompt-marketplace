@@ -33,9 +33,10 @@ export default function RootLayout({
           </main>
           
           <footer className="w-full py-6 text-center text-sm text-muted-foreground border-t">
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/privacy" className="hover:underline hover:text-foreground transition-colors">Privacy Policy</Link>
-              <span>&copy; {new Date().getFullYear()} Prompt4life. All rights reserved.</span>
+              <Link href="/delete-account" className="hover:underline hover:text-foreground transition-colors">Delete Account</Link>
+              <span className="w-full sm:w-auto mt-2 sm:mt-0">&copy; {new Date().getFullYear()} Prompt4life. All rights reserved.</span>
             </div>
           </footer>
         </ThemeProvider>
