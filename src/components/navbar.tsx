@@ -3,11 +3,17 @@ import Image from 'next/image'
 import { createClient } from '@/utils/supabase/server'
 import { signout } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import SearchBar from '@/components/SearchBar'
 import CategoryDropdown from '@/components/CategoryDropdown'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { AIToolsDropdown } from '@/components/navigation/ai-tools-dropdown'
-import { ScanSearch } from 'lucide-react'
+import { ScanSearch, PlusCircle, Settings, User as UserIcon, Shield, Store } from 'lucide-react'
 import MobileMenu from '@/components/MobileMenu'
 
 export default async function Navbar() {
@@ -29,7 +35,7 @@ export default async function Navbar() {
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
             <div className="w-full max-w-7xl mx-auto flex items-center justify-between h-16 px-5">
-                {/* Logo & Dropdown */}
+                {/* Logo & Category Dropdown */}
                 <div className="flex items-center gap-2">
                     <Link href="/" className="font-bold text-lg md:text-xl flex items-center gap-2">
                         <Image src="/logo.png" alt="Prompt4life Logo" width={32} height={32} className="rounded-xl shadow-sm" priority />
@@ -38,7 +44,14 @@ export default async function Navbar() {
                             <span className="text-[10px] uppercase font-bold tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm hidden sm:inline-block">Admin</span>
                         )}
                     </Link>
-                    <CategoryDropdown />
+                    <div className="md:hidden">
+                        <div className="flex items-center h-8 bg-muted/50 hover:bg-muted border rounded-md transition-colors">
+                            <CategoryDropdown />
+                        </div>
+                    </div>
+                    <div className="hidden md:block">
+                        <CategoryDropdown />
+                    </div>
                 </div>
 
                 {/* Centered Search Bar */}
@@ -68,20 +81,79 @@ export default async function Navbar() {
                         </Link>
 
                         {user ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 md:gap-2 mr-2">
                                 {profile?.role === 'admin' && (
-                                    <Link href="/admin">
-                                        <Button variant="ghost" size="sm">Admin</Button>
-                                    </Link>
+                                    <div className="relative group flex items-center">
+                                        <Link href="/admin">
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full bg-primary/5 hover:bg-primary/15 transition-colors">
+                                                <Shield className="h-4 w-4 text-primary" />
+                                            </Button>
+                                        </Link>
+                                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-[10px] font-medium px-2 py-1 rounded shadow-sm pointer-events-none whitespace-nowrap z-50">
+                                            Admin Panel
+                                        </span>
+                                    </div>
                                 )}
-                                <Link href="/submit">
-                                    <Button className="rounded-full shadow-sm px-4" size="sm">Create Prompt</Button>
-                                </Link>
-                                <form action={signout} className="flex">
-                                    <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2" aria-label="Log out">
-                                        Log out
-                                    </Button>
-                                </form>
+                                {(profile?.role === 'admin' || (profile?.role === 'seller' && profile?.approved)) && (
+                                    <div className="relative group flex items-center">
+                                        <Link href="/submit">
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                                                <PlusCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                            </Button>
+                                        </Link>
+                                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-[10px] font-medium px-2 py-1 rounded shadow-sm pointer-events-none whitespace-nowrap z-50">
+                                            Create Prompt
+                                        </span>
+                                    </div>
+                                )}
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden">
+                                            {profile?.avatar_url ? (
+                                                <Image 
+                                                    src={profile.avatar_url} 
+                                                    alt="Avatar" 
+                                                    fill
+                                                    className="object-cover border border-border"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full bg-muted flex items-center justify-center border border-border">
+                                                    <UserIcon className="h-5 w-5 text-muted-foreground" />
+                                                </div>
+                                            )}
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                                        <div className="flex flex-col space-y-1 p-2">
+                                            <p className="text-sm font-medium leading-none">{profile?.name || 'User'}</p>
+                                            <p className="text-xs leading-none text-muted-foreground">
+                                                {user?.email}
+                                            </p>
+                                        </div>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/profile" className="flex items-center cursor-pointer w-full">
+                                                <Settings className="mr-2 h-4 w-4" />
+                                                <span>Settings</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem asChild>
+                                            <Link href={`/user/${user?.id}`} className="flex items-center cursor-pointer w-full">
+                                                <UserIcon className="mr-2 h-4 w-4" />
+                                                <span>My Storefront</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem asChild>
+                                            <form action="/auth/signout" method="post" className="w-full">
+                                                <button type="submit" className="w-full text-left cursor-pointer flex items-center">
+                                                    Log out
+                                                </button>
+                                            </form>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
@@ -95,17 +167,61 @@ export default async function Navbar() {
                         )}
                     </div>
 
-                    {/* Theme toggle always visible */}
-                    <ThemeToggle />
-
                     {/* Mobile-only: Log in/Sign Up compact + Hamburger */}
                     <div className="flex md:hidden items-center gap-1">
                         {user ? (
-                            <form action={signout} className="flex">
-                                <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2 text-sm" aria-label="Log out">
-                                    Log out
-                                </Button>
-                            </form>
+                            <>
+                                {profile?.role === 'admin' && (
+                                    <div className="relative group">
+                                        <Link href="/admin">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-primary/5 hover:bg-primary/15 transition-colors">
+                                                <Shield className="h-4 w-4 text-primary" />
+                                            </Button>
+                                        </Link>
+                                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-[10px] font-medium px-2 py-1 rounded shadow-sm pointer-events-none whitespace-nowrap z-50">
+                                            Admin Panel
+                                        </span>
+                                    </div>
+                                )}
+                                {(profile?.role === 'admin' || (profile?.role === 'seller' && profile?.approved)) && (
+                                    <div className="relative group">
+                                        <Link href="/submit">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                                                <PlusCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                            </Button>
+                                        </Link>
+                                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-[10px] font-medium px-2 py-1 rounded shadow-sm pointer-events-none whitespace-nowrap z-50">
+                                            Create Prompt
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="relative group">
+                                    <Link href={`/user/${user.id}`}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors">
+                                            <Store className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                        </Button>
+                                    </Link>
+                                    <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-[10px] font-medium px-2 py-1 rounded shadow-sm pointer-events-none whitespace-nowrap z-50">
+                                        My Storefront
+                                    </span>
+                                </div>
+                                <Link href="/profile" className="mx-1" title="Profile Settings">
+                                    <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0 overflow-hidden">
+                                        {profile?.avatar_url ? (
+                                            <Image 
+                                                src={profile.avatar_url} 
+                                                alt="Avatar" 
+                                                fill
+                                                className="object-cover border border-border"
+                                            />
+                                        ) : (
+                                            <div className="h-full w-full bg-muted flex items-center justify-center border border-border">
+                                                <UserIcon className="h-4 w-4 text-muted-foreground" />
+                                            </div>
+                                        )}
+                                    </Button>
+                                </Link>
+                            </>
                         ) : (
                             <Link href="/login">
                                 <Button variant="ghost" size="sm" className="px-2 text-sm">Log in</Button>
@@ -114,6 +230,7 @@ export default async function Navbar() {
                         <MobileMenu
                             isLoggedIn={!!user}
                             isAdmin={profile?.role === 'admin'}
+                            userId={user?.id}
                             signoutAction={signout}
                         />
                     </div>

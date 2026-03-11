@@ -4,6 +4,7 @@ import Link from 'next/link'
 import './globals.css'
 import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import Script from 'next/script'
 import NextTopLoader from 'nextjs-toploader'
 
@@ -34,6 +35,10 @@ export default function RootLayout({
             {children}
           </main>
           
+          <div className="fixed bottom-4 right-4 z-50">
+            <ThemeToggle />
+          </div>
+
           <footer className="w-full py-6 text-center text-sm text-muted-foreground border-t">
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href="/privacy" className="hover:underline hover:text-foreground transition-colors">Privacy Policy</Link>

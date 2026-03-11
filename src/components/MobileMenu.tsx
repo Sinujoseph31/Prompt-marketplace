@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button'
 interface MobileMenuProps {
     isLoggedIn: boolean
     isAdmin: boolean
+    userId?: string
     signoutAction: any
 }
 
-export default function MobileMenu({ isLoggedIn, isAdmin, signoutAction }: MobileMenuProps) {
+export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction }: MobileMenuProps) {
     const [open, setOpen] = useState(false)
     const [mounted, setMounted] = useState(false)
 
@@ -106,6 +107,14 @@ export default function MobileMenu({ isLoggedIn, isAdmin, signoutAction }: Mobil
                                 <Link href="/submit" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
                                     ➕ Create Prompt
                                 </Link>
+                                <Link href="/profile" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                                    ⚙️ Settings
+                                </Link>
+                                {userId && (
+                                    <Link href={`/user/${userId}`} onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                                        🏪 My Storefront
+                                    </Link>
+                                )}
                                 <form action={signoutAction} className="w-full">
                                     <button type="submit" className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors w-full text-left text-muted-foreground">
                                         🚪 Log Out
