@@ -58,7 +58,7 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
                     If you leave this section blank, your existing images will remain exactly as they are.
                     If you select new files or URLs below, ALL previous images will be permanently replaced.
                 </p>
-                <ImageUploadField />
+                <ImageUploadField defaultUrls={prompt.preview_images || (prompt.preview_image ? [prompt.preview_image] : [])} />
             </div>
 
             <div className="grid gap-2 border p-4 rounded-xl bg-muted/10 shadow-sm border-dashed">
@@ -85,10 +85,10 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
 
             {/* Extended padding bottom to ensure buttons are completely clickable on mobile without overlapping the system OS navigation bar */}
             <div className="flex flex-col-reverse md:flex-row gap-4 pb-24 md:pb-0 pt-4">
-                <Button type="button" variant="outline" className="w-full" asChild>
+                <Button type="button" variant="outline" className="w-full md:w-auto md:flex-1" asChild>
                     <a href={`/prompt/${prompt.id}`}>Cancel</a>
                 </Button>
-                <Button type="submit" size="lg" className="w-full">
+                <Button type="submit" size="lg" className="w-full md:w-auto md:flex-1">
                     Save Changes
                 </Button>
             </div>

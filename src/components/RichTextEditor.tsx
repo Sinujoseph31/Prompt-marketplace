@@ -2,8 +2,10 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { Bold, Italic, List, ListOrdered, Heading2 } from 'lucide-react'
+import { Bold, Italic, List, ListOrdered, Heading2, Palette } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { Color } from '@tiptap/extension-color'
+import { TextStyle } from '@tiptap/extension-text-style'
 import { Toggle } from '@/components/ui/toggle'
 
 export default function RichTextEditor({
@@ -18,6 +20,8 @@ export default function RichTextEditor({
     const editor = useEditor({
         extensions: [
             StarterKit,
+            TextStyle,
+            Color,
         ],
         immediatelyRender: false,
         content: defaultValue,
@@ -90,6 +94,24 @@ export default function RichTextEditor({
                 >
                     <ListOrdered className="h-4 w-4" />
                 </Toggle>
+                <div className="w-[1px] h-4 bg-border mx-1" />
+                <div className="flex items-center gap-2 pl-2 border-l border-border h-6">
+                    <Palette className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <input
+                        type="color"
+                        onInput={event => editor.chain().focus().setColor((event.target as HTMLInputElement).value).run()}
+                        value={editor.getAttributes('textStyle').color || '#000000'}
+                        className="w-6 h-6 p-0 border-0 rounded cursor-pointer overflow-hidden shrink-0"
+                        title="Text Color"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => editor.chain().focus().unsetColor().run()}
+                        className="text-[10px] text-muted-foreground hover:text-foreground font-semibold px-1"
+                    >
+                        Reset
+                    </button>
+                </div>
             </div>
 
             {/* Editor Area */}

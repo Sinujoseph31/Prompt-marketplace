@@ -5,10 +5,10 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { X } from 'lucide-react'
 
-export default function ImageUploadField() {
+export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: string[] }) {
     const [accumulatedFiles, setAccumulatedFiles] = useState<File[]>([])
     const [filePreviews, setFilePreviews] = useState<{ url: string, name: string, size: number }[]>([])
-    const [urlPreviews, setUrlPreviews] = useState<string[]>([])
+    const [urlPreviews, setUrlPreviews] = useState<string[]>(defaultUrls)
 
     // Ref to the hidden input that actually submits the form
     const hiddenInputRef = useRef<HTMLInputElement>(null)
@@ -178,7 +178,7 @@ export default function ImageUploadField() {
                                 <button
                                     type="button"
                                     onClick={(e) => removeFile(e, idx)}
-                                    className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-destructive text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                    className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-destructive text-white rounded-full transition-colors z-10"
                                     title="Remove Image"
                                 >
                                     <X className="w-3 h-3" strokeWidth={3} />
@@ -232,7 +232,7 @@ export default function ImageUploadField() {
                                 <button
                                     type="button"
                                     onClick={(e) => removeUrl(e, idx)}
-                                    className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-destructive text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                    className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-destructive text-white rounded-full transition-colors z-10"
                                     title="Remove URL"
                                 >
                                     <X className="w-3 h-3" strokeWidth={3} />
