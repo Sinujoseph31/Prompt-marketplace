@@ -75,7 +75,6 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
                     id="full_prompt"
                     name="full_prompt"
                     required
-                    defaultValue={prompt.full_prompt}
                     rows={6}
                     className="font-mono text-sm"
                     value={fullPrompt}
@@ -84,7 +83,8 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
                 <AiPromptEnhancer fullPrompt={fullPrompt} onUpdate={setFullPrompt} />
             </div>
 
-            <div className="flex gap-4">
+            {/* Extended padding bottom to ensure buttons are completely clickable on mobile without overlapping the system OS navigation bar */}
+            <div className="flex flex-col-reverse md:flex-row gap-4 pb-24 md:pb-0 pt-4">
                 <Button type="button" variant="outline" className="w-full" asChild>
                     <a href={`/prompt/${prompt.id}`}>Cancel</a>
                 </Button>

@@ -100,7 +100,13 @@ export default async function Navbar() {
 
                     {/* Mobile-only: Log in/Sign Up compact + Hamburger */}
                     <div className="flex md:hidden items-center gap-1">
-                        {!user && (
+                        {user ? (
+                            <form action={signout} className="flex">
+                                <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2 text-sm" aria-label="Log out">
+                                    Log out
+                                </Button>
+                            </form>
+                        ) : (
                             <Link href="/login">
                                 <Button variant="ghost" size="sm" className="px-2 text-sm">Log in</Button>
                             </Link>

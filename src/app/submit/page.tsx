@@ -102,9 +102,12 @@ export default function SubmitPage() {
                     <AiPromptEnhancer fullPrompt={fullPrompt} onUpdate={setFullPrompt} />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full">
-                    Submit for Review
-                </Button>
+                {/* Extended padding bottom to ensure buttons are completely clickable on mobile without overlapping the system OS navigation bar */}
+                <div className="pb-24 md:pb-0 pt-4">
+                    <Button type="submit" size="lg" className="w-full">
+                        Submit for Review
+                    </Button>
+                </div>
             </form>
         </div>
     )
