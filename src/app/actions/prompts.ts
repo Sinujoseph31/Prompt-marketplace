@@ -39,7 +39,7 @@ export async function submitPrompt(formData: FormData) {
 
                 if (uploadError) {
                     console.error('File upload error:', uploadError)
-                    redirect('/submit?message=Failed to upload one or more images')
+                    redirect('/submit?message=Uh oh! We had a problem uploading your image. Please try again with a smaller file.')
                 }
 
                 const { data: { publicUrl } } = supabase.storage
@@ -144,7 +144,7 @@ export async function submitPrompt(formData: FormData) {
 
     if (error || !newPrompt) {
         console.error('Submit error:', error)
-        redirect('/submit?message=Failed to submit prompt')
+        redirect('/submit?message=Oops! We couldn’t save your prompt right now. Double-check your fields and try again.')
     }
 
     revalidatePath('/')
@@ -281,7 +281,7 @@ export async function updatePrompt(formData: FormData) {
 
     if (error) {
         console.error('Update error:', error)
-        redirect(`/edit/${promptId}?message=Failed to update prompt`)
+        redirect(`/edit/${promptId}?message=Oops! We couldn’t update your prompt. Please refresh the page and try again.`)
     }
 
     revalidatePath('/')

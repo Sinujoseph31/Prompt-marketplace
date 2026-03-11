@@ -13,6 +13,7 @@ import ImageUploadField from '@/components/ImageUploadField'
 import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
 import AiPromptEnhancer from '@/components/AiPromptEnhancer'
+import { SubmitButton } from '@/components/SubmitButton'
 
 function FormMessages() {
     const searchParams = useSearchParams()
@@ -104,9 +105,12 @@ export default function SubmitPage() {
 
                 {/* Extended padding bottom to ensure buttons are completely clickable on mobile without overlapping the system OS navigation bar */}
                 <div className="pb-24 md:pb-0 pt-4">
-                    <Button type="submit" size="lg" className="w-full">
-                        Submit for Review
-                    </Button>
+                    <SubmitButton
+                        defaultText="Submit for Review"
+                        loadingText="Uploading & Submitting..."
+                        size="lg"
+                        className="w-full"
+                    />
                 </div>
             </form>
         </div>

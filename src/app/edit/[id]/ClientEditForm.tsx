@@ -10,6 +10,7 @@ import ImageUploadField from '@/components/ImageUploadField'
 import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
 import AiPromptEnhancer from '@/components/AiPromptEnhancer'
+import { SubmitButton } from '@/components/SubmitButton'
 import { updatePrompt } from '@/app/actions/prompts'
 
 function FormMessages() {
@@ -88,9 +89,12 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
                 <Button type="button" variant="outline" className="w-full md:w-auto md:flex-1" asChild>
                     <a href={`/prompt/${prompt.id}`}>Cancel</a>
                 </Button>
-                <Button type="submit" size="lg" className="w-full md:w-auto md:flex-1">
-                    Save Changes
-                </Button>
+                <SubmitButton
+                    defaultText="Save Changes"
+                    loadingText="Saving..."
+                    size="lg"
+                    className="w-full md:w-auto md:flex-1"
+                />
             </div>
         </form>
     )
