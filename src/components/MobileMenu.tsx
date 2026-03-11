@@ -107,7 +107,7 @@ export default function MobileMenu({ isLoggedIn, isAdmin, signoutAction }: Mobil
                                     ➕ Create Prompt
                                 </Link>
                                 <form action={signoutAction} className="w-full">
-                                    <button type="submit" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors w-full text-left text-muted-foreground">
+                                    <button type="submit" className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors w-full text-left text-muted-foreground">
                                         🚪 Log Out
                                     </button>
                                 </form>

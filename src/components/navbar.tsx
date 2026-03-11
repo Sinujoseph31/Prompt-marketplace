@@ -78,7 +78,7 @@ export default async function Navbar() {
                                     <Button className="rounded-full shadow-sm px-4" size="sm">Create Prompt</Button>
                                 </Link>
                                 <form action={signout} className="flex">
-                                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2" aria-label="Log out">
+                                    <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground px-2" aria-label="Log out">
                                         Log out
                                     </Button>
                                 </form>

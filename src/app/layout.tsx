@@ -5,6 +5,7 @@ import './globals.css'
 import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Script from 'next/script'
+import NextTopLoader from 'nextjs-toploader'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,6 +28,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <NextTopLoader color="#22c55e" showSpinner={false} />
           <Navbar />
           <main className="min-h-screen bg-background flex flex-col items-center">
             {children}

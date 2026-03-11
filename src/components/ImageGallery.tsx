@@ -15,6 +15,24 @@ export default function ImageGallery({ images, video, title }: { images: string[
         }
     }
 
+    const scrollTo = (index: number) => {
+        setActiveIndex(index)
+        if (scrollContainerRef.current) {
+            const container = scrollContainerRef.current
+            container.scrollTo({ left: index * container.clientWidth, behavior: 'smooth' })
+        }
+    }
+
+    const handleScroll = () => {
+        if (scrollContainerRef.current) {
+            const container = scrollContainerRef.current
+            const index = Math.round(container.scrollLeft / container.clientWidth)
+            if (index !== activeIndex) {
+                setActiveIndex(index)
+            }
+        }
+    }
+
     const mediaList = []
     if (video) {
         mediaList.push({ type: 'video', url: video })
@@ -41,7 +59,11 @@ export default function ImageGallery({ images, video, title }: { images: string[
                     </button>
                 )}
 
-                <div ref={scrollContainerRef} className="w-full md:w-fit max-w-full rounded-xl overflow-x-auto snap-x snap-mandatory flex [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border border-border/50 shadow-sm relative bg-muted/20 md:bg-transparent">
+                <div 
+                    ref={scrollContainerRef} 
+                    onScroll={handleScroll}
+                    className="w-full md:w-fit max-w-full rounded-xl overflow-x-auto snap-x snap-mandatory flex [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] border border-border/50 shadow-sm relative bg-muted/20 md:bg-transparent"
+                >
                     {mediaList.map((media, idx) => (
                         <div key={idx} className={`w-full md:w-fit shrink-0 snap-center transition-opacity duration-300 flex items-center justify-center bg-black/5 dark:bg-black/20 md:bg-transparent ${activeIndex === idx ? 'block' : 'block md:hidden'}`}>
                             {media.type === 'video' ? (
@@ -71,21 +93,21 @@ export default function ImageGallery({ images, video, title }: { images: string[
                     </button>
                 )}
 
-                {/* Mobile scroll indicator */}
+                {/* Mobile scroll indicator / counter */}
                 {mediaList.length > 1 && (
-                    <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full backdrop-blur-md shadow-sm pointer-events-none z-10 whitespace-nowrap">
-                        Swipe ({mediaList.length} Media)
+                    <div className="md:hidden absolute top-3 right-3 bg-black/70 text-white text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm pointer-events-none z-10">
+                        {activeIndex + 1} / {mediaList.length}
                     </div>
                 )}
             </div>
 
-            {/* Thumbnails Row (Hidden on mobile) */}
+            {/* Thumbnails Row (Visible on all devices now) */}
             {mediaList.length > 1 && (
-                <div className="hidden md:flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     {mediaList.map((media, idx) => (
                         <button
                             key={idx}
-                            onClick={() => setActiveIndex(idx)}
+                            onClick={() => scrollTo(idx)}
                             className={`relative w-24 h-24 md:w-32 md:h-32 shrink-0 snap-start bg-muted rounded-lg overflow-hidden border-2 transition-all ${activeIndex === idx
                                 ? 'border-primary opacity-100 ring-2 ring-primary ring-offset-2'
                                 : 'border-transparent opacity-60 hover:opacity-100'
