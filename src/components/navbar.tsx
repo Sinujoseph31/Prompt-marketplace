@@ -24,8 +24,11 @@ export default async function Navbar() {
     }
 
     return (
-        <nav className="w-full border-b border-b-foreground/10 h-16 sticky top-0 bg-background/95 backdrop-blur z-[100]">
-            <div className="w-full max-w-7xl mx-auto flex items-center justify-between h-full px-5">
+        <nav 
+            className="w-full border-b border-b-foreground/10 sticky top-0 bg-background/95 backdrop-blur z-[100]"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
+            <div className="w-full max-w-7xl mx-auto flex items-center justify-between h-16 px-5">
                 {/* Logo & Dropdown */}
                 <div className="flex items-center gap-2">
                     <Link href="/" className="font-bold text-lg md:text-xl flex items-center gap-2">
@@ -109,6 +112,11 @@ export default async function Navbar() {
                         />
                     </div>
                 </div>
+            </div>
+
+            {/* Mobile Search Bar - displayed below the top navbar icons */}
+            <div className="md:hidden px-5 pb-3">
+                <SearchBar />
             </div>
         </nav>
     )
