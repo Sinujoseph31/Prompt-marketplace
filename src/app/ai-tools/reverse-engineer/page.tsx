@@ -213,8 +213,26 @@ export default function ReverseEngineerPage() {
             })
 
             if (!res.ok) {
-                const data = await res.json()
-                throw new Error(data.error || 'Failed to analyze image.')
+                const errorText = await res.text()
+                let errorMessage = 'Failed to analyze image.'
+                try {
+                    const parsed = JSON.parse(errorText)
+                    errorMessage = parsed.error || errorMessage
+                } catch {
+                    errorMessage = errorText
+                }
+
+                if (res.status === 413 || errorMessage.toLowerCase().includes('payload') || errorMessage.toLowerCase().includes('large')) {
+                    throw new Error("The selected image is too large for the forensic engine to process. Please crop it smaller, or use a lower resolution version.")
+                }
+                if (res.status === 504 || errorMessage.toLowerCase().includes('timeout')) {
+                    throw new Error("The AI vision model timed out analyzing this image. Please wait a moment and try scanning again.")
+                }
+                if (errorMessage.toLowerCase().includes('json') || errorMessage.toLowerCase().includes('token')) {
+                     throw new Error("We encountered a brief interruption connecting to the AI models. Please try scanning the image again.")
+                }
+
+                throw new Error(errorMessage)
             }
 
             const data = await res.json()
@@ -225,7 +243,11 @@ export default function ReverseEngineerPage() {
             }, 100);
 
         } catch (err: any) {
-            setError(err.message || 'An unexpected error occurred during forensic analysis.')
+            let uiError = err.message || 'An unexpected error occurred during forensic analysis.'
+            if (uiError === 'Failed to fetch') {
+                uiError = "We couldn't connect to the AI engine. Please check your internet connection and try again."
+            }
+            setError(uiError)
         } finally {
             setIsAnalyzing(false)
         }

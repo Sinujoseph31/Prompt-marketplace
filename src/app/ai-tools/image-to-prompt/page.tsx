@@ -65,10 +65,38 @@ export default function ImageToPromptPage() {
 
         const reader = new FileReader()
         reader.onload = (event) => {
-            setImagePreview(event.target?.result as string)
-            setError(null)
-            // If they upload an image, clear previous results
-            if (results) setResults(null)
+            const img = new Image()
+            img.onload = () => {
+                const canvas = document.createElement('canvas')
+                const MAX_WIDTH = 1024
+                const MAX_HEIGHT = 1024
+                let width = img.width
+                let height = img.height
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width
+                        width = MAX_WIDTH
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height
+                        height = MAX_HEIGHT
+                    }
+                }
+
+                canvas.width = width
+                canvas.height = height
+                const ctx = canvas.getContext('2d')
+                ctx?.drawImage(img, 0, 0, width, height)
+                
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8)
+                setImagePreview(compressedDataUrl)
+                setError(null)
+                // If they upload an image, clear previous results
+                if (results) setResults(null)
+            }
+            img.src = event.target?.result as string
         }
         reader.readAsDataURL(file)
     }
@@ -92,9 +120,17 @@ export default function ImageToPromptPage() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ imageBase64, mimeType })
                 })
+                
+                const responseText = await res.text()
                 if (res.ok) {
-                    const data = await res.json()
-                    setPromptText(data.idea)
+                    try {
+                        const data = JSON.parse(responseText)
+                        setPromptText(data.idea)
+                    } catch (e) {
+                        console.error('Failed to parse surprise idea', e)
+                    }
+                } else {
+                    console.error('Surprise API Error:', responseText)
                 }
             } catch (err) {
                 console.error("Surprise image error", err)
@@ -142,8 +178,26 @@ export default function ImageToPromptPage() {
             })
 
             if (!res.ok) {
-                const data = await res.json()
-                throw new Error(data.error || 'Failed to generate prompt variants')
+                const errorText = await res.text()
+                let errorMessage = 'Failed to generate prompt variants'
+                try {
+                    const parsed = JSON.parse(errorText)
+                    errorMessage = parsed.error || errorMessage
+                } catch {
+                    errorMessage = errorText
+                }
+
+                if (res.status === 413 || errorMessage.toLowerCase().includes('payload') || errorMessage.toLowerCase().includes('large')) {
+                    throw new Error("The image size is too large for our servers to process right now. Please try uploading a slightly smaller image, or one with a lower resolution.")
+                }
+                if (res.status === 504 || errorMessage.toLowerCase().includes('timeout')) {
+                    throw new Error("The AI engine took too long to respond. It might be generating a very complex image. Please wait a moment and try clicking Generate again.")
+                }
+                if (errorMessage.toLowerCase().includes('json') || errorMessage.toLowerCase().includes('token')) {
+                     throw new Error("We encountered a brief interruption connecting to the AI models. Please try clicking Generate again.")
+                }
+
+                throw new Error(errorMessage)
             }
 
             const data = await res.json()
@@ -155,7 +209,12 @@ export default function ImageToPromptPage() {
             }, 100);
 
         } catch (err: any) {
-            setError(err.message || 'An unexpected error occurred.')
+            let uiError = err.message || 'An unexpected error occurred.'
+            // Catch edge case network crashes
+            if (uiError === 'Failed to fetch') {
+                uiError = "We couldn't connect to the AI engine. Please check your internet connection and try again."
+            }
+            setError(uiError)
         } finally {
             setIsGenerating(false)
         }

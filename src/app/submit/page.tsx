@@ -84,8 +84,21 @@ export default function SubmitPage() {
 
                 <div className="grid gap-2 border p-4 rounded-xl bg-muted/10 shadow-sm border-dashed">
                     <Label htmlFor="preview_video_file" className="text-foreground">Upload Video Preview (Optional)</Label>
-                    <Input id="preview_video_file" name="preview_video_file" type="file" accept="video/mp4,video/webm" className="cursor-pointer bg-background" />
-                    <p className="text-xs text-muted-foreground">Max 10MB. MP4 or WebM formats supported. Plays automatically on marketplace hover.</p>
+                    <Input 
+                        id="preview_video_file" 
+                        name="preview_video_file" 
+                        type="file" 
+                        accept="video/mp4,video/webm" 
+                        className="cursor-pointer bg-background" 
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file && file.size > 50 * 1024 * 1024) {
+                                alert("Please select a video file under 50MB.");
+                                e.target.value = '';
+                            }
+                        }}
+                    />
+                    <p className="text-xs text-muted-foreground">Max 50MB. MP4 or WebM formats supported. Plays automatically on marketplace hover.</p>
                 </div>
 
                 <div className="grid gap-2">

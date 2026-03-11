@@ -21,6 +21,11 @@ export default function ProfileClientForm({ profile }: { profile: any }) {
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Please select an avatar image under 5MB.");
+                e.target.value = '';
+                return;
+            }
             // Create a preview URL immediately so the user sees the change before saving
             const objectUrl = URL.createObjectURL(file)
             setAvatarPreview(objectUrl)
@@ -71,7 +76,7 @@ export default function ProfileClientForm({ profile }: { profile: any }) {
                 <div className="text-center sm:text-left space-y-2">
                     <h3 className="font-semibold text-lg">Profile Picture</h3>
                     <p className="text-sm text-muted-foreground max-w-sm">
-                        JPG, GIF or PNG. 1MB max. Click the image to upload a new one.
+                        JPG, GIF or PNG. 5MB max. Click the image to upload a new one.
                     </p>
                     <Input 
                         type="file" 

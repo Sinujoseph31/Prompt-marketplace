@@ -41,18 +41,35 @@ export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: s
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            const newFiles = Array.from(e.target.files)
+            const incomingFiles = Array.from(e.target.files)
+            
+            const validFiles: File[] = []
+            let rejectedCount = 0
 
-            // Add new files to our accumulated state (Additive upload)
-            setAccumulatedFiles(prev => {
-                const updated = [...prev, ...newFiles]
-                // If it's the first batch of files, set it as primary
-                if (prev.length === 0 && urlPreviews.length === 0) {
-                    setPrimaryType('file')
-                    setPrimaryIndex(0)
+            incomingFiles.forEach(f => {
+                if (f.size > 20 * 1024 * 1024) {
+                    rejectedCount++
+                } else {
+                    validFiles.push(f)
                 }
-                return updated
             })
+
+            if (rejectedCount > 0) {
+                alert(`${rejectedCount} image(s) were ignored because they exceed the 20MB per-image limit. Please compress them and try again.`)
+            }
+
+            if (validFiles.length > 0) {
+                // Add new valid files to our accumulated state (Additive upload)
+                setAccumulatedFiles(prev => {
+                    const updated = [...prev, ...validFiles]
+                    // If it's the first batch of files, set it as primary
+                    if (prev.length === 0 && urlPreviews.length === 0) {
+                        setPrimaryType('file')
+                        setPrimaryIndex(0)
+                    }
+                    return updated
+                })
+            }
 
             // Reset the visible input so the same file could technically be picked again if needed, 
             // but more importantly so the "No file chosen" visual resets visually to allow adding more cleanly.
@@ -143,7 +160,7 @@ export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: s
             <div className="flex flex-col gap-4 p-4 border rounded-xl bg-muted/10 shadow-sm">
                 <div className="grid gap-2">
                     <div className="flex justify-between items-end">
-                        <Label htmlFor="preview_files_visible" className="text-sm text-foreground">Upload from Device (Add Multiple)</Label>
+                        <Label htmlFor="preview_files_visible" className="text-sm text-foreground">Upload from Device (Max 20MB each)</Label>
                         {filePreviews.length > 0 && (
                             <span className={`text-xs font-semibold ${totalFileSize > 150 * 1024 * 1024 ? 'text-destructive' : 'text-primary'}`}>
                                 Total Size: {formatSize(totalFileSize)} / 150 MB
