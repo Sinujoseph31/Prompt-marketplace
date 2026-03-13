@@ -122,23 +122,23 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
 
             {/* Compact Footer */}
             <div className="flex flex-col gap-1 px-1">
-                <div className="flex justify-between items-start gap-2">
-                    <h3 className="font-semibold text-base leading-tight line-clamp-1 group-hover:underline decoration-foreground/30 underline-offset-4">{prompt.title}</h3>
-                    <span className="font-bold text-base shrink-0">
+                <div className="flex justify-between items-start gap-1 pb-0.5">
+                    <h3 className="font-semibold text-sm md:text-base leading-tight line-clamp-1 group-hover:underline decoration-foreground/30 underline-offset-4">{prompt.title}</h3>
+                    <span className="font-bold text-sm md:text-base shrink-0">
                         {prompt.price ? `$${prompt.price}` : 'Free'}
                     </span>
                 </div>
                 <div className="flex items-center justify-between">
                     {prompt.profiles?.name && (
-                        <p className="text-sm text-muted-foreground line-clamp-1">
+                        <p className="text-[11px] md:text-sm text-muted-foreground line-clamp-1">
                             By {prompt.profiles.name}
                         </p>
                     )}
                     {reviewCount > 0 && (
-                        <div className="flex items-center gap-1 text-xs font-medium text-foreground/80">
-                            <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                        <div className="flex items-center gap-1 text-[10px] md:text-xs font-medium text-foreground/80 shrink-0">
+                            <Star className="w-3 h-3 md:w-3.5 md:h-3.5 fill-yellow-400 text-yellow-400" />
                             <span>{avgRating.toFixed(1)}</span>
-                            <span className="text-muted-foreground">({reviewCount})</span>
+                            <span className="text-muted-foreground hidden sm:inline-block">({reviewCount})</span>
                         </div>
                     )}
                 </div>

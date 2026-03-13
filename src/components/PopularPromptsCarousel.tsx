@@ -47,7 +47,7 @@ export default function PopularPromptsCarousel({ title = "Popular Prompts", prom
                     className="flex overflow-x-auto gap-3 md:gap-6 pb-2 md:pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] px-1 pt-1"
                 >
                     {prompts.map((prompt) => (
-                        <div key={prompt.id} className="w-[75vw] sm:w-64 md:w-72 lg:w-[calc((100%-4rem)/5)] shrink-0 snap-start">
+                        <div key={prompt.id} className="w-[45vw] sm:w-64 md:w-72 lg:w-[calc((100%-4rem)/5)] shrink-0 snap-start">
                             <PromptCard prompt={prompt} forceAspectSquare={true} />
                         </div>
                     ))}
