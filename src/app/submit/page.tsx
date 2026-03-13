@@ -32,6 +32,8 @@ export default function SubmitPage() {
     const [user, setUser] = useState<any>(null)
     const [fullPrompt, setFullPrompt] = useState('')
 
+    const [accumulatedFiles, setAccumulatedFiles] = useState<File[]>([])
+
     useEffect(() => {
         const fetchUser = async () => {
             const { data: { user } } = await supabase.auth.getUser()
@@ -46,8 +48,17 @@ export default function SubmitPage() {
 
     if (!user) return null;
 
-    // We no longer block buyers from submitting prompts.
-    // They will be set to 'pending' automatically by the server action.
+    // Advanced Form Action interceptor to append our dynamically tracked files
+    // without relying on the mobile-unfriendly DataTransfer API
+    const handleAction = async (formData: FormData) => {
+        // Append all collected files to the payload under the expected key
+        accumulatedFiles.forEach(file => {
+            formData.append('preview_files', file)
+        })
+        
+        // Pass to the server action
+        await submitPrompt(formData)
+    }
 
     return (
         <div className="w-full max-w-2xl px-5 py-8 flex flex-col gap-8 mx-auto mt-8">
@@ -58,7 +69,7 @@ export default function SubmitPage() {
                 </p>
             </div>
 
-            <form action={submitPrompt} className="flex flex-col gap-6">
+            <form action={handleAction} className="flex flex-col gap-6">
                 <Suspense fallback={null}>
                     <FormMessages />
                 </Suspense>
@@ -80,7 +91,7 @@ export default function SubmitPage() {
                     <Input id="price" name="price" type="number" step="0.01" min="0" placeholder="0.00" />
                 </div>
 
-                <ImageUploadField />
+                <ImageUploadField onFilesUpdate={setAccumulatedFiles} />
 
                 <div className="grid gap-2 border p-4 rounded-xl bg-muted/10 shadow-sm border-dashed">
                     <Label htmlFor="preview_video_file" className="text-foreground">Upload Video Preview (Optional)</Label>
@@ -92,13 +103,13 @@ export default function SubmitPage() {
                         className="cursor-pointer bg-background" 
                         onChange={(e) => {
                             const file = e.target.files?.[0];
-                            if (file && file.size > 50 * 1024 * 1024) {
-                                alert("Please select a video file under 50MB.");
+                            if (file && file.size > 4 * 1024 * 1024) {
+                                alert("Please select a video file under 4MB to ensure successful upload.");
                                 e.target.value = '';
                             }
                         }}
                     />
-                    <p className="text-xs text-muted-foreground">Max 50MB. MP4 or WebM formats supported. Plays automatically on marketplace hover.</p>
+                    <p className="text-xs text-muted-foreground">Max 4MB. MP4 or WebM formats supported. Plays automatically on marketplace hover.</p>
                 </div>
 
                 <div className="grid gap-2">

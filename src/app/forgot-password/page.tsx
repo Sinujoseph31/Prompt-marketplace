@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import { signup, sendMagicLink } from '@/app/actions/auth'
+import { resetPasswordForEmail } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { OAuthButtons } from '@/components/OAuthButtons'
 
-export default async function SignupPage({
+export default async function ForgotPasswordPage({
     searchParams,
 }: {
     searchParams: Promise<{ message: string }>
@@ -30,33 +29,13 @@ export default async function SignupPage({
                 </div>
 
                 <div className="bg-card text-card-foreground shadow-xl shadow-black/5 border border-border/50 rounded-2xl p-8 backdrop-blur-xl relative overflow-hidden">
-                    <form className="flex-1 flex flex-col w-full justify-center gap-6" action={signup}>
+                    <form className="flex-1 flex flex-col w-full justify-center gap-6" action={resetPasswordForEmail}>
                         <div className="flex flex-col space-y-2 text-center mb-2">
-                            <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
-                            <p className="text-sm text-muted-foreground">Join Prompt4life today</p>
+                            <h1 className="text-3xl font-bold tracking-tight">Forgot Password</h1>
+                            <p className="text-sm text-muted-foreground">Enter your email to receive a secure recovery link.</p>
                         </div>
-
-                        <OAuthButtons />
-
-                        <div className="relative my-2">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-border/50" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-card px-4 text-muted-foreground/70 font-semibold tracking-wider">Or continue via Email</span>
-                            </div>
-                        </div>
-
+                        
                         <div className="grid gap-5">
-                            <div className="grid gap-2 group">
-                                <Label htmlFor="name" className="text-foreground/80 group-focus-within:text-primary transition-colors">Name</Label>
-                                <Input 
-                                    name="name" 
-                                    placeholder="John Doe" 
-                                    required 
-                                    className="bg-background border-border focus:border-primary h-12 transition-all"
-                                />
-                            </div>
                             <div className="grid gap-2 group">
                                 <Label htmlFor="email" className="text-foreground/80 group-focus-within:text-primary transition-colors">Email Address</Label>
                                 <Input 
@@ -66,23 +45,10 @@ export default async function SignupPage({
                                     className="bg-background border-border focus:border-primary h-12 transition-all"
                                 />
                             </div>
-                            <div className="grid gap-2 group">
-                                <Label htmlFor="password" className="text-foreground/80 group-focus-within:text-primary transition-colors">Password</Label>
-                                <Input 
-                                    type="password" 
-                                    name="password" 
-                                    placeholder="••••••••" 
-                                    required 
-                                    className="bg-background border-border focus:border-primary h-12 transition-all"
-                                />
-                            </div>
                             
                             <div className="flex flex-col gap-3 mt-2">
                                 <Button className="w-full h-12 text-md font-medium shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-shadow">
-                                    Sign Up
-                                </Button>
-                                <Button formAction={sendMagicLink} variant="outline" type="submit" className="w-full h-12 bg-transparent border-border hover:bg-muted hover:text-foreground transition-colors">
-                                    Email me a Magic Link
+                                    Send Recovery Link
                                 </Button>
                             </div>
                             
@@ -94,7 +60,7 @@ export default async function SignupPage({
                         </div>
 
                         <div className="text-center text-sm mt-4 text-muted-foreground">
-                            Already have an account?{' '}
+                            Remembered your password?{' '}
                             <Link href="/login" className="text-primary font-medium hover:underline hover:underline-offset-4 transition-all">
                                 Login
                             </Link>

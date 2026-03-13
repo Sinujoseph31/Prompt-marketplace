@@ -146,7 +146,7 @@ export default async function Navbar() {
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <form action="/auth/signout" method="post" className="w-full">
+                                            <form action={signout} className="w-full">
                                                 <button type="submit" className="w-full text-left cursor-pointer flex items-center">
                                                     Log out
                                                 </button>

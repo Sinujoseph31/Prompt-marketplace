@@ -26,9 +26,22 @@ function FormMessages() {
 
 export default function ClientEditForm({ prompt }: { prompt: any }) {
     const [fullPrompt, setFullPrompt] = useState(prompt.full_prompt)
+    const [accumulatedFiles, setAccumulatedFiles] = useState<File[]>([])
+
+    // Advanced Form Action interceptor to append our dynamically tracked files
+    // without relying on the mobile-unfriendly DataTransfer API
+    const handleAction = async (formData: FormData) => {
+        // Append all collected files to the payload under the expected key
+        accumulatedFiles.forEach(file => {
+            formData.append('preview_files', file)
+        })
+        
+        // Pass to the server action
+        await updatePrompt(formData)
+    }
 
     return (
-        <form action={updatePrompt} className="flex flex-col gap-6">
+        <form action={handleAction} className="flex flex-col gap-6">
             <Suspense fallback={null}>
                 <FormMessages />
             </Suspense>
@@ -59,14 +72,30 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
                     If you leave this section blank, your existing images will remain exactly as they are.
                     If you select new files or URLs below, ALL previous images will be permanently replaced.
                 </p>
-                <ImageUploadField defaultUrls={prompt.preview_images || (prompt.preview_image ? [prompt.preview_image] : [])} />
+                <ImageUploadField 
+                    defaultUrls={prompt.preview_images || (prompt.preview_image ? [prompt.preview_image] : [])} 
+                    onFilesUpdate={setAccumulatedFiles}
+                />
             </div>
 
             <div className="grid gap-2 border p-4 rounded-xl bg-muted/10 shadow-sm border-dashed">
                 <Label htmlFor="preview_video_file" className="text-foreground">Upload Video Preview (Optional)</Label>
-                <Input id="preview_video_file" name="preview_video_file" type="file" accept="video/mp4,video/webm" className="cursor-pointer bg-background" />
+                <Input 
+                    id="preview_video_file" 
+                    name="preview_video_file" 
+                    type="file" 
+                    accept="video/mp4,video/webm" 
+                    className="cursor-pointer bg-background" 
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && file.size > 4 * 1024 * 1024) {
+                            alert("Please select a video file under 4MB to ensure successful upload.");
+                            e.target.value = '';
+                        }
+                    }}
+                />
                 <p className="text-xs text-muted-foreground">
-                    {prompt.preview_video ? "You currently have a video saved. Uploading a new one replaces it." : "Max 10MB. MP4 or WebM formats supported. Plays automatically on marketplace hover."}
+                    {prompt.preview_video ? "You currently have a video saved. Uploading a new one replaces it." : "Max 4MB. MP4 or WebM formats supported. Plays automatically on marketplace hover."}
                 </p>
             </div>
 

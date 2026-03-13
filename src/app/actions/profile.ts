@@ -15,13 +15,19 @@ export async function updateProfile(formData: FormData) {
     const name = formData.get('name') as string
     const bio = formData.get('bio') as string
     const avatarFile = formData.get('avatar') as File | null
+    const removeAvatar = formData.get('remove_avatar') as string | null
 
-    let avatar_url: string | undefined = undefined
+    let avatar_url: string | null | undefined = undefined
 
-    // Upload new avatar if provided
+    // Handle explicit avatar removal request
+    if (removeAvatar === 'true') {
+        avatar_url = null
+    }
+
+    // Upload new avatar if one was provided by the client interceptor
     if (avatarFile && avatarFile.size > 0) {
-        const fileExt = avatarFile.name.split('.').pop()
-        // We use a timestamp to prevent browser caching of the old image URL
+        const fileExt = avatarFile.name.split('.').pop() || 'jpeg'
+        // Timestamp in filename prevents browser caching of old avatar
         const fileName = `${user.id}/avatar_${Date.now()}.${fileExt}`
         
         const { error: uploadError } = await supabase.storage
@@ -30,7 +36,7 @@ export async function updateProfile(formData: FormData) {
 
         if (uploadError) {
             console.error('Avatar upload error:', uploadError)
-            return redirect('/profile?error=Uh oh! We had a problem uploading your avatar.')
+            return redirect('/profile?error=Uh oh! We had a problem uploading your avatar. Please try again with a smaller image.')
         }
 
         const { data: { publicUrl } } = supabase.storage
@@ -41,7 +47,7 @@ export async function updateProfile(formData: FormData) {
     }
 
     const updatePayload: any = { name, bio }
-    if (avatar_url) {
+    if (avatar_url !== undefined) {
         updatePayload.avatar_url = avatar_url
     }
 
@@ -52,11 +58,10 @@ export async function updateProfile(formData: FormData) {
 
     if (updateError) {
         console.error('Profile update error:', updateError)
-        return redirect('/profile?error=Oops! We couldn’t save your profile details.')
+        return redirect('/profile?error=Oops! We couldn\'t save your profile details. Please try again.')
     }
 
     revalidatePath('/profile')
-    // Also revalidate the user's public portfolio page so updates show immediately
     revalidatePath(`/user/${user.id}`)
     
     redirect('/profile?message=Profile updated successfully!')

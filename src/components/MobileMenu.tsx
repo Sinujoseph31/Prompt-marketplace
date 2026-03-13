@@ -49,8 +49,11 @@ export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction 
                     </Button>
                 </div>
 
-                <div className="overflow-y-auto flex-1 p-5 space-y-6">
-                    <nav className="flex flex-col gap-1 text-base font-medium">
+                <div 
+                    className="overflow-y-auto flex-1 p-5 space-y-6"
+                    style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 2rem)' }}
+                >
+                    <nav className="flex flex-col gap-1 text-base font-medium pb-8">
                         <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground px-2 pb-2">Navigation</p>
 
                         <Link href="/search" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">

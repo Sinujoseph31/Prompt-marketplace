@@ -5,24 +5,25 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { X } from 'lucide-react'
 
-export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: string[] }) {
+export default function ImageUploadField({ 
+    defaultUrls = [],
+    onFilesUpdate 
+}: { 
+    defaultUrls?: string[],
+    onFilesUpdate?: (files: File[]) => void
+}) {
     const [accumulatedFiles, setAccumulatedFiles] = useState<File[]>([])
     const [filePreviews, setFilePreviews] = useState<{ url: string, name: string, size: number }[]>([])
     const [urlPreviews, setUrlPreviews] = useState<string[]>(defaultUrls)
-
-    // Ref to the hidden input that actually submits the form
-    const hiddenInputRef = useRef<HTMLInputElement>(null)
 
     // primaryType is 'file' or 'url', primaryIndex is the index within that array
     const [primaryType, setPrimaryType] = useState<'file' | 'url'>('file')
     const [primaryIndex, setPrimaryIndex] = useState<number>(0)
 
-    // Sync state files to the hidden input whenever they change
+    // Notify parent component when state files update
     useEffect(() => {
-        if (hiddenInputRef.current) {
-            const dt = new DataTransfer()
-            accumulatedFiles.forEach(file => dt.items.add(file))
-            hiddenInputRef.current.files = dt.files
+        if (onFilesUpdate) {
+            onFilesUpdate(accumulatedFiles)
         }
 
         // Generate preview URLs when files update
@@ -39,15 +40,69 @@ export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: s
         }
     }, [accumulatedFiles])
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const incomingFiles = Array.from(e.target.files)
             
             const validFiles: File[] = []
             let rejectedCount = 0
 
-            incomingFiles.forEach(f => {
-                if (f.size > 20 * 1024 * 1024) {
+            // Helper to asynchronously compress large images via Canvas
+            const compressImage = async (file: File): Promise<File> => {
+                // Skip compression if it's already comfortably small (under 1.5MB)
+                if (file.size < 1.5 * 1024 * 1024) return file;
+                
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            // Scale down to max 1920x1920 dimension
+                            const MAX_DIMENSION = 1920;
+                            if (width > height && width > MAX_DIMENSION) {
+                                height *= MAX_DIMENSION / width;
+                                width = MAX_DIMENSION;
+                            } else if (height > MAX_DIMENSION) {
+                                width *= MAX_DIMENSION / height;
+                                height = MAX_DIMENSION;
+                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            
+                            const ctx = canvas.getContext('2d');
+                            ctx?.drawImage(img, 0, 0, width, height);
+                            
+                            // Compress securely down to ~80% quality JPEG
+                            canvas.toBlob((blob) => {
+                                if (blob) {
+                                    // Swap out the original extension mathematically to avoid naming bugs
+                                    const newName = file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpeg";
+                                    resolve(new File([blob], newName, { type: 'image/jpeg' }));
+                                } else {
+                                    resolve(file); // fail safe bypass
+                                }
+                            }, 'image/jpeg', 0.80);
+                        };
+                        img.onerror = () => resolve(file); // fail safe if unsupported encoding
+                        img.src = event.target?.result as string;
+                    };
+                    reader.onerror = () => resolve(file);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // We sequence the array map so we process compression all at once
+            const processedFiles = await Promise.all(incomingFiles.map(f => compressImage(f)))
+
+            processedFiles.forEach(f => {
+                // Vercel Serverless Function limit is 4.5MB payload absolute.
+                // We lock single files to maximum 3.5MB to leave room for the REST of the multipart boundary/text
+                if (f.size > 3.5 * 1024 * 1024) {
                     rejectedCount++
                 } else {
                     validFiles.push(f)
@@ -55,7 +110,7 @@ export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: s
             })
 
             if (rejectedCount > 0) {
-                alert(`${rejectedCount} image(s) were ignored because they exceed the 20MB per-image limit. Please compress them and try again.`)
+                alert(`${rejectedCount} image(s) were still too large after compression (exceeding 3.5MB). Please choose smaller files.`)
             }
 
             if (validFiles.length > 0) {
@@ -72,7 +127,6 @@ export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: s
             }
 
             // Reset the visible input so the same file could technically be picked again if needed, 
-            // but more importantly so the "No file chosen" visual resets visually to allow adding more cleanly.
             e.target.value = ''
         }
     }
@@ -167,10 +221,8 @@ export default function ImageUploadField({ defaultUrls = [] }: { defaultUrls?: s
                             </span>
                         )}
                     </div>
-                    {/* The visible input just gathers files for our state */}
+                    {/* The visible input just gathers files for our React state */}
                     <Input id="preview_files_visible" type="file" accept="image/*" multiple className="cursor-pointer" onChange={handleFileChange} />
-                    {/* The hidden input holds the actual Form Submission payload via DataTransfer */}
-                    <input id="preview_files" name="preview_files" type="file" accept="image/*" multiple ref={hiddenInputRef} className="hidden" />
                 </div>
 
                 {filePreviews.length > 0 && (
