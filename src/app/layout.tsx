@@ -31,7 +31,7 @@ export default function RootLayout({
         >
           <NextTopLoader color="#22c55e" showSpinner={false} />
           <Navbar />
-          <main className="min-h-screen bg-background flex flex-col items-center">
+          <main className="min-h-screen bg-background flex flex-col items-center pt-[116px] md:pt-16">
             {children}
           </main>
           

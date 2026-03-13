@@ -31,7 +31,7 @@ export default async function Navbar() {
 
     return (
         <nav 
-            className="w-full border-b border-b-foreground/10 sticky top-0 bg-background/95 backdrop-blur z-[100]"
+            className="fixed top-0 left-0 right-0 w-full border-b border-b-foreground/10 bg-background/95 backdrop-blur z-[100]"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
             <div className="w-full max-w-7xl mx-auto flex items-center justify-between h-16 px-5">
