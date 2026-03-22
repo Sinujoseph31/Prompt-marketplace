@@ -2,6 +2,10 @@ import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import PromptCard from '@/components/PromptCard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { PlusCircle, Edit, Trash2 } from 'lucide-react'
+import { deleteUserPrompt } from '@/app/actions/prompts'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient()
@@ -101,7 +105,15 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
             </div>
 
             {hasFullAccess ? (
-                <Tabs defaultValue="approved" className="w-full">
+                <div className="flex flex-col gap-6">
+                    <div className="flex items-center justify-between border-b pb-4">
+                        <h2 className="text-2xl font-bold tracking-tight">Manage Your Prompts</h2>
+                        <Link href="/submit">
+                            <Button className="flex items-center gap-2 shadow-sm rounded-full"><PlusCircle className="w-4 h-4" /> Add New Prompt</Button>
+                        </Link>
+                    </div>
+
+                    <Tabs defaultValue="approved" className="w-full">
                     <TabsList className="mb-8 bg-muted/50 p-1 w-full sm:w-auto h-auto flex flex-wrap sm:inline-flex">
                         <TabsTrigger value="approved" className="flex-1 sm:flex-none">Approved ({approvedPrompts.length})</TabsTrigger>
                         <TabsTrigger value="pending" className="flex-1 sm:flex-none text-yellow-600 data-[state=active]:text-yellow-700">Pending ({pendingPrompts.length})</TabsTrigger>
@@ -109,15 +121,16 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
                     </TabsList>
                     
                     <TabsContent value="approved">
-                        <PromptGrid prompts={approvedPrompts} emptyMessage="No approved prompts yet." />
+                        <PromptGrid prompts={approvedPrompts} emptyMessage="No approved prompts yet." isEditable={true} />
                     </TabsContent>
                     <TabsContent value="pending">
-                        <PromptGrid prompts={pendingPrompts} emptyMessage="No pending prompts." />
+                        <PromptGrid prompts={pendingPrompts} emptyMessage="No pending prompts." isEditable={true} />
                     </TabsContent>
                     <TabsContent value="rejected">
-                        <PromptGrid prompts={rejectedPrompts} emptyMessage="No rejected prompts." />
+                        <PromptGrid prompts={rejectedPrompts} emptyMessage="No rejected prompts." isEditable={true} />
                     </TabsContent>
                 </Tabs>
+                </div>
             ) : (
                 <div className="space-y-6">
                     <h2 className="text-2xl font-bold tracking-tight border-b pb-4">Portfolio</h2>
@@ -128,7 +141,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
     )
 }
 
-function PromptGrid({ prompts, emptyMessage }: { prompts: any[], emptyMessage: string }) {
+function PromptGrid({ prompts, emptyMessage, isEditable }: { prompts: any[], emptyMessage: string, isEditable?: boolean }) {
     if (prompts.length === 0) {
         return (
             <div className="text-center py-24 bg-muted/10 border-2 border-dashed rounded-xl">
@@ -140,7 +153,19 @@ function PromptGrid({ prompts, emptyMessage }: { prompts: any[], emptyMessage: s
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {prompts.map(prompt => (
-                <PromptCard key={prompt.id} prompt={prompt} />
+                <div key={prompt.id} className="flex flex-col gap-2">
+                    <PromptCard prompt={prompt} />
+                    {isEditable && (
+                        <div className="flex items-center gap-2 w-full pt-1">
+                            <Link href={`/edit/${prompt.id}`} className="flex-1">
+                                <Button variant="outline" size="sm" className="w-full flex items-center justify-center gap-1.5"><Edit className="w-3.5 h-3.5" /> Edit</Button>
+                            </Link>
+                            <form action={deleteUserPrompt.bind(null, prompt.id)} className="flex-1">
+                                <Button variant="destructive" size="sm" className="w-full flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700"><Trash2 className="w-3.5 h-3.5" /> Delete</Button>
+                            </form>
+                        </div>
+                    )}
+                </div>
             ))}
         </div>
     )

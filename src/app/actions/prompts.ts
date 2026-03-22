@@ -289,3 +289,21 @@ export async function updatePrompt(formData: FormData) {
     revalidatePath(`/prompt/${promptId}`)
     redirect(`/prompt/${promptId}`)
 }
+
+export async function deleteUserPrompt(promptId: string) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    const { data: existingPrompt } = await supabase.from('prompts').select('*').eq('id', promptId).single()
+
+    if (!existingPrompt) return
+    if (existingPrompt.seller_id !== user.id && profile?.role !== 'admin') return
+
+    await supabase.from('prompts').delete().eq('id', promptId)
+    revalidatePath('/')
+    revalidatePath('/admin')
+    revalidatePath(`/user/${user.id}`)
+}

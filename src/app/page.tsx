@@ -23,7 +23,7 @@ export default async function Index() {
     .from('prompts')
     .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name), comments(rating)')
     .eq('status', 'approved')
-    .order('price', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(10)
 
   return (

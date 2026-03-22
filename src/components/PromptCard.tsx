@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Star } from 'lucide-react'
@@ -8,6 +8,24 @@ import { Star } from 'lucide-react'
 export default function PromptCard({ prompt, forceAspectSquare = false }: { prompt: any, forceAspectSquare?: boolean }) {
     const router = useRouter()
     const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const [canScrollLeft, setCanScrollLeft] = useState(false)
+    const [canScrollRight, setCanScrollRight] = useState(false)
+
+    useEffect(() => {
+        if (prompt.preview_images?.length > 1) {
+            checkScroll()
+            window.addEventListener('resize', checkScroll)
+            return () => window.removeEventListener('resize', checkScroll)
+        }
+    }, [prompt.preview_images])
+
+    const checkScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+            setCanScrollLeft(scrollLeft > 0)
+            setCanScrollRight(Math.ceil(scrollLeft + clientWidth) < scrollWidth)
+        }
+    }
 
     let avgRating = 0
     let reviewCount = 0
@@ -37,53 +55,59 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
     return (
         <div
             onClick={handleCardClick}
-            className="group flex flex-col gap-3 cursor-pointer"
+            className="flex flex-col gap-3 cursor-pointer"
         >
-            {/* Dynamic height or fixed square image container */}
-            <div className={`w-full relative rounded-xl shadow-sm transition-all duration-300 group-hover:shadow-md z-0 group-hover:z-10 group bg-muted border border-border/50 overflow-hidden ${forceAspectSquare ? 'aspect-square' : ''}`}>
+            {/* Fixed aspect ratio container to keep grid perfectly aligned */}
+            <div className={`w-full relative rounded-xl shadow-sm transition-all duration-300 z-0 bg-muted border border-border/50 overflow-hidden aspect-[4/5] group`}>
 
                 {prompt.preview_images && prompt.preview_images.length > 0 ? (
-                    <div 
-                        ref={scrollContainerRef}
-                        className="flex w-full overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative h-full"
-                        style={{ aspectRatio: forceAspectSquare ? undefined : '1/1' }}
-                    >
-                        {prompt.preview_images.map((imgUrl: string, idx: number) => (
-                            <div key={idx} className="w-full h-full shrink-0 snap-center relative">
-                                <img
-                                    src={imgUrl}
-                                    alt={`${prompt.title} preview ${idx + 1}`}
-                                    className={`w-full max-w-full object-cover transition-transform duration-700 group-hover:scale-105 block ${forceAspectSquare ? 'h-full absolute inset-0' : 'h-full'}`}
-                                />
-                                {/* Individual Slide Counter */}
-                                {prompt.preview_images.length > 1 && (
-                                    <div className="absolute top-2 right-2 flex justify-center z-20 pointer-events-none">
-                                        <div className="bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm">
-                                            {idx + 1} / {prompt.preview_images.length}
+                    <>
+                        <div 
+                            ref={scrollContainerRef}
+                            onScroll={checkScroll}
+                            className="flex w-full h-full overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative"
+                        >
+                            {prompt.preview_images.map((imgUrl: string, idx: number) => (
+                                <div key={idx} className="w-full h-full shrink-0 snap-center relative">
+                                    <img
+                                        src={imgUrl}
+                                        alt={`${prompt.title} preview ${idx + 1}`}
+                                        className="w-full h-full object-cover block"
+                                    />
+                                    {/* Individual Slide Counter */}
+                                    {prompt.preview_images.length > 1 && (
+                                        <div className="absolute top-2 right-2 flex justify-center z-20 pointer-events-none">
+                                            <div className="bg-black/60 text-white text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full backdrop-blur-md shadow-sm">
+                                                {idx + 1} / {prompt.preview_images.length}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                    )}
+                                </div>
+                            ))}
+                        </div>
 
                         {/* Navigation Arrows for the gallery (Desktop Hover) */}
                         {prompt.preview_images.length > 1 && (
                             <>
-                                <button
-                                    onClick={scrollLeft}
-                                    className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm z-30 hidden md:flex"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
-                                </button>
-                                <button
-                                    onClick={scrollRight}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm z-30 hidden md:flex"
-                                >
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
-                                </button>
+                                {canScrollLeft && (
+                                    <button
+                                        onClick={scrollLeft}
+                                        className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm z-30 hidden md:flex"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+                                    </button>
+                                )}
+                                {canScrollRight && (
+                                    <button
+                                        onClick={scrollRight}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-black/50 hover:bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm z-30 hidden md:flex"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                )}
                             </>
                         )}
-                    </div>
+                    </>
                 ) : prompt.preview_video ? (
                     <video
                         src={prompt.preview_video}
@@ -91,18 +115,16 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
                         muted
                         loop
                         playsInline
-                        className={`w-full bg-black object-contain transition-transform duration-700 group-hover:scale-105 block ${forceAspectSquare ? 'h-full absolute inset-0' : 'h-auto aspect-square'}`}
-                        style={{ aspectRatio: forceAspectSquare ? undefined : '1/1' }}
+                        className="w-full h-full object-cover block"
                     />
                 ) : prompt.preview_image ? (
                     <img
                         src={prompt.preview_image}
                         alt={prompt.title}
-                        className={`w-full max-w-full object-cover transition-transform duration-700 group-hover:scale-105 block ${forceAspectSquare ? 'h-full absolute inset-0' : 'h-auto aspect-square'}`}
-                        style={{ aspectRatio: forceAspectSquare ? undefined : '1/1' }}
+                        className="w-full h-full object-cover block"
                     />
                 ) : (
-                    <div className={`w-full flex items-center justify-center text-muted-foreground bg-muted/50 ${forceAspectSquare ? 'h-full absolute inset-0' : 'aspect-square'}`}>
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted/50">
                         No Image
                     </div>
                 )}
@@ -123,7 +145,7 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
             {/* Compact Footer */}
             <div className="flex flex-col gap-1 px-1">
                 <div className="flex justify-between items-start gap-1 pb-0.5">
-                    <h3 className="font-semibold text-sm md:text-base leading-tight line-clamp-1 group-hover:underline decoration-foreground/30 underline-offset-4">{prompt.title}</h3>
+                    <h3 className="font-semibold text-sm md:text-base leading-tight line-clamp-1">{prompt.title}</h3>
                     <span className="font-bold text-sm md:text-base shrink-0">
                         {prompt.price ? `$${prompt.price}` : 'Free'}
                     </span>

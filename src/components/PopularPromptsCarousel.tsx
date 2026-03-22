@@ -40,7 +40,7 @@ export default function PopularPromptsCarousel({ title = "Popular Prompts", prom
         <section className="w-full max-w-7xl mx-auto px-5 pb-4 md:pb-8 flex flex-col gap-3 md:gap-4 relative">
             <h2 className="text-2xl font-bold tracking-tight px-1">{title}</h2>
 
-            <div className="relative group">
+            <div className="relative group/carousel">
                 <div
                     ref={scrollContainerRef}
                     onScroll={checkScroll}
@@ -57,7 +57,7 @@ export default function PopularPromptsCarousel({ title = "Popular Prompts", prom
                 {canScrollLeft && (
                     <button
                         onClick={scrollLeft}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -ml-2 sm:-ml-4 z-10 bg-background/90 text-foreground border border-border shadow-lg hover:bg-muted w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -ml-2 sm:-ml-4 z-10 bg-background/90 text-foreground border border-border shadow-lg hover:bg-muted w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
                         aria-label="Scroll left"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -68,7 +68,7 @@ export default function PopularPromptsCarousel({ title = "Popular Prompts", prom
                 {canScrollRight && (
                     <button
                         onClick={scrollRight}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 sm:-mr-4 z-10 bg-background/90 text-foreground border border-border shadow-lg hover:bg-muted w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 sm:-mr-4 z-10 bg-background/90 text-foreground border border-border shadow-lg hover:bg-muted w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover/carousel:opacity-100"
                         aria-label="Scroll right"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>

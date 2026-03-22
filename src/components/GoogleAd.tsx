@@ -59,11 +59,14 @@ export default function GoogleAd({
 
     // If no client ID exists (e.g., local dev without env vars), we show a placeholder for testing
     if (!process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID) {
-        return (
-            <div className={`w-full h-[100px] bg-muted border-2 border-dashed border-border/50 rounded-xl flex items-center justify-center text-muted-foreground font-semibold text-sm animate-pulse ${className}`}>
-                [Ad Placeholder] <br /> Add NEXT_PUBLIC_GOOGLE_ADSENSE_ID to .env.local
-            </div>
-        )
+        if (process.env.NODE_ENV === 'development') {
+            return (
+                <div className={`w-full h-[100px] bg-muted border-2 border-dashed border-border/50 rounded-xl flex items-center justify-center text-muted-foreground font-semibold text-sm animate-pulse ${className}`}>
+                    [Ad Placeholder] <br /> Add NEXT_PUBLIC_GOOGLE_ADSENSE_ID to .env.local
+                </div>
+            )
+        }
+        return null;
     }
 
     // Google AdSense requires the slot to be a completely numeric ID (e.g. "1234567890").
@@ -71,12 +74,15 @@ export default function GoogleAd({
     // We catch that here and intentionally render a developer hint.
     const isNumericSlot = /^\d+$/.test(slot);
     if (!isNumericSlot) {
-        return (
-            <div className={`w-full h-[100px] bg-muted/50 border border-dashed border-border/50 rounded-xl flex flex-col items-center justify-center text-muted-foreground text-xs p-4 text-center ${className}`}>
-                <p className="font-bold text-sm text-foreground mb-1">Ad Slot: {slot}</p>
-                <p>Replace this string with your numeric Ad Unit ID from AdSense</p>
-            </div>
-        )
+        if (process.env.NODE_ENV === 'development') {
+            return (
+                <div className={`w-full h-[100px] bg-muted/50 border border-dashed border-border/50 rounded-xl flex flex-col items-center justify-center text-muted-foreground text-xs p-4 text-center ${className}`}>
+                    <p className="font-bold text-sm text-foreground mb-1">Ad Slot: {slot}</p>
+                    <p>Replace this string with your numeric Ad Unit ID from AdSense</p>
+                </div>
+            )
+        }
+        return null;
     }
 
     return (
