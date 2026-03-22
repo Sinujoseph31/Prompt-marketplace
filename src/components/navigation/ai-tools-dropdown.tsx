@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch } from "lucide-react"
+import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -51,6 +51,14 @@ const tools = [
         icon: MoonStar,
         color: "text-indigo-400",
         bgColor: "bg-indigo-400/10"
+    },
+    {
+        title: "Aesthetic DNA Search",
+        href: "/ai-tools/aesthetic-dna",
+        description: "Find matching vibes in store",
+        icon: Fingerprint,
+        color: "text-emerald-500",
+        bgColor: "bg-emerald-500/10"
     }
 ]
 

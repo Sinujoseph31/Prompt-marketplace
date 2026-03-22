@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import PromptCard from '@/components/PromptCard'
 import PopularPromptsCarousel from '@/components/PopularPromptsCarousel'
+import SocialActivityFeed from '@/components/SocialActivityFeed'
 import AiModelBundles from '@/components/AiModelBundles'
 import CategoryPillsRow from '@/components/CategoryPillsRow'
 import Link from 'next/link'
@@ -37,6 +38,11 @@ export default async function Index() {
           Discover, buy, and sell top-quality prompts for Midjourney, ChatGPT, DALL-E, and more.
         </p>
       </section>
+
+      {/* Social Pulse Feed */}
+      <div className="w-full max-w-7xl px-5 mb-12">
+        <SocialActivityFeed initialPrompts={latestPrompts || []} />
+      </div>
 
 
       {/* Popular Prompts Carousel */}

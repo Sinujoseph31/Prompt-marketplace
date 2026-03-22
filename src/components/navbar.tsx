@@ -13,7 +13,7 @@ import {
 import SearchBar from '@/components/SearchBar'
 import CategoryDropdown from '@/components/CategoryDropdown'
 import { AIToolsDropdown } from '@/components/navigation/ai-tools-dropdown'
-import { ScanSearch, PlusCircle, Settings, User as UserIcon, Shield, Store } from 'lucide-react'
+import { ScanSearch, PlusCircle, Settings, User as UserIcon, Shield, Store, Fingerprint } from 'lucide-react'
 import MobileMenu from '@/components/MobileMenu'
 
 export default async function Navbar() {
@@ -70,6 +70,13 @@ export default async function Navbar() {
                             <Button variant="ghost" size="sm" className="font-bold text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 hover:bg-emerald-500/10 transition-colors gap-2 px-3">
                                 <ScanSearch className="w-4 h-4" />
                                 <span>Reverse Engineer</span>
+                            </Button>
+                        </Link>
+
+                        <Link href="/ai-tools/aesthetic-dna" className="inline-flex shrink-0">
+                            <Button variant="ghost" size="sm" className="font-bold text-blue-600 dark:text-blue-500 hover:text-blue-700 hover:bg-blue-500/10 transition-colors gap-2 px-3">
+                                <Fingerprint className="w-4 h-4" />
+                                <span>Aesthetic DNA</span>
                             </Button>
                         </Link>
 
