@@ -116,6 +116,16 @@ export default async function AdminPage() {
                                                 </form>
                                             </>
                                         )}
+                                        {p.status === 'approved' && (
+                                            <form action={updatePromptStatus.bind(null, p.id, 'rejected')}>
+                                                <Button size="sm" variant="outline" className="text-orange-600 border-orange-600 hover:bg-orange-50">Disable</Button>
+                                            </form>
+                                        )}
+                                        {p.status === 'rejected' && (
+                                            <form action={updatePromptStatus.bind(null, p.id, 'approved')}>
+                                                <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">Enable</Button>
+                                            </form>
+                                        )}
                                         <form action={deletePrompt.bind(null, p.id)}>
                                             <Button size="sm" variant="destructive">Delete</Button>
                                         </form>

@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import PromptCard from '@/components/PromptCard'
 import PopularPromptsCarousel from '@/components/PopularPromptsCarousel'
+import SocialActivityFeed from '@/components/SocialActivityFeed'
 import AiModelBundles from '@/components/AiModelBundles'
 import CategoryPillsRow from '@/components/CategoryPillsRow'
 import Link from 'next/link'
@@ -23,7 +24,7 @@ export default async function Index() {
     .from('prompts')
     .select('id, title, description, category, subcategory, price, preview_image, preview_images, preview_video, profiles(name), comments(rating)')
     .eq('status', 'approved')
-    .order('price', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(10)
 
   return (
@@ -37,6 +38,11 @@ export default async function Index() {
           Discover, share, and use top-quality prompts for Midjourney, ChatGPT, DALL-E, and more—all for free.
         </p>
       </section>
+
+      {/* Social Pulse Feed */}
+      <div className="w-full max-w-7xl px-5 mb-12">
+        <SocialActivityFeed initialPrompts={latestPrompts || []} />
+      </div>
 
 
       {/* Popular Prompts Carousel */}
