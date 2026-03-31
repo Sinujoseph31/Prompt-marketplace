@@ -114,19 +114,33 @@ export default async function SearchPage({
                     </div>
 
                     {prompts?.length === 0 ? (
-                        <div className="py-24 text-center text-muted-foreground flex flex-col items-center gap-4 bg-background rounded-2xl border shadow-sm">
-                            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                                <svg className="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <div className="py-20 px-6 text-center text-muted-foreground flex flex-col items-center gap-6 bg-background rounded-3xl border shadow-sm max-w-4xl mx-auto w-full">
+                            <div className="h-20 w-20 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <p className="text-xl font-semibold text-foreground">No matches found</p>
-                                <p className="text-base text-muted-foreground max-w-sm mx-auto">
-                                    Try adjusting your search or filters to find what you're looking for.
+                            <div className="flex flex-col gap-2">
+                                <p className="text-24 md:text-3xl font-bold text-foreground">No matches found</p>
+                                <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
+                                    We couldn't find any prompts matching your criteria. Try adjusting your search or exploring our popular categories below.
                                 </p>
                             </div>
-                            <Link href="/search">
-                                <Button variant="outline" className="mt-2">Clear Filters</Button>
-                            </Link>
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full mt-2">
+                                {MAIN_CATEGORIES.slice(0, 6).map(cat => (
+                                    <Link key={cat} href={`/search?category=${encodeURIComponent(cat)}`} className="px-4 py-3 rounded-xl border bg-muted/30 hover:bg-primary/5 hover:border-primary/30 transition-all text-sm font-medium text-foreground">
+                                        {cat}
+                                    </Link>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-4 mt-4">
+                                <Link href="/search">
+                                    <Button variant="outline" className="rounded-xl px-8">Clear All Filters</Button>
+                                </Link>
+                                <Link href="/">
+                                    <Button className="rounded-xl px-8">Back to Home</Button>
+                                </Link>
+                            </div>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 items-start">
@@ -137,10 +151,12 @@ export default async function SearchPage({
                     )}
                 </div>
 
-                {/* Mid-Page Ad Unit */}
-                <div className="w-full">
-                    <GoogleAd slot="search-mid" />
-                </div>
+                {/* Mid-Page Ad Unit - Only show if we have enough content to justify it */}
+                {((prompts?.length || 0) + (relatedPrompts?.length || 0)) > 3 && (
+                    <div className="w-full">
+                        <GoogleAd slot="search-mid" />
+                    </div>
+                )}
 
                 {/* Section 2: Related Prompts */}
                 {relatedPrompts && relatedPrompts.length > 0 && (

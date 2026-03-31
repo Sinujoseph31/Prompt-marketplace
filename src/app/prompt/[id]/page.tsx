@@ -149,19 +149,39 @@ export default async function PromptDetailPage({
                             {/* Price & Action */}
                             <div className="flex flex-col gap-4 p-6 border rounded-2xl bg-card shadow-sm">
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-black">{prompt.price ? `$${prompt.price}` : 'Free'}</span>
-                                    <span className="text-muted-foreground text-sm">one-time payment</span>
+                                    <span className="text-4xl font-black text-primary">Free</span>
+                                    <span className="text-muted-foreground text-sm">community access</span>
                                 </div>
                                 <RevealPrompt fullPrompt={prompt.full_prompt} category={prompt.category} />
                                 <p className="text-xs text-center text-muted-foreground mt-2">
-                                    Secure transaction handled by Prompt4life.
+                                    Prompts are currently free to use during our community phase.
                                 </p>
                             </div>
 
-                            {/* Sticky Sidebar Ad Unit - Moved below action block for better mobile flow */}
-                            <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
-                                <GoogleAd slot="prompt-detail-sidebar" />
+                            {/* Buyer Protection & Usage Info - Adding High-Value Content */}
+                            <div className="flex flex-col gap-4 p-6 border rounded-2xl bg-muted/30">
+                                <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                    Buyer Protection
+                                </h4>
+                                <ul className="text-xs space-y-3 text-muted-foreground">
+                                    <li className="flex gap-2">
+                                        <span className="text-primary font-bold">•</span>
+                                        <span><strong>Free Access:</strong> Enjoy full access to this prompt at no cost during our beta phase.</span>
+                                    </li>
+                                    <li className="flex gap-2">
+                                        <span className="text-primary font-bold">•</span>
+                                        <span><strong>Support:</strong> Community assistance if you face any issues with your experience.</span>
+                                    </li>
+                                </ul>
                             </div>
+
+                            {/* Sticky Sidebar Ad Unit - Only show if the page has significant content depth */}
+                            {(prompt.description?.length > 300 || (comments?.length || 0) > 0) && (
+                                <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
+                                    <GoogleAd slot="prompt-detail-sidebar" />
+                                </div>
+                            )}
 
                             {/* Owner Actions */}
                             {canEdit && (

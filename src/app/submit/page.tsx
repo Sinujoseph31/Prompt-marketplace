@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { submitPrompt } from '@/app/actions/prompts'
+import { Badge } from '@/components/ui/badge'
 import ImageUploadField from '@/components/ImageUploadField'
 import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
@@ -86,9 +87,13 @@ export default function SubmitPage() {
 
                 <ModelCategorySelector />
 
-                <div className="grid gap-2">
-                    <Label htmlFor="price">Price (USD) - Optional</Label>
-                    <Input id="price" name="price" type="number" step="0.01" min="0" placeholder="0.00" />
+                <div className="grid gap-2 opacity-60">
+                    <Label htmlFor="price" className="flex items-center gap-2">
+                        Price (USD)
+                        <Badge variant="outline" className="text-[10px] uppercase tracking-tighter py-0 h-4">Coming Soon</Badge>
+                    </Label>
+                    <Input id="price" name="price" type="number" step="0.01" min="0" disabled placeholder="Currently Free" className="bg-muted/50 cursor-not-allowed" />
+                    <p className="text-[10px] text-muted-foreground">Pricing features are currently disabled. All prompts are free for the community right now.</p>
                 </div>
 
                 <ImageUploadField onFilesUpdate={setAccumulatedFiles} />

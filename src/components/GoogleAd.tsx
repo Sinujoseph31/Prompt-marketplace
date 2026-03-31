@@ -7,13 +7,15 @@ interface GoogleAdProps {
     format?: 'auto' | 'fluid' | 'rectangle' | 'horizontal' | 'vertical'
     responsive?: boolean
     className?: string
+    style?: React.CSSProperties
 }
 
 export default function GoogleAd({
     slot,
     format = 'auto',
     responsive = true,
-    className = ''
+    className = '',
+    style = {}
 }: GoogleAdProps) {
     const adRef = useRef<HTMLModElement>(null)
 
@@ -80,11 +82,11 @@ export default function GoogleAd({
     }
 
     return (
-        <div className={`w-full overflow-hidden flex justify-center ${className}`}>
+        <div className={`w-full overflow-hidden flex justify-center min-h-[100px] ${className}`} style={style}>
             <ins
                 ref={adRef}
                 className="adsbygoogle"
-                style={{ display: 'block', width: '100%' }}
+                style={{ display: 'block', width: '100%', minHeight: '100px', ...style }}
                 data-ad-client={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID}
                 data-ad-slot={slot}
                 data-ad-format={format}

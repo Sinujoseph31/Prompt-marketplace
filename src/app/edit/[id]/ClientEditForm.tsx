@@ -10,6 +10,7 @@ import ImageUploadField from '@/components/ImageUploadField'
 import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
 import AiPromptEnhancer from '@/components/AiPromptEnhancer'
+import { Badge } from '@/components/ui/badge'
 import { SubmitButton } from '@/components/SubmitButton'
 import { updatePrompt } from '@/app/actions/prompts'
 
@@ -60,9 +61,13 @@ export default function ClientEditForm({ prompt }: { prompt: any }) {
 
             <ModelCategorySelector defaultCategory={prompt.category} defaultSubcategory={prompt.subcategory} />
 
-            <div className="grid gap-2">
-                <Label htmlFor="price">Price (USD) - Optional</Label>
-                <Input id="price" name="price" type="number" step="0.01" min="0" defaultValue={prompt.price} />
+            <div className="grid gap-2 opacity-60">
+                <Label htmlFor="price" className="flex items-center gap-2">
+                    Price (USD) 
+                    <Badge variant="outline" className="text-[10px] uppercase tracking-tighter py-0 h-4">Coming Soon</Badge>
+                </Label>
+                <Input id="price" name="price" type="number" step="0.01" min="0" defaultValue={prompt.price} disabled placeholder="Managed by platform" className="bg-muted/50 cursor-not-allowed" />
+                <p className="text-[10px] text-muted-foreground">Monetization is coming in the next phase. Currently all prompts are free.</p>
             </div>
 
             <div className="border p-4 rounded-xl bg-muted/20 flex flex-col gap-4">

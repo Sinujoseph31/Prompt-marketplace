@@ -124,8 +124,8 @@ export default function PromptCard({ prompt, forceAspectSquare = false }: { prom
             <div className="flex flex-col gap-1 px-1">
                 <div className="flex justify-between items-start gap-1 pb-0.5">
                     <h3 className="font-semibold text-sm md:text-base leading-tight line-clamp-1 group-hover:underline decoration-foreground/30 underline-offset-4">{prompt.title}</h3>
-                    <span className="font-bold text-sm md:text-base shrink-0">
-                        {prompt.price ? `$${prompt.price}` : 'Free'}
+                    <span className="font-bold text-sm md:text-base shrink-0 text-primary">
+                        Free
                     </span>
                 </div>
                 <div className="flex items-center justify-between">
