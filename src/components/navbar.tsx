@@ -15,6 +15,7 @@ import CategoryDropdown from '@/components/CategoryDropdown'
 import { AIToolsDropdown } from '@/components/navigation/ai-tools-dropdown'
 import { ScanSearch, PlusCircle, Settings, User as UserIcon, Shield, Store, Fingerprint } from 'lucide-react'
 import MobileMenu from '@/components/MobileMenu'
+import PointsBadge from '@/components/PointsBadge'
 
 export default async function Navbar() {
     const supabase = await createClient()
@@ -89,6 +90,7 @@ export default async function Navbar() {
 
                         {user ? (
                             <div className="flex items-center gap-1 md:gap-2 mr-2">
+                                <PointsBadge initialPoints={profile?.points || 0} />
                                 {profile?.role === 'admin' && (
                                     <div className="relative group flex items-center">
                                         <Link href="/admin">
@@ -178,6 +180,7 @@ export default async function Navbar() {
                     <div className="flex md:hidden items-center gap-1">
                         {user ? (
                             <>
+                                <PointsBadge initialPoints={profile?.points || 0} />
                                 {profile?.role === 'admin' && (
                                     <div className="relative group">
                                         <Link href="/admin">

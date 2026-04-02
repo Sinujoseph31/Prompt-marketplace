@@ -149,12 +149,12 @@ export default async function PromptDetailPage({
                             {/* Price & Action */}
                             <div className="flex flex-col gap-4 p-6 border rounded-2xl bg-card shadow-sm">
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-black text-primary">Free</span>
-                                    <span className="text-muted-foreground text-sm">community access</span>
+                                    <span className="text-4xl font-black text-primary">Points Base</span>
+                                    <span className="text-muted-foreground text-sm">premium access</span>
                                 </div>
-                                <RevealPrompt fullPrompt={prompt.full_prompt} category={prompt.category} />
+                                <RevealPrompt promptId={prompt.id} fullPrompt={prompt.full_prompt} category={prompt.category} subcategory={prompt.subcategory} />
                                 <p className="text-xs text-center text-muted-foreground mt-2">
-                                    Prompts are currently free to use during our community phase.
+                                    Unlock prompts using your points. Earn points by watching ads.
                                 </p>
                             </div>
 
