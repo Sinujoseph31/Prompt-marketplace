@@ -135,9 +135,18 @@ export default async function Index() {
             </div>
           </div>
           <div className="flex-1 w-full bg-muted/20 rounded-[2rem] p-8 md:p-12 border aspect-square flex flex-col justify-center gap-6">
-            <div className="bg-background p-6 rounded-2xl shadow-xl border-l-4 border-primary">
+            <div className="bg-background p-6 rounded-2xl shadow-xl border-l-4 border-primary relative group/example">
               <p className="text-sm font-medium text-primary mb-2 italic">Prompt Example</p>
               <p className="text-lg font-bold leading-tight">"A futuristic cityscape at sunset, cinematic lighting, 8k resolution, hyper-realistic, neon accents..."</p>
+              <a 
+                href={`https://chatgpt.com/?q=${encodeURIComponent("A futuristic cityscape at sunset, cinematic lighting, 8k resolution, hyper-realistic, neon accents...")}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="absolute top-4 right-4 opacity-0 group-hover/example:opacity-100 transition-opacity bg-primary/10 text-primary hover:bg-primary text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md flex items-center gap-1.5 hover:text-primary-foreground"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                Try this on AI
+              </a>
             </div>
             <div className="bg-background p-6 rounded-2xl shadow-xl border-l-4 border-blue-500 transform translate-x-4">
               <p className="text-sm font-medium text-blue-500 mb-2 italic">ChatGPT Result</p>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { checkRevealStatus, revealPrompt, getUserPoints } from '@/app/actions/points'
 import { Loader2, Coins, ExternalLink } from 'lucide-react'
 import RewardAdModal from './RewardAdModal'
+import { getAiInterfaceUrl } from '@/utils/ai-interfaces'
 
 export default function RevealPrompt({ promptId, fullPrompt, category, subcategory }: { promptId: string, fullPrompt: string, category: string, subcategory?: string }) {
     const [revealed, setRevealed] = useState(false)
@@ -14,22 +15,6 @@ export default function RevealPrompt({ promptId, fullPrompt, category, subcatego
     const [error, setError] = useState<string | null>(null)
     const [showAdModal, setShowAdModal] = useState(false)
 
-    // Mapping for AI Interfaces
-    const getAiInterfaceUrl = (sub: string | undefined): string | null => {
-        if (!sub) return null
-        const s = sub.toLowerCase()
-        if (s.includes('chatgpt')) return `https://chatgpt.com/?q=${encodeURIComponent(fullPrompt)}`
-        if (s.includes('claude')) return `https://claude.ai/`
-        if (s.includes('gemini')) return `https://gemini.google.com/app?q=${encodeURIComponent(fullPrompt)}`
-        if (s.includes('deepseek')) return `https://chat.deepseek.com/`
-        if (s.includes('midjourney')) return `https://www.midjourney.com/`
-        if (s.includes('dall-e') || s.includes('dalle')) return `https://chatgpt.com/`
-        if (s.includes('stable diffusion')) return `https://dreamstudio.ai/`
-        
-        // Default based on category
-        if (category === 'Models') return `https://chatgpt.com/`
-        return null
-    }
 
     useEffect(() => {
         async function fetchStatus() {
@@ -90,7 +75,7 @@ export default function RevealPrompt({ promptId, fullPrompt, category, subcatego
         )
     }
 
-    const aiUrl = getAiInterfaceUrl(subcategory)
+    const aiUrl = getAiInterfaceUrl(fullPrompt, category, subcategory)
 
     if (!revealed) {
         return (

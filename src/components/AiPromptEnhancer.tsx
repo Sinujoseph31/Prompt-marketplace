@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Sparkles, Loader2, Check, ImageIcon } from 'lucide-react'
+import { Sparkles, Loader2, Check, ImageIcon, ExternalLink } from 'lucide-react'
+import { getAiInterfaceUrl } from '@/utils/ai-interfaces'
 
 export default function AiPromptEnhancer({
     fullPrompt,
@@ -74,23 +75,41 @@ export default function AiPromptEnhancer({
                         Add "Face/Structure Replacement" instructions
                     </Label>
                 </div>
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleEnhance}
-                    disabled={isLoading || !fullPrompt.trim()}
-                    className={isSuccess ? "border-green-500/50 bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-600 w-full sm:w-auto" : "w-full sm:w-auto"}
-                >
-                    {isLoading ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : isSuccess ? (
-                        <Check className="w-4 h-4 mr-2" />
-                    ) : (
-                        <Sparkles className="w-4 h-4 mr-2" />
+                <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleEnhance}
+                        disabled={isLoading || !fullPrompt.trim()}
+                        className={isSuccess ? "border-green-500/50 bg-green-500/10 text-green-600 hover:bg-green-500/20 hover:text-green-600 w-full sm:w-auto" : "w-full sm:w-auto"}
+                    >
+                        {isLoading ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : isSuccess ? (
+                            <Check className="w-4 h-4 mr-2" />
+                        ) : (
+                            <Sparkles className="w-4 h-4 mr-2" />
+                        )}
+                        {isSuccess ? 'Optimized!' : 'Enhance Prompt'}
+                    </Button>
+                    
+                    {fullPrompt.trim() && (
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                                const url = getAiInterfaceUrl(fullPrompt);
+                                if (url) window.open(url, '_blank');
+                            }}
+                            className="w-full sm:w-auto flex items-center gap-2"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span>Try on AI</span>
+                        </Button>
                     )}
-                    {isSuccess ? 'Optimized!' : 'Enhance Prompt'}
-                </Button>
+                </div>
             </div>
 
             {error && (

@@ -15,6 +15,8 @@ import RichTextEditor from '@/components/RichTextEditor'
 import ModelCategorySelector from '@/components/ModelCategorySelector'
 import AiPromptEnhancer from '@/components/AiPromptEnhancer'
 import { SubmitButton } from '@/components/SubmitButton'
+import { ExternalLink } from 'lucide-react'
+import { getAiInterfaceUrl } from '@/utils/ai-interfaces'
 
 function FormMessages() {
     const searchParams = useSearchParams()
@@ -118,7 +120,24 @@ export default function SubmitPage() {
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="full_prompt">The Prompt Itself</Label>
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="full_prompt">The Prompt Itself</Label>
+                        {fullPrompt.trim() && (
+                            <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-[10px] uppercase font-black tracking-widest text-primary hover:text-primary hover:bg-primary/10 gap-1.5"
+                                onClick={() => {
+                                    const url = getAiInterfaceUrl(fullPrompt);
+                                    if (url) window.open(url, '_blank');
+                                }}
+                            >
+                                <ExternalLink className="w-3 h-3" />
+                                Try on AI
+                            </Button>
+                        )}
+                    </div>
                     <Textarea
                         id="full_prompt"
                         name="full_prompt"
