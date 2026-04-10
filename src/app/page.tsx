@@ -7,6 +7,19 @@ import CategoryPillsRow from '@/components/CategoryPillsRow'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import GoogleAd from '@/components/GoogleAd'
+import Script from 'next/script'
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Prompt4life',
+  url: 'https://prompt4life.com',
+  logo: 'https://prompt4life.com/logo.png',
+  description: 'The premier marketplace for high-quality, vetted AI prompts for ChatGPT, Midjourney, and more.',
+  sameAs: [
+    'https://twitter.com/prompt4life',
+  ]
+}
 
 export default async function Index() {
   const supabase = await createClient()
@@ -29,6 +42,11 @@ export default async function Index() {
 
   return (
     <div className="w-full flex flex-col min-h-screen items-center">
+      <Script
+        id="org-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <section className="w-full max-w-7xl px-5 py-10 md:py-24 flex flex-col items-center text-center gap-4 md:gap-6">
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-3xl">
@@ -37,6 +55,50 @@ export default async function Index() {
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
           Discover, share, and use top-quality prompts for Midjourney, ChatGPT, DALL-E, and more—all for free.
         </p>
+      </section>
+
+      {/* Top Categories Section - High Value Content */}
+      <section className="w-full max-w-7xl px-5 mb-16">
+        <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-2">
+                <h2 className="text-2xl font-bold tracking-tight">Explore Top Categories</h2>
+                <p className="text-muted-foreground text-sm">Specialized prompts engineered for maximum performance across the most popular AI models.</p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Link href="/search?category=Marketing" className="group p-6 rounded-3xl border bg-card hover:bg-primary/5 hover:border-primary/20 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
+                    </div>
+                    <h3 className="font-bold text-lg">Marketing</h3>
+                    <p className="text-xs text-muted-foreground mt-1">SEO, Copywriting, Ads</p>
+                </Link>
+
+                <Link href="/search?category=Design" className="group p-6 rounded-3xl border bg-card hover:bg-blue-500/5 hover:border-blue-500/20 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                    <h3 className="font-bold text-lg">Art & Design</h3>
+                    <p className="text-xs text-muted-foreground mt-1">Midjourney, DALL-E</p>
+                </Link>
+
+                <Link href="/search?category=Business" className="group p-6 rounded-3xl border bg-card hover:bg-green-500/5 hover:border-green-500/20 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    </div>
+                    <h3 className="font-bold text-lg">Business</h3>
+                    <p className="text-xs text-muted-foreground mt-1">Strategy, Analysis</p>
+                </Link>
+
+                <Link href="/search?category=Coding" className="group p-6 rounded-3xl border bg-card hover:bg-purple-500/5 hover:border-purple-500/20 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                    </div>
+                    <h3 className="font-bold text-lg">Development</h3>
+                    <p className="text-xs text-muted-foreground mt-1">React, Python, SQL</p>
+                </Link>
+            </div>
+        </div>
       </section>
 
       {/* Social Pulse Feed */}

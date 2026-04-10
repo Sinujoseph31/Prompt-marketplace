@@ -6,6 +6,45 @@ import ImageGallery from '@/components/ImageGallery'
 import PromptCard from '@/components/PromptCard'
 import Comments from '@/components/Comments'
 import GoogleAd from '@/components/GoogleAd'
+import { Metadata } from 'next'
+import Script from 'next/script'
+
+type Props = {
+    params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const id = (await params).id
+    const supabase = await createClient()
+
+    const { data: prompt } = await supabase
+        .from('prompts')
+        .select('title, description, category, subcategory, preview_image')
+        .eq('id', id)
+        .single()
+
+    if (!prompt) return {}
+
+    const plainDescription = prompt.description?.replace(/<[^>]*>?/gm, '').substring(0, 160) || ''
+
+    return {
+        title: prompt.title,
+        description: plainDescription,
+        category: prompt.category,
+        openGraph: {
+            title: prompt.title,
+            description: plainDescription,
+            images: prompt.preview_image ? [prompt.preview_image] : [],
+            type: 'article',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: prompt.title,
+            description: plainDescription,
+            images: prompt.preview_image ? [prompt.preview_image] : [],
+        },
+    }
+}
 
 export default async function PromptDetailPage({
     params,
@@ -82,8 +121,28 @@ export default async function PromptDetailPage({
         }
     }
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'CreativeWork',
+        name: prompt.title,
+        description: prompt.description?.replace(/<[^>]*>?/gm, ''),
+        author: {
+            '@type': 'Person',
+            name: prompt.profiles?.name || 'Unknown',
+        },
+        genre: prompt.category,
+        keywords: `${prompt.category}, ${prompt.subcategory}, AI prompt`,
+        image: prompt.preview_image || '',
+        datePublished: prompt.created_at,
+    }
+
     return (
         <div className="w-full min-h-screen flex flex-col items-center">
+            <Script
+                id="prompt-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <div className="w-full max-w-7xl mx-auto px-5 py-8 md:py-12 flex-1">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-10 xl:gap-x-16">
 

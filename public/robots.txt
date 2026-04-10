@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /edit/*
-Disallow: /delete-account
-
-Sitemap: https://prompt4life.com/sitemap.xml
