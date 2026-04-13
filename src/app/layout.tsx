@@ -5,8 +5,8 @@ import './globals.css'
 import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import Script from 'next/script'
 import NextTopLoader from 'nextjs-toploader'
+import AdSenseScript from '@/components/AdSenseScript'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -115,13 +115,8 @@ export default function RootLayout({
           </footer>
         </ThemeProvider>
 
-        {/* Google AdSense Global Script */}
-        <Script
-          id="google-adsense"
-          strategy="afterInteractive"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID}`}
-          crossOrigin="anonymous"
-        />
+        {/* Global AdSense Handler (disables on sensitive routes) */}
+        <AdSenseScript />
       </body>
     </html>
   )

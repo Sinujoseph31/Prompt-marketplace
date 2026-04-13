@@ -236,7 +236,7 @@ export default async function PromptDetailPage({
                             </div>
 
                             {/* Sticky Sidebar Ad Unit - Only show if the page has significant content depth */}
-                            {(prompt.description?.length > 300 || (comments?.length || 0) > 0) && (
+                            {((prompt.description?.length || 0) > 500 || (comments?.length || 0) > 0) && (
                                 <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
                                     <GoogleAd slot="prompt-detail-sidebar" />
                                 </div>
