@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import GoogleAd from '@/components/GoogleAd'
 import Script from 'next/script'
+import AdSenseScript from '@/components/AdSenseScript'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -42,6 +43,7 @@ export default async function Index() {
 
   return (
     <div className="w-full flex flex-col min-h-screen items-center">
+      <AdSenseScript />
       <Script
         id="org-jsonld"
         type="application/ld+json"

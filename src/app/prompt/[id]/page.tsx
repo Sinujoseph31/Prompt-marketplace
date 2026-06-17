@@ -8,6 +8,7 @@ import Comments from '@/components/Comments'
 import GoogleAd from '@/components/GoogleAd'
 import { Metadata } from 'next'
 import Script from 'next/script'
+import AdSenseScript from '@/components/AdSenseScript'
 
 type Props = {
     params: Promise<{ id: string }>
@@ -138,6 +139,7 @@ export default async function PromptDetailPage({
 
     return (
         <div className="w-full min-h-screen flex flex-col items-center">
+            {prompt.status === 'approved' && <AdSenseScript />}
             <Script
                 id="prompt-jsonld"
                 type="application/ld+json"

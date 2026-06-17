@@ -6,7 +6,6 @@ import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import NextTopLoader from 'nextjs-toploader'
-import AdSenseScript from '@/components/AdSenseScript'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -114,9 +113,6 @@ export default function RootLayout({
             </div>
           </footer>
         </ThemeProvider>
-
-        {/* Global AdSense Handler (disables on sensitive routes) */}
-        <AdSenseScript />
       </body>
     </html>
   )
