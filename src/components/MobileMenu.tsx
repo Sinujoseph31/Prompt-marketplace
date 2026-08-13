@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Menu, X, ScanSearch, UserCheck, Activity } from 'lucide-react'
+import { Menu, X, ScanSearch, UserCheck, Activity, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface MobileMenuProps {
@@ -77,6 +77,10 @@ export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction 
 
                         <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground px-2 pt-2 pb-2">AI Tools</p>
 
+                        <Link href="/ai-tools/product-studio" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                            <ShoppingBag className="w-5 h-5 text-amber-400" />
+                            <span className="font-bold text-amber-400">Product Studio</span>
+                        </Link>
                         <Link href="/ai-tools/prompt-doctor" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
                             <Activity className="w-5 h-5 text-cyan-400" />
                             <span className="font-bold text-cyan-400">Prompt Doctor</span>
