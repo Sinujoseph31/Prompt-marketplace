@@ -52,6 +52,7 @@ export default function ReverseEngineerPage() {
     const [file, setFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [isDragging, setIsDragging] = useState(false)
+    const [subjectType, setSubjectType] = useState<'auto' | 'any_person' | 'woman' | 'man' | 'girl' | 'boy' | 'non_human'>('auto')
 
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<ReconstructionResult | null>(null)
@@ -233,6 +234,7 @@ export default function ReverseEngineerPage() {
 
         const formData = new FormData()
         formData.append('image', file)
+        formData.append('subjectType', subjectType)
 
         try {
             const res = await fetch('/api/reverse-engineer', {
@@ -375,6 +377,99 @@ export default function ReverseEngineerPage() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Subject / Demographic Lock Option */}
+                        {file && (
+                            <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                                    <span className="flex items-center gap-1.5 font-bold text-zinc-300">
+                                        <User className="w-3.5 h-3.5 text-emerald-400" />
+                                        Target Demographic Mode
+                                    </span>
+                                    <span className="text-[10px] text-zinc-500">Explicit Subject Target</span>
+                                </span>
+                                
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('auto')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'auto'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        🤖 Auto
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('any_person')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'any_person'
+                                                ? 'bg-cyan-500 text-zinc-950 shadow-sm shadow-cyan-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👤 Any Person
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('woman')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'woman'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👩 Woman
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('man')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'man'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👨 Man
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('girl')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'girl'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👧 Girl
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('boy')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'boy'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👦 Boy
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSubjectType('non_human')}
+                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all col-span-3 sm:col-span-2 ${
+                                            subjectType === 'non_human'
+                                                ? 'bg-purple-500 text-zinc-950 shadow-sm shadow-purple-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        🏞️ Object / Scene
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {error && (
                             <div className="p-4 bg-red-950/30 text-red-400 text-sm rounded-xl border border-red-900/50 flex items-center gap-3 font-mono">

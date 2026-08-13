@@ -8,6 +8,7 @@ export async function POST(req: Request) {
     try {
         const formData = await req.formData();
         const file = formData.get('image') as File;
+        const subjectType = (formData.get('subjectType') as string) || 'auto';
 
         if (!file) {
             return new NextResponse(JSON.stringify({ error: "No image file provided." }), { status: 400 });
@@ -28,9 +29,18 @@ export async function POST(req: Request) {
         // Using flash for speed, it handles images well
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
+        const subjectOverrideInstruction = subjectType === 'any_person'
+            ? `\nUSER EXPLICIT SUBJECT SELECTION: "ANY PERSON / GENDER-NEUTRAL / VERSATILE HUMAN".
+You MUST construct prompts that are versatile and can be applied to ANY person (men, women, girls, or boys). Use adaptable framing such as "A portrait of a person with [detailed facial anatomy, expressions]..." with universal aesthetic lighting, composition, styling, and camera specifications that produce stellar results whether the user chooses to render a man, woman, girl, or boy.\n`
+            : subjectType !== 'auto'
+            ? `\nUSER EXPLICIT SUBJECT SELECTION:
+The user explicitly specified that the subject is: "${subjectType.toUpperCase()}".
+You MUST strictly construct all prompts for a "${subjectType}" (e.g. if 'girl' -> young/teen girl; if 'boy' -> young/teen boy; if 'woman' -> adult female; if 'man' -> adult male; if 'non_human' -> focus on landscape/object/animal without human attributes). Ensure zero demographic ambiguity.\n`
+            : '';
+
         const prompt = `You are a world-class AI Prompt Engineer and Forensic Digital Art Analyst.
 Your task is to Forensically 'Reverse Engineer' the provided image and generate highly accurate prompts designed primarily for ChatGPT (DALL-E 3 / GPT-4o) and Google Gemini (Imagen 3), with secondary support for Midjourney.
-
+${subjectOverrideInstruction}
 CRITICAL FOCUS ON DEMOGRAPHIC, GENDER, FACE & BODY ACCURACY:
 If the image contains a person or character:
 1. ACCURATE DEMOGRAPHIC & LIFE-STAGE CLASSIFICATION:
