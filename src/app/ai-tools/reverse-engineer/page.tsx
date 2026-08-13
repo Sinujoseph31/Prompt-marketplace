@@ -34,6 +34,7 @@ type ReconstructionResult = {
     chatgpt_prompt?: string;
     gemini_prompt?: string;
     midjourney_prompt?: string;
+    face_lock_dna?: string;
     detected_style: string;
     confidence_score: number;
     demographics?: Demographics;
@@ -57,7 +58,7 @@ export default function ReverseEngineerPage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<ReconstructionResult | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [activeTab, setActiveTab] = useState<'chatgpt' | 'gemini' | 'master' | 'midjourney'>('chatgpt')
+    const [activeTab, setActiveTab] = useState<'chatgpt' | 'gemini' | 'master' | 'midjourney' | 'face_dna'>('chatgpt')
     const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
     // Cropping State
@@ -296,6 +297,7 @@ export default function ReverseEngineerPage() {
         if (activeTab === 'chatgpt') return result.chatgpt_prompt || result.reconstructed_prompt;
         if (activeTab === 'gemini') return result.gemini_prompt || result.reconstructed_prompt;
         if (activeTab === 'midjourney') return result.midjourney_prompt || result.reconstructed_prompt;
+        if (activeTab === 'face_dna') return result.face_lock_dna || result.reconstructed_prompt;
         return result.reconstructed_prompt;
     }
 
@@ -628,15 +630,15 @@ export default function ReverseEngineerPage() {
                                                 Optimized Model Target
                                             </h3>
                                             <span className="text-[11px] font-mono text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                                {activeTab === 'chatgpt' ? 'ChatGPT / DALL-E' : activeTab === 'gemini' ? 'Gemini / Imagen 3' : activeTab === 'midjourney' ? 'Midjourney v6' : 'Master Prompt'}
+                                                {activeTab === 'chatgpt' ? 'ChatGPT / DALL-E' : activeTab === 'gemini' ? 'Gemini / Imagen 3' : activeTab === 'midjourney' ? 'Midjourney v6' : activeTab === 'face_dna' ? 'Biometric Face DNA Anchor' : 'Master Prompt'}
                                             </span>
                                         </div>
 
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
+                                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('chatgpt')}
-                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'chatgpt'
                                                         ? 'bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -648,7 +650,7 @@ export default function ReverseEngineerPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('gemini')}
-                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'gemini'
                                                         ? 'bg-blue-500 text-zinc-950 shadow-md shadow-blue-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -660,7 +662,7 @@ export default function ReverseEngineerPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('master')}
-                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'master'
                                                         ? 'bg-zinc-200 text-zinc-950'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -671,13 +673,25 @@ export default function ReverseEngineerPage() {
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('midjourney')}
-                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'midjourney'
                                                         ? 'bg-purple-500 text-zinc-950 shadow-md shadow-purple-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                                 }`}
                                             >
                                                 Midjourney
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('face_dna')}
+                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 col-span-2 sm:col-span-1 ${
+                                                    activeTab === 'face_dna'
+                                                        ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20'
+                                                        : 'text-amber-400 hover:text-amber-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                <Fingerprint className="w-3.5 h-3.5" />
+                                                Face DNA
                                             </button>
                                         </div>
                                     </div>
@@ -698,13 +712,15 @@ export default function ReverseEngineerPage() {
                                                 ? 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
                                                 : activeTab === 'gemini'
                                                 ? 'bg-blue-500 text-zinc-950 hover:bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
+                                                : activeTab === 'face_dna'
+                                                ? 'bg-amber-400 hover:bg-amber-300 text-zinc-950 shadow-[0_0_15px_rgba(251,191,36,0.2)]'
                                                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'
                                         }`}
                                     >
                                         {copiedKey === 'main' ? (
                                             <><Check className="w-4 h-4 mr-2" /> Copied to Clipboard</>
                                         ) : (
-                                            <><Copy className="w-4 h-4 mr-2" /> Copy {activeTab === 'chatgpt' ? 'ChatGPT' : activeTab === 'gemini' ? 'Gemini' : activeTab === 'midjourney' ? 'Midjourney' : 'Master'} Prompt</>
+                                            <><Copy className="w-4 h-4 mr-2" /> Copy {activeTab === 'chatgpt' ? 'ChatGPT' : activeTab === 'gemini' ? 'Gemini' : activeTab === 'midjourney' ? 'Midjourney' : activeTab === 'face_dna' ? 'Face DNA Anchor' : 'Master'} Prompt</>
                                         )}
                                     </Button>
                                 </div>
@@ -806,6 +822,35 @@ export default function ReverseEngineerPage() {
                                                         </div>
                                                     ))}
                                                 </div>
+                                            </div>
+                                        )}
+
+                                        {/* Standalone Biometric Face-DNA Anchor */}
+                                        {result.face_lock_dna && (
+                                            <div className="bg-zinc-950/90 rounded-xl p-4 border border-amber-500/30 flex flex-col gap-2.5 shadow-lg">
+                                                <div className="flex items-center justify-between flex-wrap gap-2">
+                                                    <span className="text-[11px] font-mono text-amber-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
+                                                        <Fingerprint className="w-4 h-4 text-amber-400" />
+                                                        Biometric Face-Lock DNA Anchor
+                                                    </span>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => copyToClipboard(result.face_lock_dna || '', 'face_dna_block')}
+                                                        className="h-7 px-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold font-mono text-[11px] rounded-lg"
+                                                    >
+                                                        {copiedKey === 'face_dna_block' ? (
+                                                            <><Check className="w-3 h-3 mr-1" /> Copied Face DNA</>
+                                                        ) : (
+                                                            <><Copy className="w-3 h-3 mr-1" /> Copy Face DNA</>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                <p className="text-xs font-serif text-zinc-200 leading-relaxed bg-zinc-900/80 p-3 rounded-lg border border-zinc-800">
+                                                    {result.face_lock_dna}
+                                                </p>
+                                                <p className="text-[10px] text-zinc-400 font-mono">
+                                                    💡 Pro Tip: Paste this Biometric Anchor into any custom prompt or image generator to ensure 95%+ identical facial bone structure.
+                                                </p>
                                             </div>
                                         )}
 
