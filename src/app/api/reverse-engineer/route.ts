@@ -31,14 +31,25 @@ export async function POST(req: Request) {
         const prompt = `You are a world-class AI Prompt Engineer and Forensic Digital Art Analyst.
 Your task is to Forensically 'Reverse Engineer' the provided image and generate highly accurate prompts designed primarily for ChatGPT (DALL-E 3 / GPT-4o) and Google Gemini (Imagen 3), with secondary support for Midjourney.
 
-CRITICAL FOCUS ON FACE, BODY & IDENTITY PRESERVATION:
-If the image contains a person:
-1. FACIAL ANATOMY: Describe their exact facial features (eye shape/color, nose profile, lips, jawline/chin, cheekbones, skin tone/texture/pores/freckles, hair style/color/parting/length, facial hair, age, and natural expression).
-2. BODY & PHYSIQUE: Describe their body type/build (e.g., athletic, slender, broad-shouldered, curvy), posture, stature, skin tone, and clothing style so their entire identity and body silhouette remains identical without drifting.
-3. IMAGE CLARITY DIAGNOSIS: Assess the uploaded image clarity, sharpness, and lighting.
+CRITICAL FOCUS ON DEMOGRAPHIC, GENDER, FACE & BODY ACCURACY:
+If the image contains a person or character:
+1. ACCURATE DEMOGRAPHIC & LIFE-STAGE CLASSIFICATION:
+   - Identify with 100% precision whether the subject is a:
+     * Young Girl (child / toddler / elementary)
+     * Teen Girl (adolescent / high-school age)
+     * Adult Woman / Female
+     * Young Boy (child / toddler / elementary)
+     * Teen Boy (adolescent / high-school age)
+     * Adult Man / Male
+     * Senior Woman / Senior Man
+   - State their exact estimated age bracket (e.g., "7-9 years old", "15-17 years old", "26-28 years old").
+   - In all generated prompts, ALWAYS explicitly declare this exact age & gender descriptor at the very start (e.g. "A photorealistic portrait of a 15-year-old teenage girl...") so AI models NEVER mistakenly age them up into an adult, down into a child, or swap their gender.
+2. FACIAL ANATOMY & LANDMARKS: Describe their exact facial features (eye shape/color, nose profile, lips, jawline/chin, cheekbones, skin tone/texture/pores/freckles, hair style/color/parting/length, facial hair if any, and expression).
+3. BODY & SILHOUETTE: Describe their exact build/physique (e.g., petite adolescent frame, athletic slender, broad-shouldered muscular, tall lean), posture, and clothing so the full body identity stays completely identical.
+4. IMAGE CLARITY DIAGNOSIS: Assess uploaded image clarity, sharpness, and lighting.
 
 Analyze the image for:
-- Subject & Action (with extreme facial and body precision if human)
+- Subject & Action (with extreme demographic, facial, and body precision if human)
 - Artistic Style & Medium (e.g., Raw 35mm photograph, Cinematic film still, Digital 3D, Oil painting)
 - Lighting & Atmosphere (e.g., Golden hour directional light, soft rim lighting, volumetric fog)
 - Camera & Composition (e.g., 85mm f/1.4 portrait lens, close-up shot, rule of thirds, bokeh)
@@ -52,6 +63,13 @@ Respond ONLY with a valid JSON object matching exactly this schema:
     "midjourney_prompt": "string", // Prompt formatted for Midjourney v6 with stylistic keywords and parameters (e.g., --v 6.1 --ar 16:9, and --cref [IMAGE_URL] if a face is detected).
     "detected_style": "string", // The primary overriding art style (1-3 words)
     "confidence_score": 95, // Overall confidence score between 1 and 100
+    "demographics": {
+        "identity_classification": "e.g. Teen Girl (15-17 yrs) / Young Boy (7-9 yrs) / Adult Woman (26-28 yrs) / Adult Man (32-35 yrs)",
+        "gender": "e.g. Female (Girl) / Female (Woman) / Male (Boy) / Male (Man)",
+        "estimated_age": "e.g. 16 years old",
+        "body_physique": "e.g. Petite adolescent frame with natural posture",
+        "face_shape": "e.g. Soft oval with youthful features and light freckles"
+    },
     "sub_metrics": {
         "image_clarity": 92, // 1-100: Score evaluating sharpness, noise, and resolution fidelity of the uploaded image
         "face_retention": 95, // 1-100: Score evaluating facial landmark precision and face-lock capability

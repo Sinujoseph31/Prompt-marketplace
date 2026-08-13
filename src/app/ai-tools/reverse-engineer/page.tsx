@@ -21,6 +21,14 @@ type SubMetrics = {
     lighting_fidelity?: number;
 }
 
+type Demographics = {
+    identity_classification?: string;
+    gender?: string;
+    estimated_age?: string;
+    body_physique?: string;
+    face_shape?: string;
+}
+
 type ReconstructionResult = {
     reconstructed_prompt: string;
     chatgpt_prompt?: string;
@@ -28,6 +36,7 @@ type ReconstructionResult = {
     midjourney_prompt?: string;
     detected_style: string;
     confidence_score: number;
+    demographics?: Demographics;
     sub_metrics?: SubMetrics;
     key_elements: string[];
     face_detected?: boolean;
@@ -626,6 +635,48 @@ export default function ReverseEngineerPage() {
                                                 </div>
                                             </div>
                                         </div>
+
+                                        {/* Demographics & Life-Stage Diagnosis */}
+                                        {result.demographics && (
+                                            <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-emerald-500/30 flex flex-col gap-2.5">
+                                                <div className="flex items-center justify-between flex-wrap gap-2">
+                                                    <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
+                                                        <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                                        Diagnosed Subject Identity:
+                                                    </span>
+                                                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-mono py-0.5">
+                                                        {result.demographics.identity_classification || result.demographics.gender || 'Person'}
+                                                    </Badge>
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+                                                    {result.demographics.gender && (
+                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                                                            <span className="text-zinc-500">Gender / Stage:</span>
+                                                            <span className="font-bold text-white">{result.demographics.gender}</span>
+                                                        </div>
+                                                    )}
+                                                    {result.demographics.estimated_age && (
+                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                                                            <span className="text-zinc-500">Estimated Age:</span>
+                                                            <span className="font-bold text-white">{result.demographics.estimated_age}</span>
+                                                        </div>
+                                                    )}
+                                                    {result.demographics.face_shape && (
+                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col gap-0.5 sm:col-span-2">
+                                                            <span className="text-zinc-500 text-[10px] uppercase tracking-wider">Face Anatomy:</span>
+                                                            <span className="text-zinc-300">{result.demographics.face_shape}</span>
+                                                        </div>
+                                                    )}
+                                                    {result.demographics.body_physique && (
+                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col gap-0.5 sm:col-span-2">
+                                                            <span className="text-zinc-500 text-[10px] uppercase tracking-wider">Body & Physique:</span>
+                                                            <span className="text-zinc-300">{result.demographics.body_physique}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
 
                                         {/* Key Facial Traits */}
                                         {result.face_consistency_instructions?.key_facial_traits && result.face_consistency_instructions.key_facial_traits.length > 0 && (

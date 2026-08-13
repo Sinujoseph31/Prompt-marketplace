@@ -68,12 +68,22 @@ export async function POST(req: Request) {
 
         const scenesDescription = requestedScenes.map(s => `- ID: "${s.id}", Title: "${s.title}", Scene Context: "${s.prompt_cue}"`).join('\n');
 
-        const prompt = `You are a world-class AI Character Architect and Prompt Engineer specializing in biometric facial consistency across diverse scenes for ChatGPT (GPT-4o / DALL-E 3) and Google Gemini (Imagen 3).
+        const prompt = `You are a world-class AI Character Architect and Prompt Engineer specializing in biometric facial and demographic consistency across diverse scenes for ChatGPT (GPT-4o / DALL-E 3) and Google Gemini (Imagen 3).
 
 Your Mission:
-1. Extract or synthesize a comprehensive, ultra-precise Biometric Identity DNA for this character (eye shape/iris color, nose bridge, jawline, lips, skin tone/texture/pores, hair texture/color/parting/length, age, and natural expression).
-2. For EVERY requested scene listed below, construct highly detailed, identity-locked prompts tailored specifically for:
-   - "chatgpt_prompt": Natural language narrative format with strict facial consistency instructions for ChatGPT (GPT-4o / DALL-E 3).
+1. DEMOGRAPHIC & LIFE-STAGE PRECISION:
+   - Identify with 100% precision whether the subject is a:
+     * Young Girl (child / toddler / elementary, e.g. "7-9 years old")
+     * Teen Girl (adolescent, e.g. "14-16 years old")
+     * Adult Woman / Female (e.g. "26-28 years old")
+     * Young Boy (child / toddler / elementary, e.g. "6-8 years old")
+     * Teen Boy (adolescent, e.g. "15-17 years old")
+     * Adult Man / Male (e.g. "30-34 years old")
+     * Senior Woman / Senior Man
+   - In EVERY scene prompt, you MUST start with the exact age and demographic declaration (e.g., "A cinematic shot of a 15-year-old teenage girl..." or "A shot of a 7-year-old young boy...") so AI models NEVER swap gender or alter their age across storyboard scenes.
+2. Extract or synthesize a comprehensive, ultra-precise Biometric Identity DNA for this character (eye shape/iris color, nose bridge, jawline, lips, skin tone/texture/pores, hair texture/color/parting/length, age, build, posture, and natural expression).
+3. For EVERY requested scene listed below, construct highly detailed, identity-locked prompts tailored specifically for:
+   - "chatgpt_prompt": Natural language narrative format with strict facial and demographic consistency instructions for ChatGPT (GPT-4o / DALL-E 3).
    - "gemini_prompt": Photorealistic prompt with lighting, camera lens, and facial landmark retention for Google Gemini (Imagen 3).
    - "midjourney_prompt": Midjourney v6.1 format with styling parameters and "--cref [IMAGE_URL] --cw 100".
 
