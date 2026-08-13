@@ -28,23 +28,37 @@ export async function POST(req: Request) {
         // Using flash for speed, it handles images well
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const prompt = `You are an expert AI Prompt Engineer and Digital Art Analyst. 
-        Your task is to Forensically 'Reverse Engineer' the provided image and generate the exact prompt that was likely used to create it.
-        
-        Analyze the image for:
-        1. Primary subjects and their actions
-        2. Artistic style (e.g., Cyberpunk, Hyperrealistic, Watercolor, 3D Render)
-        3. Lighting and atmosphere (e.g., volumetric lighting, cinematic, gloomy)
-        4. Camera angles or perspectives (e.g., extreme close up, drone shot, isometric)
-        5. Suspected rendering engine or medium (e.g., Unreal Engine 5, Octane Render, Oil on Canvas)
+        const prompt = `You are a world-class AI Prompt Engineer and Forensic Digital Art Analyst.
+Your task is to Forensically 'Reverse Engineer' the provided image and generate highly accurate prompts designed primarily for ChatGPT (DALL-E 3 / GPT-4o) and Google Gemini (Imagen 3), with secondary support for Midjourney.
 
-        Respond ONLY with a valid JSON object matching exactly this schema:
-        {
-            "reconstructed_prompt": "string", // A dense, highly detailed 50-100 word prompt
-            "detected_style": "string", // The primary overriding art style (1-3 words)
-            "confidence_score": number, // Your confidence in this reconstruction from 1 to 100
-            "key_elements": ["string", "string"] // An array of 4-6 specific visual tags/keywords found
-        }`;
+CRITICAL FOCUS ON FACE & IDENTITY PRESERVATION:
+If the image contains a person or face:
+1. Describe their specific facial anatomy and biometric characteristics in high detail (exact eye shape/color, nose profile, lips, jawline/chin, cheekbones, skin tone/texture/pores/freckles, hair style/color/parting/length, facial hair if any, age, and natural expression).
+2. DO NOT use vague terms like "a pretty person" or "a man". Describe specific physical features so that ChatGPT, Gemini, and other image generators will produce the exact same face and identity without drifting or changing.
+
+Analyze the image for:
+- Subject & Action (with extreme facial precision if human)
+- Artistic Style & Medium (e.g., Raw 35mm photograph, Cinematic film still, Digital 3D, Oil painting)
+- Lighting & Atmosphere (e.g., Golden hour directional light, soft rim lighting, volumetric fog)
+- Camera & Composition (e.g., 85mm f/1.4 portrait lens, close-up shot, rule of thirds, bokeh)
+- Color Palette & Mood
+
+Respond ONLY with a valid JSON object matching exactly this schema:
+{
+    "reconstructed_prompt": "string", // Rich, ultra-descriptive master prompt (60-120 words) in natural language.
+    "chatgpt_prompt": "string", // Prompt specifically optimized for ChatGPT (DALL-E 3 / GPT-4o). If a face is present, includes an instruction like: 'Generate a photo maintaining the exact facial identity of: [detailed face description]...'
+    "gemini_prompt": "string", // Prompt specifically optimized for Google Gemini (Imagen 3), with camera specs, lighting fidelity, and exact facial landmarks.
+    "midjourney_prompt": "string", // Prompt formatted for Midjourney v6 with stylistic keywords and parameters (e.g., --v 6.1 --ar 16:9, and --cref [IMAGE_URL] if a face is detected).
+    "detected_style": "string", // The primary overriding art style (1-3 words)
+    "confidence_score": 95, // Confidence score between 1 and 100
+    "key_elements": ["string", "string", "string", "string"], // 4-6 specific visual tags
+    "face_detected": true, // true if a human face or identifiable character is present, otherwise false
+    "face_consistency_instructions": {
+        "chatgpt_tip": "string", // Step-by-step guidance for ChatGPT (e.g., upload reference image and paste this prompt)
+        "gemini_tip": "string", // Step-by-step guidance for Gemini (e.g., use with Imagen 3 / Gemini Advanced with reference image)
+        "key_facial_traits": ["string", "string", "string"] // 3-5 bullet points of unique facial identifiers extracted from the image
+    }
+}`;
 
         const imagePart = {
             inlineData: {

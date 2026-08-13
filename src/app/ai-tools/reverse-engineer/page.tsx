@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint, Crop as CropIcon } from 'lucide-react'
+import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint, Crop as CropIcon, Sparkles, Check, UserCheck, ShieldCheck } from 'lucide-react'
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import {
@@ -16,9 +16,18 @@ import {
 
 type ReconstructionResult = {
     reconstructed_prompt: string;
+    chatgpt_prompt?: string;
+    gemini_prompt?: string;
+    midjourney_prompt?: string;
     detected_style: string;
     confidence_score: number;
     key_elements: string[];
+    face_detected?: boolean;
+    face_consistency_instructions?: {
+        chatgpt_tip?: string;
+        gemini_tip?: string;
+        key_facial_traits?: string[];
+    };
 }
 
 export default function ReverseEngineerPage() {
@@ -29,7 +38,8 @@ export default function ReverseEngineerPage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<ReconstructionResult | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [copied, setCopied] = useState(false)
+    const [activeTab, setActiveTab] = useState<'chatgpt' | 'gemini' | 'master' | 'midjourney'>('chatgpt')
+    const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
     // Cropping State
     const [cropModalOpen, setCropModalOpen] = useState(false)
@@ -237,6 +247,7 @@ export default function ReverseEngineerPage() {
 
             const data = await res.json()
             setResult(data.result)
+            setActiveTab('chatgpt') // Default to ChatGPT as priority
 
             setTimeout(() => {
                 document.getElementById('analysis-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -253,11 +264,19 @@ export default function ReverseEngineerPage() {
         }
     }
 
-    const copyPrompt = () => {
-        if (!result) return;
-        navigator.clipboard.writeText(result.reconstructed_prompt)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 2000)
+    const copyToClipboard = (text: string, key: string) => {
+        if (!text) return;
+        navigator.clipboard.writeText(text)
+        setCopiedKey(key)
+        setTimeout(() => setCopiedKey(null), 2000)
+    }
+
+    const getActivePrompt = () => {
+        if (!result) return '';
+        if (activeTab === 'chatgpt') return result.chatgpt_prompt || result.reconstructed_prompt;
+        if (activeTab === 'gemini') return result.gemini_prompt || result.reconstructed_prompt;
+        if (activeTab === 'midjourney') return result.midjourney_prompt || result.reconstructed_prompt;
+        return result.reconstructed_prompt;
     }
 
     return (
@@ -276,13 +295,13 @@ export default function ReverseEngineerPage() {
                 <div className="flex flex-col gap-4 text-center items-center">
                     <Badge variant="outline" className="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] tracking-widest text-xs font-mono rounded-md backdrop-blur-md uppercase">
                         <ScanSearch className="w-3.5 h-3.5 mr-2 inline-block -mt-0.5" />
-                        Forensic Engine v1.0
+                        Forensic Engine v2.0 • ChatGPT & Gemini Priority
                     </Badge>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white uppercase text-center flex flex-col items-center">
                         Reverse Engineer
                     </h1>
                     <p className="text-zinc-400 text-lg md:text-xl font-medium max-w-2xl px-4 leading-relaxed font-mono">
-                        Upload an AI-generated image. Our vision model will deconstruct its DNA and reconstruct the prompt used to make it.
+                        Deconstruct any image into high-precision prompts optimized for <span className="text-emerald-400 font-semibold">ChatGPT</span> & <span className="text-blue-400 font-semibold">Gemini</span> with biometric facial locking.
                     </p>
                 </div>
 
@@ -320,9 +339,9 @@ export default function ReverseEngineerPage() {
                                                 <div className="absolute top-0 left-0 w-full h-px bg-emerald-500 shadow-[0_0_10px_#10B981] animate-scan"></div>
                                                 <div className="flex items-center gap-3 text-emerald-400 font-mono text-sm uppercase tracking-widest font-bold">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                    Scanning DNA...
+                                                    Forensic Analysis...
                                                 </div>
-                                                <div className="flex gap-1 mt-3 opactiy-50">
+                                                <div className="flex gap-1 mt-3 opacity-50">
                                                     <div className="h-1 w-full bg-emerald-500/20 overflow-hidden"><div className="h-full bg-emerald-400 animate-pulse w-full"></div></div>
                                                     <div className="h-1 w-1/4 bg-emerald-500/20 overflow-hidden"><div className="h-full bg-emerald-400 animate-pulse delay-75 w-full"></div></div>
                                                 </div>
@@ -372,7 +391,7 @@ export default function ReverseEngineerPage() {
                                 disabled={!file || isAnalyzing}
                                 className={`h-14 font-black text-lg uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'col-span-2 md:flex-[3]' : 'col-span-2 md:w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
                             >
-                                {isAnalyzing ? 'Analyzing...' : 'Reverse Engineer'}
+                                {isAnalyzing ? 'Extracting DNA...' : 'Reverse Engineer'}
                             </Button>
                         </div>
                     </div>
@@ -383,7 +402,7 @@ export default function ReverseEngineerPage() {
                             <div className="w-full h-full rounded-2xl border border-zinc-800 bg-zinc-900/30 flex flex-col items-center justify-center p-10 text-center text-zinc-600">
                                 <Fingerprint className="w-16 h-16 mb-4 opacity-50" />
                                 <h3 className="text-xl font-bold mb-2 font-mono uppercase text-zinc-500">Awaiting Target</h3>
-                                <p className="text-sm leading-relaxed max-w-xs">Upload an image to extract its stylistic properties and reconstruct the baseline prompt.</p>
+                                <p className="text-sm leading-relaxed max-w-xs">Upload an image to extract its forensic characteristics and reconstruct the prompt for ChatGPT & Gemini.</p>
                             </div>
                         ) : result ? (
                             <div id="analysis-results" className="w-full flex flex-col gap-6 animate-in slide-in-from-right-8 duration-700 fade-in">
@@ -407,32 +426,192 @@ export default function ReverseEngineerPage() {
                                     </div>
                                 </div>
 
-                                {/* Reconstructed Prompt */}
-                                <div className="p-6 md:p-8 rounded-2xl bg-zinc-900/80 border border-zinc-700 shadow-xl flex flex-col gap-6 relative group overflow-hidden">
+                                {/* Reconstructed Prompt Card */}
+                                <div className="p-6 md:p-8 rounded-2xl bg-zinc-900/90 border border-zinc-700 shadow-xl flex flex-col gap-6 relative group overflow-hidden">
                                     {/* Decoration */}
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-[100px] pointer-events-none"></div>
 
-                                    <div>
-                                        <h3 className="text-sm font-bold font-mono text-emerald-400 uppercase tracking-widest mb-4 flex items-center">
-                                            <TerminalSquareIcon className="w-4 h-4 mr-2" />
-                                            Reconstructed Prompt
-                                        </h3>
-                                        <p className="font-serif text-base sm:text-lg md:text-xl leading-relaxed text-zinc-100 selection:bg-emerald-500/40">
-                                            {result.reconstructed_prompt}
+                                    {/* Model Selector Tabs (ChatGPT & Gemini Priority) */}
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-xs font-bold font-mono text-zinc-400 uppercase tracking-widest flex items-center">
+                                                <TerminalSquareIcon className="w-4 h-4 mr-2 text-emerald-400" />
+                                                Optimized Model Target
+                                            </h3>
+                                            <span className="text-[11px] font-mono text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                                {activeTab === 'chatgpt' ? 'ChatGPT / DALL-E' : activeTab === 'gemini' ? 'Gemini / Imagen 3' : activeTab === 'midjourney' ? 'Midjourney v6' : 'Master Prompt'}
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('chatgpt')}
+                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                    activeTab === 'chatgpt'
+                                                        ? 'bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/20'
+                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                <Sparkles className="w-3.5 h-3.5" />
+                                                ChatGPT
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('gemini')}
+                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                    activeTab === 'gemini'
+                                                        ? 'bg-blue-500 text-zinc-950 shadow-md shadow-blue-500/20'
+                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                <Sparkles className="w-3.5 h-3.5" />
+                                                Gemini
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('master')}
+                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                    activeTab === 'master'
+                                                        ? 'bg-zinc-200 text-zinc-950'
+                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                Master
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('midjourney')}
+                                                className={`py-2 px-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                    activeTab === 'midjourney'
+                                                        ? 'bg-purple-500 text-zinc-950 shadow-md shadow-purple-500/20'
+                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                Midjourney
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Prompt Display */}
+                                    <div className="p-4 rounded-xl bg-zinc-950/70 border border-zinc-800">
+                                        <p className="font-serif text-base sm:text-lg leading-relaxed text-zinc-100 selection:bg-emerald-500/40">
+                                            {getActivePrompt()}
                                         </p>
                                     </div>
 
                                     <Button
-                                        onClick={copyPrompt}
-                                        className={`w-full mt-2 rounded-xl h-14 font-bold font-mono uppercase tracking-wider transition-all duration-300 ${copied ? 'bg-emerald-500 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:bg-emerald-400' : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'}`}
+                                        onClick={() => copyToClipboard(getActivePrompt(), 'main')}
+                                        className={`w-full rounded-xl h-14 font-bold font-mono uppercase tracking-wider transition-all duration-300 ${
+                                            copiedKey === 'main'
+                                                ? 'bg-emerald-500 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:bg-emerald-400'
+                                                : activeTab === 'chatgpt'
+                                                ? 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                                                : activeTab === 'gemini'
+                                                ? 'bg-blue-500 text-zinc-950 hover:bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
+                                                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'
+                                        }`}
                                     >
-                                        {copied ? (
-                                            <><Copy className="w-4 h-4 mr-2" /> Extracted to Clipboard</>
+                                        {copiedKey === 'main' ? (
+                                            <><Check className="w-4 h-4 mr-2" /> Copied to Clipboard</>
                                         ) : (
-                                            <><Copy className="w-4 h-4 mr-2" /> Copy Prompt</>
+                                            <><Copy className="w-4 h-4 mr-2" /> Copy {activeTab === 'chatgpt' ? 'ChatGPT' : activeTab === 'gemini' ? 'Gemini' : activeTab === 'midjourney' ? 'Midjourney' : 'Master'} Prompt</>
                                         )}
                                     </Button>
                                 </div>
+
+                                {/* Face & Identity Lock Card (Rendered if a face is detected) */}
+                                {result.face_detected && (
+                                    <div className="p-5 sm:p-6 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.07)] flex flex-col gap-4 relative overflow-hidden animate-in fade-in duration-500">
+                                        <div className="flex items-center justify-between flex-wrap gap-2">
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                                                    <Fingerprint className="w-5 h-5 animate-pulse" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-bold font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                                                        Face & Identity Lock
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                                            ACTIVE
+                                                        </span>
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-400 font-mono">
+                                                        Biometric facial landmarks detected & extracted for zero identity-drift.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Key Facial Traits */}
+                                        {result.face_consistency_instructions?.key_facial_traits && result.face_consistency_instructions.key_facial_traits.length > 0 && (
+                                            <div className="bg-zinc-900/90 rounded-xl p-3.5 border border-zinc-800 flex flex-col gap-2">
+                                                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                                    Preserved Facial Signatures:
+                                                </span>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    {result.face_consistency_instructions.key_facial_traits.map((trait, idx) => (
+                                                        <div key={idx} className="text-xs font-mono text-zinc-300 flex items-start gap-2 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800/80">
+                                                            <span className="text-emerald-400 font-bold">•</span>
+                                                            <span>{trait}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Priority Guides for ChatGPT & Gemini */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                                            {/* ChatGPT Guide */}
+                                            <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-emerald-500/20 flex flex-col justify-between gap-3">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <span className="text-xs font-bold font-mono text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                                                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                                                        ChatGPT (GPT-4o) Lock
+                                                    </span>
+                                                    <p className="text-xs text-zinc-400 leading-relaxed">
+                                                        {result.face_consistency_instructions?.chatgpt_tip || "Attach the source image directly in ChatGPT with the ChatGPT prompt to enforce exact face likeness across all variations."}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => copyToClipboard(result.chatgpt_prompt || result.reconstructed_prompt, 'chatgpt')}
+                                                    className="w-full bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-mono"
+                                                >
+                                                    {copiedKey === 'chatgpt' ? (
+                                                        <><Check className="w-3.5 h-3.5 mr-1.5" /> Copied ChatGPT Prompt</>
+                                                    ) : (
+                                                        <><Copy className="w-3.5 h-3.5 mr-1.5" /> Copy ChatGPT Prompt</>
+                                                    )}
+                                                </Button>
+                                            </div>
+
+                                            {/* Gemini Guide */}
+                                            <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-blue-500/20 flex flex-col justify-between gap-3">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <span className="text-xs font-bold font-mono text-blue-300 uppercase tracking-wider flex items-center gap-1.5">
+                                                        <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                                                        Gemini (Imagen 3) Lock
+                                                    </span>
+                                                    <p className="text-xs text-zinc-400 leading-relaxed">
+                                                        {result.face_consistency_instructions?.gemini_tip || "Upload the image in Gemini and use this prompt with Imagen 3 for high fidelity lighting and exact bone structure retention."}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => copyToClipboard(result.gemini_prompt || result.reconstructed_prompt, 'gemini')}
+                                                    className="w-full bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 text-xs font-mono"
+                                                >
+                                                    {copiedKey === 'gemini' ? (
+                                                        <><Check className="w-3.5 h-3.5 mr-1.5" /> Copied Gemini Prompt</>
+                                                    ) : (
+                                                        <><Copy className="w-3.5 h-3.5 mr-1.5" /> Copy Gemini Prompt</>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Extracted Tags */}
                                 <div className="flex flex-col gap-3">
