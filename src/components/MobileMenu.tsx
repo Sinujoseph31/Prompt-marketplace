@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Menu, X, ScanSearch, UserCheck } from 'lucide-react'
+import { Menu, X, ScanSearch, UserCheck, Activity } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface MobileMenuProps {
@@ -77,6 +77,10 @@ export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction 
 
                         <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground px-2 pt-2 pb-2">AI Tools</p>
 
+                        <Link href="/ai-tools/prompt-doctor" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                            <Activity className="w-5 h-5 text-cyan-400" />
+                            <span className="font-bold text-cyan-400">Prompt Doctor</span>
+                        </Link>
                         <Link href="/ai-tools/character-studio" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
                             <UserCheck className="w-5 h-5 text-emerald-500" />
                             <span className="font-bold text-emerald-500">Character Studio</span>
@@ -160,7 +164,7 @@ export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction 
                 <Menu className="w-6 h-6" />
             </Button>
 
-            {mounted && createPortal(overlay, document.body)}
+            {mounted && open && overlay && createPortal(overlay, document.body)}
         </div>
     )
 }

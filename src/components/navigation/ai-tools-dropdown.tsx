@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck } from "lucide-react"
+import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck, Activity } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const tools = [
+    {
+        title: "Prompt Doctor",
+        href: "/ai-tools/prompt-doctor",
+        description: "Benchmark score & token optimization",
+        icon: Activity,
+        color: "text-cyan-400",
+        bgColor: "bg-cyan-500/10"
+    },
     {
         title: "Character Studio",
         href: "/ai-tools/character-studio",

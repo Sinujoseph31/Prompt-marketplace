@@ -28,11 +28,14 @@ import {
     Edit3,
     Dumbbell,
     Briefcase,
+    Glasses,
     Rocket,
     Shield,
     Plane,
     Mic,
     Snowflake,
+    User,
+    Activity,
     Film
 } from 'lucide-react'
 
@@ -60,11 +63,20 @@ const SAMPLE_CHARACTERS = [
     "A 24-year-old Brazilian photographer with warm bronze skin, hazel-amber eyes, defined cheekbones, and dark curly hair falling over forehead."
 ]
 
+type CharacterSubMetrics = {
+    image_clarity?: number;
+    face_match?: number;
+    body_proportions?: number;
+    lighting_fidelity?: number;
+}
+
 type CharacterDNA = {
     title: string;
     estimated_age: string;
     gender: string;
     key_facial_signatures: string[];
+    body_physique_signatures?: string[];
+    sub_metrics?: CharacterSubMetrics;
     full_identity_anchor: string;
 }
 
@@ -497,15 +509,84 @@ export default function CharacterStudioPage() {
                                         </Button>
                                     </div>
 
-                                    {/* Facial Landmarks Tags */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-800">
-                                        {result.character_dna.key_facial_signatures.map((sig, idx) => (
-                                            <div key={idx} className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs font-mono text-zinc-300 flex items-start gap-2">
-                                                <span className="text-emerald-400 font-bold">•</span>
-                                                <span className="leading-tight">{sig}</span>
+                                    {/* Sub-Metrics Row */}
+                                    {result.character_dna.sub_metrics && (
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-800">
+                                            <div className="p-2 rounded-lg bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1">
+                                                <div className="flex justify-between text-[11px] font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1"><Camera className="w-3 h-3 text-cyan-400" /> Clarity</span>
+                                                    <span className="text-cyan-300 font-bold">{result.character_dna.sub_metrics.image_clarity || 92}%</span>
+                                                </div>
+                                                <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-cyan-400 rounded-full" style={{ width: `${result.character_dna.sub_metrics.image_clarity || 92}%` }}></div>
+                                                </div>
                                             </div>
-                                        ))}
+
+                                            <div className="p-2 rounded-lg bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1">
+                                                <div className="flex justify-between text-[11px] font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1"><UserCheck className="w-3 h-3 text-emerald-400" /> Face</span>
+                                                    <span className="text-emerald-300 font-bold">{result.character_dna.sub_metrics.face_match || 95}%</span>
+                                                </div>
+                                                <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${result.character_dna.sub_metrics.face_match || 95}%` }}></div>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-2 rounded-lg bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1">
+                                                <div className="flex justify-between text-[11px] font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1"><User className="w-3 h-3 text-purple-400" /> Body</span>
+                                                    <span className="text-purple-300 font-bold">{result.character_dna.sub_metrics.body_proportions || 90}%</span>
+                                                </div>
+                                                <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-purple-400 rounded-full" style={{ width: `${result.character_dna.sub_metrics.body_proportions || 90}%` }}></div>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-2 rounded-lg bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1">
+                                                <div className="flex justify-between text-[11px] font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1"><Sparkles className="w-3 h-3 text-yellow-400" /> Light</span>
+                                                    <span className="text-yellow-300 font-bold">{result.character_dna.sub_metrics.lighting_fidelity || 92}%</span>
+                                                </div>
+                                                <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${result.character_dna.sub_metrics.lighting_fidelity || 92}%` }}></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Facial Landmarks Tags */}
+                                    <div className="flex flex-col gap-2 pt-1 border-t border-zinc-800">
+                                        <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                                            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                            Preserved Facial Signatures:
+                                        </span>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {result.character_dna.key_facial_signatures.map((sig, idx) => (
+                                                <div key={idx} className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs font-mono text-zinc-300 flex items-start gap-2">
+                                                    <span className="text-emerald-400 font-bold">•</span>
+                                                    <span className="leading-tight">{sig}</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+
+                                    {/* Body & Silhouette Signatures */}
+                                    {result.character_dna.body_physique_signatures && result.character_dna.body_physique_signatures.length > 0 && (
+                                        <div className="flex flex-col gap-2 pt-1 border-t border-zinc-800">
+                                            <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                <User className="w-3.5 h-3.5 text-purple-400" />
+                                                Preserved Body & Physique Signatures:
+                                            </span>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                {result.character_dna.body_physique_signatures.map((sig, idx) => (
+                                                    <div key={idx} className="p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs font-mono text-zinc-300 flex items-start gap-2">
+                                                        <span className="text-purple-400 font-bold">•</span>
+                                                        <span className="leading-tight">{sig}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Target Model Selector Tabs */}

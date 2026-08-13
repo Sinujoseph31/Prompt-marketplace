@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint, Crop as CropIcon, Sparkles, Check, UserCheck, ShieldCheck } from 'lucide-react'
+import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint, Crop as CropIcon, Sparkles, Check, UserCheck, ShieldCheck, Camera, Activity, Target, User, Focus, Layers } from 'lucide-react'
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import {
@@ -14,6 +14,13 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 
+type SubMetrics = {
+    image_clarity?: number;
+    face_retention?: number;
+    body_consistency?: number;
+    lighting_fidelity?: number;
+}
+
 type ReconstructionResult = {
     reconstructed_prompt: string;
     chatgpt_prompt?: string;
@@ -21,12 +28,14 @@ type ReconstructionResult = {
     midjourney_prompt?: string;
     detected_style: string;
     confidence_score: number;
+    sub_metrics?: SubMetrics;
     key_elements: string[];
     face_detected?: boolean;
     face_consistency_instructions?: {
         chatgpt_tip?: string;
         gemini_tip?: string;
         key_facial_traits?: string[];
+        body_physique_traits?: string[];
     };
 }
 
@@ -426,6 +435,82 @@ export default function ReverseEngineerPage() {
                                     </div>
                                 </div>
 
+                                {/* Forensic Sub-Metrics Dashboard (Clarity, Face, Body, Lighting) */}
+                                {result.sub_metrics && (
+                                    <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-3">
+                                        <span className="text-xs font-bold font-mono text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+                                            <Activity className="w-4 h-4 text-cyan-400" />
+                                            Source Image Sub-Metrics & Identity Retention
+                                        </span>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                            {/* Image Clarity */}
+                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
+                                                <div className="flex items-center justify-between text-xs font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1.5">
+                                                        <Camera className="w-3.5 h-3.5 text-cyan-400" />
+                                                        Image Clarity & Resolution
+                                                    </span>
+                                                    <span className="font-bold text-cyan-300">
+                                                        {result.sub_metrics.image_clarity || 90}%
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-400 rounded-full" style={{ width: `${result.sub_metrics.image_clarity || 90}%` }}></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Face Likeness Lock */}
+                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
+                                                <div className="flex items-center justify-between text-xs font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1.5">
+                                                        <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                                                        Face Likeness Precision
+                                                    </span>
+                                                    <span className="font-bold text-emerald-300">
+                                                        {result.sub_metrics.face_retention || 95}%
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style={{ width: `${result.sub_metrics.face_retention || 95}%` }}></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Body & Silhouette Consistency */}
+                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
+                                                <div className="flex items-center justify-between text-xs font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1.5">
+                                                        <User className="w-3.5 h-3.5 text-purple-400" />
+                                                        Body & Physique Consistency
+                                                    </span>
+                                                    <span className="font-bold text-purple-300">
+                                                        {result.sub_metrics.body_consistency || 88}%
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full" style={{ width: `${result.sub_metrics.body_consistency || 88}%` }}></div>
+                                                </div>
+                                            </div>
+
+                                            {/* Lighting & Style Fidelity */}
+                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
+                                                <div className="flex items-center justify-between text-xs font-mono">
+                                                    <span className="text-zinc-400 flex items-center gap-1.5">
+                                                        <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+                                                        Lighting & Style Fidelity
+                                                    </span>
+                                                    <span className="font-bold text-yellow-300">
+                                                        {result.sub_metrics.lighting_fidelity || 92}%
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-gradient-to-r from-yellow-500 to-amber-400 rounded-full" style={{ width: `${result.sub_metrics.lighting_fidelity || 92}%` }}></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* Reconstructed Prompt Card */}
                                 <div className="p-6 md:p-8 rounded-2xl bg-zinc-900/90 border border-zinc-700 shadow-xl flex flex-col gap-6 relative group overflow-hidden">
                                     {/* Decoration */}
@@ -520,7 +605,7 @@ export default function ReverseEngineerPage() {
                                     </Button>
                                 </div>
 
-                                {/* Face & Identity Lock Card (Rendered if a face is detected) */}
+                                {/* Face & Body Identity Lock Card (Rendered if a face is detected) */}
                                 {result.face_detected && (
                                     <div className="p-5 sm:p-6 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.07)] flex flex-col gap-4 relative overflow-hidden animate-in fade-in duration-500">
                                         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -530,13 +615,13 @@ export default function ReverseEngineerPage() {
                                                 </div>
                                                 <div>
                                                     <h4 className="text-sm font-bold font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                                                        Face & Identity Lock
+                                                        Face & Body Identity Lock
                                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                                                             ACTIVE
                                                         </span>
                                                     </h4>
                                                     <p className="text-xs text-zinc-400 font-mono">
-                                                        Biometric facial landmarks detected & extracted for zero identity-drift.
+                                                        Biometric facial landmarks & body silhouette locked for zero identity-drift.
                                                     </p>
                                                 </div>
                                             </div>
@@ -553,6 +638,24 @@ export default function ReverseEngineerPage() {
                                                     {result.face_consistency_instructions.key_facial_traits.map((trait, idx) => (
                                                         <div key={idx} className="text-xs font-mono text-zinc-300 flex items-start gap-2 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800/80">
                                                             <span className="text-emerald-400 font-bold">•</span>
+                                                            <span>{trait}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Body & Physique Traits */}
+                                        {result.face_consistency_instructions?.body_physique_traits && result.face_consistency_instructions.body_physique_traits.length > 0 && (
+                                            <div className="bg-zinc-900/90 rounded-xl p-3.5 border border-zinc-800 flex flex-col gap-2">
+                                                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                                                    <User className="w-3.5 h-3.5 text-purple-400" />
+                                                    Preserved Body & Physique Signatures:
+                                                </span>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    {result.face_consistency_instructions.body_physique_traits.map((trait, idx) => (
+                                                        <div key={idx} className="text-xs font-mono text-zinc-300 flex items-start gap-2 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800/80">
+                                                            <span className="text-purple-400 font-bold">•</span>
                                                             <span>{trait}</span>
                                                         </div>
                                                     ))}

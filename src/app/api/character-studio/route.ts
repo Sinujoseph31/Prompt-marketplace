@@ -90,12 +90,23 @@ Respond ONLY with a valid JSON object matching this schema:
         "estimated_age": "e.g. 26 years old",
         "gender": "e.g. Female",
         "key_facial_signatures": [
-            "Specific trait 1 (e.g. Deep almond-shaped hazel-green eyes with subtle arch brows)",
-            "Specific trait 2 (e.g. High sculpted cheekbones with light bridge freckles)",
-            "Specific trait 3 (e.g. Chestnut wavy shoulder-length hair with warm golden undertones)",
-            "Specific trait 4 (e.g. Defined soft jawline with subtle natural resting smile)"
+            "Specific facial trait 1 (e.g. Deep almond-shaped hazel-green eyes with subtle arch brows)",
+            "Specific facial trait 2 (e.g. High sculpted cheekbones with light bridge freckles)",
+            "Specific facial trait 3 (e.g. Chestnut wavy shoulder-length hair with warm golden undertones)",
+            "Specific facial trait 4 (e.g. Defined soft jawline with subtle natural resting smile)"
         ],
-        "full_identity_anchor": "A 40-word standalone biometric description paragraph used to anchor the character across all AI models."
+        "body_physique_signatures": [
+            "Specific body trait 1 (e.g. Athletic lean build with graceful neck and defined collarbones)",
+            "Specific body trait 2 (e.g. Warm olive skin tone with healthy natural glow)",
+            "Specific body trait 3 (e.g. Confident upright posture with relaxed shoulders)"
+        ],
+        "sub_metrics": {
+            "image_clarity": 94, // 1-100 score of source resolution/clarity
+            "face_match": 96, // 1-100 score of facial landmark retention
+            "body_proportions": 90, // 1-100 score of body & silhouette consistency
+            "lighting_fidelity": 92 // 1-100 score of lighting accuracy
+        },
+        "full_identity_anchor": "A 40-word standalone biometric description paragraph used to anchor the character's face, body, and style across all AI models."
     },
     "scenes": [
         {
