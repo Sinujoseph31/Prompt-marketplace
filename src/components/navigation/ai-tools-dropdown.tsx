@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint } from "lucide-react"
+import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -13,9 +13,25 @@ import {
 
 const tools = [
     {
+        title: "Character Studio",
+        href: "/ai-tools/character-studio",
+        description: "Zero-drift multi-scene avatar prompts",
+        icon: UserCheck,
+        color: "text-emerald-400",
+        bgColor: "bg-emerald-500/10"
+    },
+    {
+        title: "Reverse Engineer",
+        href: "/ai-tools/reverse-engineer",
+        description: "Deconstruct image DNA to prompts",
+        icon: ScanSearch,
+        color: "text-cyan-400",
+        bgColor: "bg-cyan-500/10"
+    },
+    {
         title: "Image To Prompt",
         href: "/ai-tools/image-to-prompt",
-        description: "Reverse engineer images",
+        description: "Stylized image idea generator",
         icon: ImageIcon,
         color: "text-blue-500",
         bgColor: "bg-blue-500/10"

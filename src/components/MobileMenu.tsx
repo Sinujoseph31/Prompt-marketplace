@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Menu, X, ScanSearch } from 'lucide-react'
+import { Menu, X, ScanSearch, UserCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface MobileMenuProps {
@@ -77,12 +77,16 @@ export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction 
 
                         <p className="text-xs uppercase font-bold tracking-wider text-muted-foreground px-2 pt-2 pb-2">AI Tools</p>
 
-                        <Link href="/ai-tools/image-to-prompt" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
-                            🖼️ Image to Prompt
+                        <Link href="/ai-tools/character-studio" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                            <UserCheck className="w-5 h-5 text-emerald-500" />
+                            <span className="font-bold text-emerald-500">Character Studio</span>
                         </Link>
                         <Link href="/ai-tools/reverse-engineer" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
-                            <ScanSearch className="w-5 h-5 text-emerald-600" />
-                            <span className="font-bold text-emerald-600">Reverse Engineer</span>
+                            <ScanSearch className="w-5 h-5 text-cyan-500" />
+                            <span className="font-bold text-cyan-500">Reverse Engineer</span>
+                        </Link>
+                        <Link href="/ai-tools/image-to-prompt" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                            🖼️ Image to Prompt
                         </Link>
                         <Link href="/ai-tools/roast-my-prompt" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
                             🔥 Roast My Prompt
@@ -95,6 +99,9 @@ export default function MobileMenu({ isLoggedIn, isAdmin, userId, signoutAction 
                         </Link>
                         <Link href="/ai-tools/chaos-generator" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
                             🌀 Chaos Generator
+                        </Link>
+                        <Link href="/ai-tools/aesthetic-dna" onClick={close} className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-muted transition-colors">
+                            🧬 Aesthetic DNA Search
                         </Link>
 
                         <div className="border-t border-border my-2" />
