@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck, Activity, ShoppingBag } from "lucide-react"
+import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck, Activity, ShoppingBag, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const tools = [
+    {
+        title: "Reels Architect",
+        href: "/ai-tools/reels-architect",
+        description: "Viral hooks & AI video storyboard studio",
+        icon: Video,
+        color: "text-rose-500",
+        bgColor: "bg-rose-500/10"
+    },
     {
         title: "Product Studio",
         href: "/ai-tools/product-studio",
