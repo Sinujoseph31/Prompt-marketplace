@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck, Activity, ShoppingBag, Video } from "lucide-react"
+import { Sparkles, Dices, Flame, ImageIcon, SmilePlus, MoonStar, ScanSearch, Fingerprint, UserCheck, Activity, ShoppingBag, Video, Film } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const tools = [
+    {
+        title: "Video Clips Vault",
+        href: "/movie-scene-finder",
+        description: "Browse & download movie moments, meme reactions & viral clips",
+        icon: Film,
+        color: "text-purple-500",
+        bgColor: "bg-purple-500/10"
+    },
     {
         title: "Reels Architect",
         href: "/ai-tools/reels-architect",

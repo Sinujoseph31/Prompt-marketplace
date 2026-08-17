@@ -59,6 +59,93 @@ export default async function Index() {
         </p>
       </section>
 
+      {/* AI Labs Spotlight Section */}
+      <section className="w-full max-w-7xl px-5 mb-14">
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">✨</span>
+              <h2 className="text-2xl font-bold tracking-tight">AI Tools & Creator Labs</h2>
+            </div>
+            <Link href="/movie-scene-finder" className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80">
+              Explore Suite &rarr;
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* 🎬 Movie Scene Finder Spotlight Card */}
+            <div className="group relative p-6 sm:p-7 rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-primary/10 via-purple-500/5 to-background hover:border-primary/50 shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div className="space-y-3 relative z-10">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider">
+                  <span>🎬 Featured Creator Tool</span>
+                </div>
+                <h3 className="text-2xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">
+                  🎬 Video Clips Vault
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Browse and download movie scenes, viral meme reactions, GTA stunts, and aesthetic video clips for your edits.
+                </p>
+              </div>
+
+              <div className="pt-6 relative z-10">
+                <Link href="/movie-scene-finder">
+                  <Button className="w-full rounded-2xl font-bold text-sm h-11 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md gap-2">
+                    <span>Browse Video Clips</span>
+                    <span>&rarr;</span>
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Reels Architect Card */}
+            <div className="p-6 sm:p-7 rounded-3xl border bg-card hover:border-rose-500/30 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-xs font-bold uppercase tracking-wider">
+                  <span>📹 Video Studio</span>
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-foreground">
+                  Reels Architect
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Generate viral hook scripts, retention storyboards, and AI video generator prompts for Instagram Reels.
+                </p>
+              </div>
+
+              <div className="pt-6">
+                <Link href="/ai-tools/reels-architect">
+                  <Button variant="outline" className="w-full rounded-2xl font-bold text-sm h-11 hover:bg-rose-500/10 hover:text-rose-500">
+                    Open Architect
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Aesthetic DNA & Prompt Doctor Card */}
+            <div className="p-6 sm:p-7 rounded-3xl border bg-card hover:border-cyan-500/30 transition-all flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-500 text-xs font-bold uppercase tracking-wider">
+                  <span>🧬 Image Analysis</span>
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-foreground">
+                  Aesthetic DNA Search
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Deconstruct visuals and match vibe seeds with high-performance marketplace prompt recipes.
+                </p>
+              </div>
+
+              <div className="pt-6">
+                <Link href="/ai-tools/aesthetic-dna">
+                  <Button variant="outline" className="w-full rounded-2xl font-bold text-sm h-11 hover:bg-cyan-500/10 hover:text-cyan-500">
+                    Explore DNA
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Top Categories Section - High Value Content */}
       <section className="w-full max-w-7xl px-5 mb-16">
         <div className="flex flex-col gap-8">
