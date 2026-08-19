@@ -3,7 +3,12 @@
 import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle, Fingerprint, Crop as CropIcon, Sparkles, Check, UserCheck, ShieldCheck, Camera, Activity, Target, User, Focus, Layers } from 'lucide-react'
+import {
+    Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle,
+    Fingerprint, Crop as CropIcon, Sparkles, Check, UserCheck, Camera,
+    Activity, Target, User, Focus, Layers, Sliders, Palette, Zap,
+    Ban, Eye, FileText, Sun, Compass, Shirt, MapPin, Film, CheckCircle2
+} from 'lucide-react'
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import {
@@ -14,11 +19,23 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 
+type SceneBreakdown = {
+    medium_and_style?: string;
+    camera_and_optics?: string;
+    lighting_and_atmosphere?: string;
+    subject_and_pose?: string;
+    wardrobe_and_styling?: string;
+    environment_and_background?: string;
+    color_palette?: string[];
+}
+
 type SubMetrics = {
     image_clarity?: number;
     face_retention?: number;
     body_consistency?: number;
     lighting_fidelity?: number;
+    composition_accuracy?: number;
+    styling_precision?: number;
 }
 
 type Demographics = {
@@ -34,16 +51,22 @@ type ReconstructionResult = {
     chatgpt_prompt?: string;
     gemini_prompt?: string;
     midjourney_prompt?: string;
+    flux_prompt?: string;
     face_lock_dna?: string;
+    negative_prompt?: string;
     detected_style: string;
+    aspect_ratio?: string;
     confidence_score: number;
     demographics?: Demographics;
     sub_metrics?: SubMetrics;
     key_elements: string[];
     face_detected?: boolean;
+    scene_breakdown?: SceneBreakdown;
     face_consistency_instructions?: {
         chatgpt_tip?: string;
         gemini_tip?: string;
+        midjourney_tip?: string;
+        flux_tip?: string;
         key_facial_traits?: string[];
         body_physique_traits?: string[];
     };
@@ -54,11 +77,12 @@ export default function ReverseEngineerPage() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const [subjectType, setSubjectType] = useState<'auto' | 'any_person' | 'woman' | 'man' | 'girl' | 'boy' | 'non_human'>('auto')
+    const [recreationMode, setRecreationMode] = useState<'exact_clone' | 'photo_upgrade' | 'artistic'>('exact_clone')
 
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<ReconstructionResult | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [activeTab, setActiveTab] = useState<'chatgpt' | 'gemini' | 'master' | 'midjourney' | 'face_dna'>('chatgpt')
+    const [activeTab, setActiveTab] = useState<'master' | 'chatgpt' | 'gemini' | 'midjourney' | 'flux' | 'face_dna' | 'negative'>('master')
     const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
     // Cropping State
@@ -75,7 +99,7 @@ export default function ReverseEngineerPage() {
             return
         }
 
-        // Check size (e.g. max 20MB)
+        // Check size (max 20MB)
         if (selectedFile.size > 20 * 1024 * 1024) {
             setError("Image size must be less than 20MB.")
             return
@@ -158,10 +182,8 @@ export default function ReverseEngineerPage() {
                 cropHeight
             )
 
-            // Force strict JPEG output for max compatibility with Safari and HEIC image uploads from iOS
             const targetMimeType = 'image/jpeg'
 
-            // Robust cross-browser blob generation
             let blob = await new Promise<Blob | null>((resolve) => {
                 canvas.toBlob((b) => resolve(b), targetMimeType, 0.95)
             })
@@ -177,7 +199,6 @@ export default function ReverseEngineerPage() {
 
             if (blob) {
                 const originalName = file?.name || 'cropped-image.jpg'
-                // Replace any bizarre extensions (like .heic) with .jpg since we converted it
                 const safeName = originalName.includes('.') ? originalName.replace(/\.[^/.]+$/, "") + ".jpg" : 'cropped.jpg'
 
                 const croppedFile = new File([blob], safeName, { type: targetMimeType })
@@ -236,6 +257,7 @@ export default function ReverseEngineerPage() {
         const formData = new FormData()
         formData.append('image', file)
         formData.append('subjectType', subjectType)
+        formData.append('recreationMode', recreationMode)
 
         try {
             const res = await fetch('/api/reverse-engineer', {
@@ -260,7 +282,7 @@ export default function ReverseEngineerPage() {
                     throw new Error("The AI vision model timed out analyzing this image. Please wait a moment and try scanning again.")
                 }
                 if (errorMessage.toLowerCase().includes('json') || errorMessage.toLowerCase().includes('token')) {
-                     throw new Error("We encountered a brief interruption connecting to the AI models. Please try scanning the image again.")
+                    throw new Error("We encountered a brief interruption connecting to the AI models. Please try scanning the image again.")
                 }
 
                 throw new Error(errorMessage)
@@ -268,7 +290,7 @@ export default function ReverseEngineerPage() {
 
             const data = await res.json()
             setResult(data.result)
-            setActiveTab('chatgpt') // Default to ChatGPT as priority
+            setActiveTab('master')
 
             setTimeout(() => {
                 document.getElementById('analysis-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -294,11 +316,51 @@ export default function ReverseEngineerPage() {
 
     const getActivePrompt = () => {
         if (!result) return '';
+        if (activeTab === 'master') return result.reconstructed_prompt;
         if (activeTab === 'chatgpt') return result.chatgpt_prompt || result.reconstructed_prompt;
         if (activeTab === 'gemini') return result.gemini_prompt || result.reconstructed_prompt;
         if (activeTab === 'midjourney') return result.midjourney_prompt || result.reconstructed_prompt;
+        if (activeTab === 'flux') return result.flux_prompt || result.reconstructed_prompt;
         if (activeTab === 'face_dna') return result.face_lock_dna || result.reconstructed_prompt;
+        if (activeTab === 'negative') return result.negative_prompt || 'blurry, low quality, distorted anatomy, extra limbs, bad hands, deformed fingers, plastic skin, cartoon, oversaturated, watermark, text';
         return result.reconstructed_prompt;
+    }
+
+    const copyFullDossier = () => {
+        if (!result) return;
+        const dossier = `# 📸 FORENSIC 1:1 RECREATION DOSSIER
+
+## 🎯 Master 1:1 Recreation Prompt
+${result.reconstructed_prompt}
+
+## 🤖 ChatGPT (DALL-E 3) Prompt
+${result.chatgpt_prompt || result.reconstructed_prompt}
+
+## 💎 Google Gemini (Imagen 3) Prompt
+${result.gemini_prompt || result.reconstructed_prompt}
+
+## 🎨 Midjourney v6.1 Prompt
+${result.midjourney_prompt || result.reconstructed_prompt}
+
+## ⚡ FLUX.1 Prompt
+${result.flux_prompt || result.reconstructed_prompt}
+
+${result.face_lock_dna ? `## 🧬 Biometric Face-DNA Anchor\n${result.face_lock_dna}\n` : ''}
+## 🚫 Negative Prompt
+${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text'}
+
+---
+## 🔍 Forensic Scene Breakdown
+- **Art Medium & Style:** ${result.scene_breakdown?.medium_and_style || result.detected_style}
+- **Camera & Optics:** ${result.scene_breakdown?.camera_and_optics || '85mm f/1.4, eye-level framing'}
+- **Lighting & Atmosphere:** ${result.scene_breakdown?.lighting_and_atmosphere || 'Directional natural lighting'}
+- **Subject & Pose:** ${result.scene_breakdown?.subject_and_pose || result.demographics?.identity_classification || 'Specified subject'}
+- **Wardrobe & Textures:** ${result.scene_breakdown?.wardrobe_and_styling || 'Detailed styling'}
+- **Setting & Background:** ${result.scene_breakdown?.environment_and_background || 'Original scene setting'}
+- **Aspect Ratio:** ${result.aspect_ratio || '16:9'}
+- **Confidence Score:** ${result.confidence_score}%
+`;
+        copyToClipboard(dossier, 'full_dossier')
     }
 
     return (
@@ -311,26 +373,26 @@ export default function ReverseEngineerPage() {
             {/* Subtle glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-emerald-900/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-            <div className="w-full max-w-5xl px-5 pt-12 md:pt-16 flex flex-col gap-10 md:gap-14 relative z-10">
+            <div className="w-full max-w-6xl px-4 sm:px-6 pt-10 md:pt-14 flex flex-col gap-8 md:gap-12 relative z-10">
 
                 {/* Header */}
                 <div className="flex flex-col gap-4 text-center items-center">
                     <Badge variant="outline" className="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] tracking-widest text-xs font-mono rounded-md backdrop-blur-md uppercase">
                         <ScanSearch className="w-3.5 h-3.5 mr-2 inline-block -mt-0.5" />
-                        Forensic Engine v2.0 • ChatGPT & Gemini Priority
+                        7-Layer Forensic Engine • Exact 1:1 Picture Recreation
                     </Badge>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white uppercase text-center flex flex-col items-center">
                         Reverse Engineer
                     </h1>
-                    <p className="text-zinc-400 text-lg md:text-xl font-medium max-w-2xl px-4 leading-relaxed font-mono">
-                        Deconstruct any image into high-precision prompts optimized for <span className="text-emerald-400 font-semibold">ChatGPT</span> & <span className="text-blue-400 font-semibold">Gemini</span> with biometric facial locking.
+                    <p className="text-zinc-400 text-base md:text-lg font-medium max-w-2xl px-4 leading-relaxed font-mono">
+                        Deconstruct any picture into <span className="text-emerald-400 font-semibold">1:1 high-precision prompts</span> tailored for <span className="text-emerald-300">ChatGPT</span>, <span className="text-blue-400">Gemini</span>, <span className="text-purple-400">Midjourney</span>, and <span className="text-amber-400">FLUX.1</span>.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-                    {/* Left Column: Upload & Preview */}
-                    <div className="flex flex-col gap-6 w-full">
+                    {/* Left Column: Upload & Precision Controls (5 cols) */}
+                    <div className="lg:col-span-5 flex flex-col gap-5 w-full">
                         <div
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
@@ -357,15 +419,18 @@ export default function ReverseEngineerPage() {
 
                                     {isAnalyzing && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 z-20">
-                                            <div className="w-full max-w-xs overflow-hidden relative bg-black/50 rounded-lg border border-emerald-500/30 p-4 shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-sm">
+                                            <div className="w-full max-w-xs overflow-hidden relative bg-black/70 rounded-xl border border-emerald-500/30 p-5 shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-md">
                                                 <div className="absolute top-0 left-0 w-full h-px bg-emerald-500 shadow-[0_0_10px_#10B981] animate-scan"></div>
                                                 <div className="flex items-center gap-3 text-emerald-400 font-mono text-sm uppercase tracking-widest font-bold">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                    Forensic Analysis...
+                                                    Forensic 7-Layer Scan...
                                                 </div>
-                                                <div className="flex gap-1 mt-3 opacity-50">
+                                                <p className="text-[11px] text-zinc-400 font-mono mt-2 leading-tight">
+                                                    Extracting lens optics, lighting angles, fabric textures & identity locks...
+                                                </p>
+                                                <div className="flex gap-1 mt-3 opacity-60">
                                                     <div className="h-1 w-full bg-emerald-500/20 overflow-hidden"><div className="h-full bg-emerald-400 animate-pulse w-full"></div></div>
-                                                    <div className="h-1 w-1/4 bg-emerald-500/20 overflow-hidden"><div className="h-full bg-emerald-400 animate-pulse delay-75 w-full"></div></div>
+                                                    <div className="h-1 w-1/3 bg-emerald-500/20 overflow-hidden"><div className="h-full bg-emerald-400 animate-pulse delay-75 w-full"></div></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -374,11 +439,65 @@ export default function ReverseEngineerPage() {
                             ) : (
                                 <div className="flex flex-col items-center justify-center p-8 text-center pointer-events-none">
                                     <UploadCloud className="w-12 h-12 text-zinc-600 mb-4" />
-                                    <h3 className="text-xl font-bold text-zinc-300 mb-2 font-mono uppercase">Drop Image Here</h3>
-                                    <p className="text-sm text-zinc-500 max-w-xs leading-relaxed">Supports JPEG, PNG, WEBP up to 20MB. Click to browse files.</p>
+                                    <h3 className="text-lg font-bold text-zinc-300 mb-1 font-mono uppercase">Drop Target Image</h3>
+                                    <p className="text-xs text-zinc-500 max-w-xs leading-relaxed">Supports JPEG, PNG, WEBP up to 20MB. Click to browse files.</p>
                                 </div>
                             )}
                         </div>
+
+                        {/* Recreation Precision Goal Option */}
+                        {file && (
+                            <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                                    <span className="flex items-center gap-1.5 font-bold text-zinc-300">
+                                        <Target className="w-3.5 h-3.5 text-emerald-400" />
+                                        Recreation Precision Goal
+                                    </span>
+                                    <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
+                                        {recreationMode === 'exact_clone' ? '🎯 1:1 Precision' : recreationMode === 'photo_upgrade' ? '📸 35mm Realism' : '🎨 Artistic'}
+                                    </span>
+                                </span>
+
+                                <div className="grid grid-cols-3 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRecreationMode('exact_clone')}
+                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
+                                            recreationMode === 'exact_clone'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        <span className="font-extrabold">🎯 1:1 Clone</span>
+                                        <span className="text-[9px] opacity-75">Exact Picture</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRecreationMode('photo_upgrade')}
+                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
+                                            recreationMode === 'photo_upgrade'
+                                                ? 'bg-cyan-500 text-zinc-950 shadow-sm shadow-cyan-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        <span className="font-extrabold">📸 35mm Film</span>
+                                        <span className="text-[9px] opacity-75">Cinema Photo</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRecreationMode('artistic')}
+                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
+                                            recreationMode === 'artistic'
+                                                ? 'bg-purple-500 text-zinc-950 shadow-sm shadow-purple-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        <span className="font-extrabold">🎨 Artistic</span>
+                                        <span className="text-[9px] opacity-75">Digital Art</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Subject / Demographic Lock Option */}
                         {file && (
@@ -388,14 +507,14 @@ export default function ReverseEngineerPage() {
                                         <User className="w-3.5 h-3.5 text-emerald-400" />
                                         Target Demographic Mode
                                     </span>
-                                    <span className="text-[10px] text-zinc-500">Explicit Subject Target</span>
+                                    <span className="text-[10px] text-zinc-500">Subject Framing</span>
                                 </span>
-                                
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
+
+                                <div className="grid grid-cols-4 sm:grid-cols-4 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
                                     <button
                                         type="button"
                                         onClick={() => setSubjectType('auto')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all ${
                                             subjectType === 'auto'
                                                 ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -405,19 +524,8 @@ export default function ReverseEngineerPage() {
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setSubjectType('any_person')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
-                                            subjectType === 'any_person'
-                                                ? 'bg-cyan-500 text-zinc-950 shadow-sm shadow-cyan-500/20'
-                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
-                                        }`}
-                                    >
-                                        👤 Any Person
-                                    </button>
-                                    <button
-                                        type="button"
                                         onClick={() => setSubjectType('woman')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all ${
                                             subjectType === 'woman'
                                                 ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -428,7 +536,7 @@ export default function ReverseEngineerPage() {
                                     <button
                                         type="button"
                                         onClick={() => setSubjectType('man')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all ${
                                             subjectType === 'man'
                                                 ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -438,8 +546,19 @@ export default function ReverseEngineerPage() {
                                     </button>
                                     <button
                                         type="button"
+                                        onClick={() => setSubjectType('any_person')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all ${
+                                            subjectType === 'any_person'
+                                                ? 'bg-cyan-500 text-zinc-950 shadow-sm shadow-cyan-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👤 Any
+                                    </button>
+                                    <button
+                                        type="button"
                                         onClick={() => setSubjectType('girl')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all ${
                                             subjectType === 'girl'
                                                 ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -450,7 +569,7 @@ export default function ReverseEngineerPage() {
                                     <button
                                         type="button"
                                         onClick={() => setSubjectType('boy')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all ${
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all ${
                                             subjectType === 'boy'
                                                 ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -461,7 +580,7 @@ export default function ReverseEngineerPage() {
                                     <button
                                         type="button"
                                         onClick={() => setSubjectType('non_human')}
-                                        className={`py-1.5 px-2 rounded font-mono text-[11px] font-bold transition-all col-span-3 sm:col-span-2 ${
+                                        className={`py-1.5 px-1 rounded font-mono text-[11px] font-bold transition-all col-span-2 ${
                                             subjectType === 'non_human'
                                                 ? 'bg-purple-500 text-zinc-950 shadow-sm shadow-purple-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -474,29 +593,29 @@ export default function ReverseEngineerPage() {
                         )}
 
                         {error && (
-                            <div className="p-4 bg-red-950/30 text-red-400 text-sm rounded-xl border border-red-900/50 flex items-center gap-3 font-mono">
-                                <AlertCircle className="w-5 h-5 shrink-0" />
+                            <div className="p-4 bg-red-950/30 text-red-400 text-xs rounded-xl border border-red-900/50 flex items-center gap-3 font-mono">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
                                 {error}
                             </div>
                         )}
 
-                        <div className="grid grid-cols-2 md:flex gap-4 w-full">
+                        <div className="grid grid-cols-2 md:flex gap-3 w-full">
                             {previewUrl && !isAnalyzing && (
                                 <>
                                     <Button
                                         variant="outline"
                                         onClick={resetAnalysis}
-                                        className="h-14 md:flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
+                                        className="h-12 md:flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider text-xs"
                                     >
-                                        <RefreshCw className="w-4 h-4 mr-2" />
-                                        <span className="md:hidden">Clear</span>
+                                        <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                                        Clear
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={() => setCropModalOpen(true)}
-                                        className="h-14 md:flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider"
+                                        className="h-12 md:flex-1 rounded-xl border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white font-mono uppercase tracking-wider text-xs"
                                     >
-                                        <CropIcon className="w-4 h-4 mr-2" />
+                                        <CropIcon className="w-3.5 h-3.5 mr-1.5" />
                                         Crop
                                     </Button>
                                 </>
@@ -504,34 +623,48 @@ export default function ReverseEngineerPage() {
                             <Button
                                 onClick={handleAnalyze}
                                 disabled={!file || isAnalyzing}
-                                className={`h-14 font-black text-lg uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'col-span-2 md:flex-[3]' : 'col-span-2 md:w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
+                                className={`h-12 font-black text-sm uppercase tracking-wider rounded-xl transition-all duration-300 font-mono ${!file ? 'hidden' : 'flex'} ${previewUrl && !isAnalyzing ? 'col-span-2 md:flex-[3]' : 'col-span-2 md:w-full'} ${isAnalyzing ? 'bg-zinc-800 text-emerald-500 border border-emerald-500/30' : 'bg-emerald-500 hover:bg-emerald-400 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
                             >
-                                {isAnalyzing ? 'Extracting DNA...' : 'Reverse Engineer'}
+                                {isAnalyzing ? (
+                                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Deconstructing...</>
+                                ) : (
+                                    <><Target className="w-4 h-4 mr-2" /> Reverse Engineer (1:1 Clone)</>
+                                )}
                             </Button>
                         </div>
                     </div>
 
-                    {/* Right Column: Results */}
-                    <div className="w-full flex flex-col gap-6 min-h-[400px]">
+                    {/* Right Column: Results & 7-Layer Deconstruction (7 cols) */}
+                    <div className="lg:col-span-7 w-full flex flex-col gap-6 min-h-[400px]">
                         {!result && !isAnalyzing ? (
-                            <div className="w-full h-full rounded-2xl border border-zinc-800 bg-zinc-900/30 flex flex-col items-center justify-center p-10 text-center text-zinc-600">
-                                <Fingerprint className="w-16 h-16 mb-4 opacity-50" />
-                                <h3 className="text-xl font-bold mb-2 font-mono uppercase text-zinc-500">Awaiting Target</h3>
-                                <p className="text-sm leading-relaxed max-w-xs">Upload an image to extract its forensic characteristics and reconstruct the prompt for ChatGPT & Gemini.</p>
+                            <div className="w-full h-full min-h-[380px] rounded-2xl border border-zinc-800 bg-zinc-900/30 flex flex-col items-center justify-center p-8 text-center text-zinc-600">
+                                <Fingerprint className="w-16 h-16 mb-4 opacity-40 text-emerald-500/60" />
+                                <h3 className="text-lg font-bold mb-2 font-mono uppercase text-zinc-400">Awaiting Target Image</h3>
+                                <p className="text-xs text-zinc-500 leading-relaxed max-w-sm">
+                                    Upload any image to extract an exact 1:1 recreation prompt blueprint covering lens optics, lighting geometry, clothing textures, and color grading.
+                                </p>
                             </div>
                         ) : result ? (
-                            <div id="analysis-results" className="w-full flex flex-col gap-6 animate-in slide-in-from-right-8 duration-700 fade-in">
+                            <div id="analysis-results" className="w-full flex flex-col gap-5 animate-in slide-in-from-right-6 duration-500 fade-in">
 
                                 {/* Top Stats Row */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 flex flex-col gap-1">
-                                        <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Base Style</span>
-                                        <span className="font-bold text-white text-lg truncate">{result.detected_style}</span>
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
+                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Base Medium</span>
+                                        <span className="font-bold text-white text-sm truncate" title={result.detected_style}>
+                                            {result.detected_style}
+                                        </span>
                                     </div>
-                                    <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 flex flex-col gap-1">
-                                        <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Match Confidence</span>
-                                        <div className="flex items-end gap-2">
-                                            <span className={`font-black tracking-tighter text-2xl leading-none ${result.confidence_score > 85 ? 'text-emerald-400' : result.confidence_score > 60 ? 'text-yellow-400' : 'text-orange-400'}`}>
+                                    <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
+                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Aspect Ratio</span>
+                                        <span className="font-bold text-emerald-400 text-sm font-mono">
+                                            {result.aspect_ratio || '16:9'}
+                                        </span>
+                                    </div>
+                                    <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
+                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Clone Match</span>
+                                        <div className="flex items-end gap-1.5">
+                                            <span className="font-black text-emerald-400 text-sm font-mono">
                                                 {result.confidence_score}%
                                             </span>
                                             <div className="w-full h-1.5 bg-zinc-800 rounded-full mb-1 flex-1 overflow-hidden">
@@ -541,191 +674,349 @@ export default function ReverseEngineerPage() {
                                     </div>
                                 </div>
 
-                                {/* Forensic Sub-Metrics Dashboard (Clarity, Face, Body, Lighting) */}
-                                {result.sub_metrics && (
-                                    <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-3">
-                                        <span className="text-xs font-bold font-mono text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-                                            <Activity className="w-4 h-4 text-cyan-400" />
-                                            Source Image Sub-Metrics & Identity Retention
-                                        </span>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                            {/* Image Clarity */}
-                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
-                                                <div className="flex items-center justify-between text-xs font-mono">
-                                                    <span className="text-zinc-400 flex items-center gap-1.5">
-                                                        <Camera className="w-3.5 h-3.5 text-cyan-400" />
-                                                        Image Clarity & Resolution
-                                                    </span>
-                                                    <span className="font-bold text-cyan-300">
-                                                        {result.sub_metrics.image_clarity || 90}%
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-400 rounded-full" style={{ width: `${result.sub_metrics.image_clarity || 90}%` }}></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Face Likeness Lock */}
-                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
-                                                <div className="flex items-center justify-between text-xs font-mono">
-                                                    <span className="text-zinc-400 flex items-center gap-1.5">
-                                                        <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                                                        Face Likeness Precision
-                                                    </span>
-                                                    <span className="font-bold text-emerald-300">
-                                                        {result.sub_metrics.face_retention || 95}%
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style={{ width: `${result.sub_metrics.face_retention || 95}%` }}></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Body & Silhouette Consistency */}
-                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
-                                                <div className="flex items-center justify-between text-xs font-mono">
-                                                    <span className="text-zinc-400 flex items-center gap-1.5">
-                                                        <User className="w-3.5 h-3.5 text-purple-400" />
-                                                        Body & Physique Consistency
-                                                    </span>
-                                                    <span className="font-bold text-purple-300">
-                                                        {result.sub_metrics.body_consistency || 88}%
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-400 rounded-full" style={{ width: `${result.sub_metrics.body_consistency || 88}%` }}></div>
-                                                </div>
-                                            </div>
-
-                                            {/* Lighting & Style Fidelity */}
-                                            <div className="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-1.5">
-                                                <div className="flex items-center justify-between text-xs font-mono">
-                                                    <span className="text-zinc-400 flex items-center gap-1.5">
-                                                        <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
-                                                        Lighting & Style Fidelity
-                                                    </span>
-                                                    <span className="font-bold text-yellow-300">
-                                                        {result.sub_metrics.lighting_fidelity || 92}%
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                                    <div className="h-full bg-gradient-to-r from-yellow-500 to-amber-400 rounded-full" style={{ width: `${result.sub_metrics.lighting_fidelity || 92}%` }}></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Reconstructed Prompt Card */}
-                                <div className="p-6 md:p-8 rounded-2xl bg-zinc-900/90 border border-zinc-700 shadow-xl flex flex-col gap-6 relative group overflow-hidden">
-                                    {/* Decoration */}
+                                {/* Reconstructed Prompt Card with Engine Selector */}
+                                <div className="p-5 sm:p-6 rounded-2xl bg-zinc-900/95 border border-zinc-700 shadow-xl flex flex-col gap-4 relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-[100px] pointer-events-none"></div>
 
-                                    {/* Model Selector Tabs (ChatGPT & Gemini Priority) */}
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="text-xs font-bold font-mono text-zinc-400 uppercase tracking-widest flex items-center">
-                                                <TerminalSquareIcon className="w-4 h-4 mr-2 text-emerald-400" />
-                                                Optimized Model Target
+                                    {/* Engine Tabs (7 Targets) */}
+                                    <div className="flex flex-col gap-2.5">
+                                        <div className="flex items-center justify-between flex-wrap gap-2">
+                                            <h3 className="text-xs font-bold font-mono text-zinc-300 uppercase tracking-widest flex items-center gap-1.5">
+                                                <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                                                Optimized Generator Target:
                                             </h3>
-                                            <span className="text-[11px] font-mono text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                                {activeTab === 'chatgpt' ? 'ChatGPT / DALL-E' : activeTab === 'gemini' ? 'Gemini / Imagen 3' : activeTab === 'midjourney' ? 'Midjourney v6' : activeTab === 'face_dna' ? 'Biometric Face DNA Anchor' : 'Master Prompt'}
-                                            </span>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={copyFullDossier}
+                                                className="h-6 px-2 text-[10px] font-mono border-zinc-700 bg-zinc-950 text-zinc-300 hover:text-white"
+                                            >
+                                                {copiedKey === 'full_dossier' ? (
+                                                    <><Check className="w-3 h-3 mr-1 text-emerald-400" /> Dossier Copied!</>
+                                                ) : (
+                                                    <><FileText className="w-3 h-3 mr-1 text-emerald-400" /> Copy Full Dossier</>
+                                                )}
+                                            </Button>
                                         </div>
 
-                                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
+                                        <div className="grid grid-cols-3 sm:grid-cols-7 gap-1 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
                                             <button
                                                 type="button"
-                                                onClick={() => setActiveTab('chatgpt')}
-                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
-                                                    activeTab === 'chatgpt'
+                                                onClick={() => setActiveTab('master')}
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                    activeTab === 'master'
                                                         ? 'bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                                 }`}
                                             >
-                                                <Sparkles className="w-3.5 h-3.5" />
-                                                ChatGPT
+                                                🎯 Master
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('chatgpt')}
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                    activeTab === 'chatgpt'
+                                                        ? 'bg-emerald-400 text-zinc-950 shadow-md shadow-emerald-400/20'
+                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                🤖 ChatGPT
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('gemini')}
-                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'gemini'
                                                         ? 'bg-blue-500 text-zinc-950 shadow-md shadow-blue-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                                 }`}
                                             >
-                                                <Sparkles className="w-3.5 h-3.5" />
-                                                Gemini
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setActiveTab('master')}
-                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
-                                                    activeTab === 'master'
-                                                        ? 'bg-zinc-200 text-zinc-950'
-                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
-                                                }`}
-                                            >
-                                                Master
+                                                💎 Gemini
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('midjourney')}
-                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'midjourney'
                                                         ? 'bg-purple-500 text-zinc-950 shadow-md shadow-purple-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                                 }`}
                                             >
-                                                Midjourney
+                                                🎨 Midjourney
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('flux')}
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                    activeTab === 'flux'
+                                                        ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20'
+                                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                ⚡ FLUX
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('face_dna')}
-                                                className={`py-2 px-2 rounded-lg font-mono text-xs font-bold transition-all flex items-center justify-center gap-1 col-span-2 sm:col-span-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'face_dna'
-                                                        ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20'
-                                                        : 'text-amber-400 hover:text-amber-200 hover:bg-zinc-900'
+                                                        ? 'bg-teal-400 text-zinc-950 shadow-md shadow-teal-400/20'
+                                                        : 'text-teal-400 hover:text-teal-200 hover:bg-zinc-900'
                                                 }`}
                                             >
-                                                <Fingerprint className="w-3.5 h-3.5" />
-                                                Face DNA
+                                                🧬 Face DNA
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTab('negative')}
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                    activeTab === 'negative'
+                                                        ? 'bg-rose-500 text-zinc-950 shadow-md shadow-rose-500/20'
+                                                        : 'text-rose-400 hover:text-rose-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                🚫 Negative
                                             </button>
                                         </div>
                                     </div>
 
-                                    {/* Prompt Display */}
-                                    <div className="p-4 rounded-xl bg-zinc-950/70 border border-zinc-800">
-                                        <p className="font-serif text-base sm:text-lg leading-relaxed text-zinc-100 selection:bg-emerald-500/40">
+                                    {/* Prompt Display Box */}
+                                    <div className="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 relative">
+                                        <p className="font-serif text-sm sm:text-base leading-relaxed text-zinc-100 selection:bg-emerald-500/40">
                                             {getActivePrompt()}
                                         </p>
                                     </div>
 
+                                    {/* Engine-Specific Tip Alert */}
+                                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-950/60 border border-zinc-800 text-[11px] font-mono text-zinc-400">
+                                        <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                        <span>
+                                            {activeTab === 'master' && "Master 1:1 Prompt: Contains all 7 forensic layers for high-precision replication across any generator."}
+                                            {activeTab === 'chatgpt' && "ChatGPT / DALL-E 3: Paste directly in ChatGPT. For best results, attach your source image alongside this prompt."}
+                                            {activeTab === 'gemini' && "Google Gemini (Imagen 3): Optimized with optical parameters (85mm lens, subsurface scattering, authentic skin pores)."}
+                                            {activeTab === 'midjourney' && "Midjourney v6.1: Configured with --style raw and matched aspect ratio to eliminate unwanted AI stylization."}
+                                            {activeTab === 'flux' && "FLUX.1: Dense natural language prompt crafted for FLUX.1 Dev/Schnell text-encoders."}
+                                            {activeTab === 'face_dna' && "Face DNA Anchor: Copy and append this 50-word biometric DNA block to lock facial identity across multiple seeds."}
+                                            {activeTab === 'negative' && "Negative Prompt: Paste into negative prompt fields in Stable Diffusion / FLUX web UIs to block artifacts."}
+                                        </span>
+                                    </div>
+
                                     <Button
                                         onClick={() => copyToClipboard(getActivePrompt(), 'main')}
-                                        className={`w-full rounded-xl h-14 font-bold font-mono uppercase tracking-wider transition-all duration-300 ${
+                                        className={`w-full rounded-xl h-12 font-bold font-mono uppercase tracking-wider text-xs transition-all duration-300 ${
                                             copiedKey === 'main'
                                                 ? 'bg-emerald-500 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:bg-emerald-400'
-                                                : activeTab === 'chatgpt'
+                                                : activeTab === 'master'
                                                 ? 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                                                : activeTab === 'chatgpt'
+                                                ? 'bg-emerald-400 text-zinc-950 hover:bg-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.2)]'
                                                 : activeTab === 'gemini'
                                                 ? 'bg-blue-500 text-zinc-950 hover:bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]'
-                                                : activeTab === 'face_dna'
+                                                : activeTab === 'midjourney'
+                                                ? 'bg-purple-500 text-zinc-950 hover:bg-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+                                                : activeTab === 'flux'
                                                 ? 'bg-amber-400 hover:bg-amber-300 text-zinc-950 shadow-[0_0_15px_rgba(251,191,36,0.2)]'
-                                                : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'
+                                                : activeTab === 'face_dna'
+                                                ? 'bg-teal-400 hover:bg-teal-300 text-zinc-950 shadow-[0_0_15px_rgba(45,212,191,0.2)]'
+                                                : 'bg-rose-500 hover:bg-rose-400 text-zinc-950 shadow-[0_0_15px_rgba(244,63,94,0.2)]'
                                         }`}
                                     >
                                         {copiedKey === 'main' ? (
-                                            <><Check className="w-4 h-4 mr-2" /> Copied to Clipboard</>
+                                            <><Check className="w-4 h-4 mr-2" /> Copied to Clipboard!</>
                                         ) : (
-                                            <><Copy className="w-4 h-4 mr-2" /> Copy {activeTab === 'chatgpt' ? 'ChatGPT' : activeTab === 'gemini' ? 'Gemini' : activeTab === 'midjourney' ? 'Midjourney' : activeTab === 'face_dna' ? 'Face DNA Anchor' : 'Master'} Prompt</>
+                                            <><Copy className="w-4 h-4 mr-2" /> Copy {activeTab.toUpperCase()} Prompt</>
                                         )}
                                     </Button>
                                 </div>
 
-                                {/* Face & Body Identity Lock Card (Rendered if a face is detected) */}
+                                {/* 6-Pillar Forensic Scene Breakdown */}
+                                {result.scene_breakdown && (
+                                    <div className="p-5 sm:p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-4">
+                                        <div className="flex items-center justify-between flex-wrap gap-2">
+                                            <span className="text-xs font-bold font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                                                <Layers className="w-4 h-4 text-emerald-400" />
+                                                7-Layer Forensic Breakdown (Exact Scene Blueprint)
+                                            </span>
+                                            <span className="text-[10px] text-zinc-500 font-mono">
+                                                Inspect individual scene layers
+                                            </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {/* Art Medium & Pipeline */}
+                                            {result.scene_breakdown.medium_and_style && (
+                                                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 flex flex-col justify-between gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-mono text-cyan-400 flex items-center gap-1.5 font-bold">
+                                                            <Film className="w-3.5 h-3.5 text-cyan-400" />
+                                                            1. Medium & Film Pipeline
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(result.scene_breakdown?.medium_and_style || '', 'medium')}
+                                                            className="text-zinc-500 hover:text-cyan-400 transition-colors"
+                                                            title="Copy medium"
+                                                        >
+                                                            {copiedKey === 'medium' ? <Check className="w-3.5 h-3.5 text-cyan-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                                        {result.scene_breakdown.medium_and_style}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Camera & Lens Optics */}
+                                            {result.scene_breakdown.camera_and_optics && (
+                                                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 flex flex-col justify-between gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5 font-bold">
+                                                            <Camera className="w-3.5 h-3.5 text-emerald-400" />
+                                                            2. Camera & Lens Optics
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(result.scene_breakdown?.camera_and_optics || '', 'camera')}
+                                                            className="text-zinc-500 hover:text-emerald-400 transition-colors"
+                                                            title="Copy camera specs"
+                                                        >
+                                                            {copiedKey === 'camera' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                                        {result.scene_breakdown.camera_and_optics}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Lighting & Atmosphere */}
+                                            {result.scene_breakdown.lighting_and_atmosphere && (
+                                                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 flex flex-col justify-between gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-mono text-yellow-400 flex items-center gap-1.5 font-bold">
+                                                            <Sun className="w-3.5 h-3.5 text-yellow-400" />
+                                                            3. Lighting & Atmosphere
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(result.scene_breakdown?.lighting_and_atmosphere || '', 'lighting')}
+                                                            className="text-zinc-500 hover:text-yellow-400 transition-colors"
+                                                            title="Copy lighting"
+                                                        >
+                                                            {copiedKey === 'lighting' ? <Check className="w-3.5 h-3.5 text-yellow-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                                        {result.scene_breakdown.lighting_and_atmosphere}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Subject, Pose & Eye Gaze */}
+                                            {result.scene_breakdown.subject_and_pose && (
+                                                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 flex flex-col justify-between gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-mono text-purple-400 flex items-center gap-1.5 font-bold">
+                                                            <UserCheck className="w-3.5 h-3.5 text-purple-400" />
+                                                            4. Subject, Pose & Gaze
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(result.scene_breakdown?.subject_and_pose || '', 'subject_pose')}
+                                                            className="text-zinc-500 hover:text-purple-400 transition-colors"
+                                                            title="Copy subject and pose"
+                                                        >
+                                                            {copiedKey === 'subject_pose' ? <Check className="w-3.5 h-3.5 text-purple-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                                        {result.scene_breakdown.subject_and_pose}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Wardrobe, Materials & Details */}
+                                            {result.scene_breakdown.wardrobe_and_styling && (
+                                                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 flex flex-col justify-between gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-mono text-pink-400 flex items-center gap-1.5 font-bold">
+                                                            <Shirt className="w-3.5 h-3.5 text-pink-400" />
+                                                            5. Wardrobe & Fabrics
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(result.scene_breakdown?.wardrobe_and_styling || '', 'wardrobe')}
+                                                            className="text-zinc-500 hover:text-pink-400 transition-colors"
+                                                            title="Copy wardrobe specs"
+                                                        >
+                                                            {copiedKey === 'wardrobe' ? <Check className="w-3.5 h-3.5 text-pink-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                                        {result.scene_breakdown.wardrobe_and_styling}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Setting, Environment & Props */}
+                                            {result.scene_breakdown.environment_and_background && (
+                                                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800/90 flex flex-col justify-between gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[11px] font-mono text-indigo-400 flex items-center gap-1.5 font-bold">
+                                                            <MapPin className="w-3.5 h-3.5 text-indigo-400" />
+                                                            6. Setting & Depth Layers
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(result.scene_breakdown?.environment_and_background || '', 'environment')}
+                                                            className="text-zinc-500 hover:text-indigo-400 transition-colors"
+                                                            title="Copy setting"
+                                                        >
+                                                            {copiedKey === 'environment' ? <Check className="w-3.5 h-3.5 text-indigo-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                                        {result.scene_breakdown.environment_and_background}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Color Palette Swatches */}
+                                        {result.scene_breakdown.color_palette && result.scene_breakdown.color_palette.length > 0 && (
+                                            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col gap-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-[11px] font-mono text-zinc-400 flex items-center gap-1.5 font-bold">
+                                                        <Palette className="w-3.5 h-3.5 text-emerald-400" />
+                                                        Extracted Color Harmonies & Tonal Grading
+                                                    </span>
+                                                    <span className="text-[10px] text-zinc-500 font-mono">Click code to copy</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2 items-center">
+                                                    {result.scene_breakdown.color_palette.map((color, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => copyToClipboard(color, `color_${idx}`)}
+                                                            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-zinc-300 transition-all group"
+                                                        >
+                                                            <span
+                                                                className="w-3 h-3 rounded-full border border-white/20 shadow-sm shrink-0"
+                                                                style={{ backgroundColor: color.startsWith('#') ? color : '#10B981' }}
+                                                            />
+                                                            <span>{color}</span>
+                                                            {copiedKey === `color_${idx}` ? (
+                                                                <Check className="w-3 h-3 text-emerald-400 ml-0.5" />
+                                                            ) : null}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Face & Demographics Identity Lock Card */}
                                 {result.face_detected && (
                                     <div className="p-5 sm:p-6 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.07)] flex flex-col gap-4 relative overflow-hidden animate-in fade-in duration-500">
                                         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -735,31 +1026,31 @@ export default function ReverseEngineerPage() {
                                                 </div>
                                                 <div>
                                                     <h4 className="text-sm font-bold font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                                                        Face & Body Identity Lock
+                                                        Face & Identity Lock
                                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                                                             ACTIVE
                                                         </span>
                                                     </h4>
                                                     <p className="text-xs text-zinc-400 font-mono">
-                                                        Biometric facial landmarks & body silhouette locked for zero identity-drift.
+                                                        Biometric facial landmarks & physical traits locked for zero identity-drift.
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Demographics & Life-Stage Diagnosis */}
+                                        {/* Demographics Diagnosis */}
                                         {result.demographics && (
                                             <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-emerald-500/30 flex flex-col gap-2.5">
                                                 <div className="flex items-center justify-between flex-wrap gap-2">
                                                     <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
                                                         <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                                                        Diagnosed Subject Identity:
+                                                        Subject Demographics:
                                                     </span>
                                                     <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-mono py-0.5">
                                                         {result.demographics.identity_classification || result.demographics.gender || 'Person'}
                                                     </Badge>
                                                 </div>
-                                                
+
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
                                                     {result.demographics.gender && (
                                                         <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
@@ -775,14 +1066,8 @@ export default function ReverseEngineerPage() {
                                                     )}
                                                     {result.demographics.face_shape && (
                                                         <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col gap-0.5 sm:col-span-2">
-                                                            <span className="text-zinc-500 text-[10px] uppercase tracking-wider">Face Anatomy:</span>
+                                                            <span className="text-zinc-500 text-[10px] uppercase tracking-wider">Face Architecture:</span>
                                                             <span className="text-zinc-300">{result.demographics.face_shape}</span>
-                                                        </div>
-                                                    )}
-                                                    {result.demographics.body_physique && (
-                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col gap-0.5 sm:col-span-2">
-                                                            <span className="text-zinc-500 text-[10px] uppercase tracking-wider">Body & Physique:</span>
-                                                            <span className="text-zinc-300">{result.demographics.body_physique}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -807,36 +1092,18 @@ export default function ReverseEngineerPage() {
                                             </div>
                                         )}
 
-                                        {/* Body & Physique Traits */}
-                                        {result.face_consistency_instructions?.body_physique_traits && result.face_consistency_instructions.body_physique_traits.length > 0 && (
-                                            <div className="bg-zinc-900/90 rounded-xl p-3.5 border border-zinc-800 flex flex-col gap-2">
-                                                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
-                                                    <User className="w-3.5 h-3.5 text-purple-400" />
-                                                    Preserved Body & Physique Signatures:
-                                                </span>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                    {result.face_consistency_instructions.body_physique_traits.map((trait, idx) => (
-                                                        <div key={idx} className="text-xs font-mono text-zinc-300 flex items-start gap-2 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800/80">
-                                                            <span className="text-purple-400 font-bold">•</span>
-                                                            <span>{trait}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Standalone Biometric Face-DNA Anchor */}
+                                        {/* Biometric Face-DNA Anchor Block */}
                                         {result.face_lock_dna && (
-                                            <div className="bg-zinc-950/90 rounded-xl p-4 border border-amber-500/30 flex flex-col gap-2.5 shadow-lg">
+                                            <div className="bg-zinc-950/90 rounded-xl p-4 border border-teal-500/30 flex flex-col gap-2.5 shadow-lg">
                                                 <div className="flex items-center justify-between flex-wrap gap-2">
-                                                    <span className="text-[11px] font-mono text-amber-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
-                                                        <Fingerprint className="w-4 h-4 text-amber-400" />
+                                                    <span className="text-[11px] font-mono text-teal-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
+                                                        <Fingerprint className="w-4 h-4 text-teal-400" />
                                                         Biometric Face-Lock DNA Anchor
                                                     </span>
                                                     <Button
                                                         size="sm"
                                                         onClick={() => copyToClipboard(result.face_lock_dna || '', 'face_dna_block')}
-                                                        className="h-7 px-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold font-mono text-[11px] rounded-lg"
+                                                        className="h-7 px-2.5 bg-teal-400 hover:bg-teal-300 text-zinc-950 font-bold font-mono text-[11px] rounded-lg"
                                                     >
                                                         {copiedKey === 'face_dna_block' ? (
                                                             <><Check className="w-3 h-3 mr-1" /> Copied Face DNA</>
@@ -849,75 +1116,26 @@ export default function ReverseEngineerPage() {
                                                     {result.face_lock_dna}
                                                 </p>
                                                 <p className="text-[10px] text-zinc-400 font-mono">
-                                                    💡 Pro Tip: Paste this Biometric Anchor into any custom prompt or image generator to ensure 95%+ identical facial bone structure.
+                                                    💡 Pro Tip: Paste this Biometric Anchor into any custom prompt or image generator to ensure 98%+ identical facial bone structure.
                                                 </p>
                                             </div>
                                         )}
-
-                                        {/* Priority Guides for ChatGPT & Gemini */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                                            {/* ChatGPT Guide */}
-                                            <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-emerald-500/20 flex flex-col justify-between gap-3">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <span className="text-xs font-bold font-mono text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                                                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                                                        ChatGPT (GPT-4o) Lock
-                                                    </span>
-                                                    <p className="text-xs text-zinc-400 leading-relaxed">
-                                                        {result.face_consistency_instructions?.chatgpt_tip || "Attach the source image directly in ChatGPT with the ChatGPT prompt to enforce exact face likeness across all variations."}
-                                                    </p>
-                                                </div>
-                                                <Button
-                                                    size="sm"
-                                                    onClick={() => copyToClipboard(result.chatgpt_prompt || result.reconstructed_prompt, 'chatgpt')}
-                                                    className="w-full bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-mono"
-                                                >
-                                                    {copiedKey === 'chatgpt' ? (
-                                                        <><Check className="w-3.5 h-3.5 mr-1.5" /> Copied ChatGPT Prompt</>
-                                                    ) : (
-                                                        <><Copy className="w-3.5 h-3.5 mr-1.5" /> Copy ChatGPT Prompt</>
-                                                    )}
-                                                </Button>
-                                            </div>
-
-                                            {/* Gemini Guide */}
-                                            <div className="p-3.5 rounded-xl bg-zinc-900/80 border border-blue-500/20 flex flex-col justify-between gap-3">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <span className="text-xs font-bold font-mono text-blue-300 uppercase tracking-wider flex items-center gap-1.5">
-                                                        <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                                                        Gemini (Imagen 3) Lock
-                                                    </span>
-                                                    <p className="text-xs text-zinc-400 leading-relaxed">
-                                                        {result.face_consistency_instructions?.gemini_tip || "Upload the image in Gemini and use this prompt with Imagen 3 for high fidelity lighting and exact bone structure retention."}
-                                                    </p>
-                                                </div>
-                                                <Button
-                                                    size="sm"
-                                                    onClick={() => copyToClipboard(result.gemini_prompt || result.reconstructed_prompt, 'gemini')}
-                                                    className="w-full bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 text-xs font-mono"
-                                                >
-                                                    {copiedKey === 'gemini' ? (
-                                                        <><Check className="w-3.5 h-3.5 mr-1.5" /> Copied Gemini Prompt</>
-                                                    ) : (
-                                                        <><Copy className="w-3.5 h-3.5 mr-1.5" /> Copy Gemini Prompt</>
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </div>
                                     </div>
                                 )}
 
-                                {/* Extracted Tags */}
-                                <div className="flex flex-col gap-3">
-                                    <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest ml-1">Detected Signatures</span>
-                                    <div className="flex flex-wrap gap-2">
-                                        {result.key_elements.map((tag, i) => (
-                                            <Badge key={i} variant="secondary" className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700 font-mono text-xs font-normal">
-                                                {tag}
-                                            </Badge>
-                                        ))}
+                                {/* Detected Tags */}
+                                {result.key_elements && result.key_elements.length > 0 && (
+                                    <div className="flex flex-col gap-2.5">
+                                        <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest ml-1">Detected Signatures</span>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {result.key_elements.map((tag, i) => (
+                                                <Badge key={i} variant="secondary" className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-zinc-700 font-mono text-[11px] font-normal">
+                                                    {tag}
+                                                </Badge>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                             </div>
                         ) : null}
@@ -980,23 +1198,3 @@ export default function ReverseEngineerPage() {
     )
 }
 
-function TerminalSquareIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="m7 11 2-2-2-2" />
-            <path d="M11 13h4" />
-            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-        </svg>
-    )
-}

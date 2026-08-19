@@ -9,6 +9,7 @@ export async function POST(req: Request) {
         const formData = await req.formData();
         const file = formData.get('image') as File;
         const subjectType = (formData.get('subjectType') as string) || 'auto';
+        const recreationMode = (formData.get('recreationMode') as string) || 'exact_clone';
 
         if (!file) {
             return new NextResponse(JSON.stringify({ error: "No image file provided." }), { status: 400 });
@@ -26,7 +27,6 @@ export async function POST(req: Request) {
         const mimeType = file.type;
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Using flash for speed, it handles images well
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const subjectOverrideInstruction = subjectType === 'any_person'
@@ -38,69 +38,126 @@ The user explicitly specified that the subject is: "${subjectType.toUpperCase()}
 You MUST strictly construct all prompts for a "${subjectType}" (e.g. if 'girl' -> young/teen girl; if 'boy' -> young/teen boy; if 'woman' -> adult female; if 'man' -> adult male; if 'non_human' -> focus on landscape/object/animal without human attributes). Ensure zero demographic ambiguity.\n`
             : '';
 
-        const prompt = `You are the World's Foremost Forensic Digital Art and Facial Biometric Reverse-Engineering Analyst.
-Your mission is to perform a rigorous forensic deconstruction of the provided image to generate PROMPTS WITH MAXIMUM FACIAL AND ANATOMICAL IDENTITY RETENTION for ChatGPT (GPT-4o / DALL-E 3), Google Gemini (Imagen 3), and Midjourney v6.1.
+        const modeInstruction = recreationMode === 'photo_upgrade'
+            ? `\nRECREATION TARGET MODE: "PHOTOREALISTIC 35MM UPGRADE".
+Transform the core scene into an ultra-high-end cinematic 35mm film photograph shot on Leica / Hasselblad with Kodak Portra 400, authentic optical depth of field, micro-textures, and realistic lighting physics while preserving the exact composition, pose, and subject identity.\n`
+            : recreationMode === 'artistic'
+            ? `\nRECREATION TARGET MODE: "ARTISTIC / STYLIZED CLONE".
+Recreate the exact composition, lighting, subject pose, and color harmony in a high-end digital art / conceptual illustration medium with rich visual textures while keeping the core visual elements identical.\n`
+            : `\nRECREATION TARGET MODE: "1:1 EXACT CLONE (MAXIMUM PRECISION)".
+Your primary goal is absolute 1:1 visual clone fidelity. Deconstruct every single pixel element—exact attire, fabric weave, background objects, lighting angle, shadow depth, camera lens, eye gaze vector, skin texture, color temperature, and aspect ratio—so the generated prompt produces an image virtually indistinguishable from the original.\n`;
+
+        const prompt = `You are the World's Foremost Reverse-Engineering Image Analyst and Prompt Architect.
+Your mission is to perform an exhaustive, 7-layer forensic deconstruction of the provided image to generate PROMPTS THAT WILL RECREATE THIS EXACT PICTURE WITH NEAR-IDENTICAL PRECISION across ChatGPT (DALL-E 3 / GPT-4o), Google Gemini (Imagen 3), Midjourney v6.1, and FLUX.1 (Dev / Schnell).
+
 ${subjectOverrideInstruction}
-CRITICAL MISSION: ZERO FACE-DRIFT & MAXIMUM BIOMETRIC IDENTITY MATCH
-Standard AI prompts produce low face match because they are generic (e.g. "a pretty woman with brown hair"). To achieve maximum face likeness and eliminate face drift across AI generators, execute deep anthropometric feature extraction:
+${modeInstruction}
 
-1. DEMOGRAPHIC & LIFE-STAGE LOCK:
-   - Identify with 100% precision whether the subject is a:
-     * Young Girl (child / toddler, e.g. "7-9 years old")
-     * Teen Girl (adolescent, e.g. "15-17 years old")
-     * Adult Woman / Female (e.g. "26-28 years old")
-     * Young Boy (child / toddler, e.g. "6-8 years old")
-     * Teen Boy (adolescent, e.g. "15-17 years old")
-     * Adult Man / Male (e.g. "30-34 years old")
-     * Senior Woman / Senior Man
-   - Start EVERY prompt with this exact demographic framing (e.g. "A photorealistic portrait of a 16-year-old teenage girl...") so AI models NEVER mistakenly age them up, down, or swap their gender.
+CRITICAL RECREATION PROBLEM TO SOLVE:
+Generic prompts (e.g., "a woman in a room with nice lighting") cause AI generators to hallucinate random backgrounds, random clothing, random lighting, and distorted faces—producing a totally different image.
+To achieve an EXACT 1:1 CLONE, you MUST forensically extract all 7 essential visual layers:
 
-2. FORENSIC FACIAL ANATOMY & BIOMETRIC ANCHOR:
-   Extract and describe in microscopic detail:
-   - Eye Geometry: Exact shape (almond, hooded, monolid, round), canthal tilt, iris pigmentation & sub-tones, limbal ring definition, pupil spacing.
-   - Eyebrows: Arch angle, thickness, hair stroke texture.
-   - Nasal Architecture: Bridge height/width, dorsal slope, tip shape (rounded, button, pointed, refined), columella, and nostril flare.
-   - Oral Anatomy: Cupid's bow definition, upper vs lower lip fullness ratio, vermilion border, resting lip corner expression.
-   - Craniofacial Contours: Zygomatic arch (cheekbones) height, jawline angle (soft oval, angular, defined square), chin projection, forehead curvature.
-   - Epidermal Micro-texture: Exact skin undertone (warm olive, cool rosy, golden bronze, deep ebony), natural visible skin pores, authentic freckles, beauty marks, absence of artificial airbrushed smoothness.
-   - Hair Architecture: Natural parting, strand thickness, texture (coarse coils, wavy, straight), hair highlights, hairline baby hairs.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7-LAYER FORENSIC RECREATION BLUEPRINT:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. MODEL-SPECIFIC PROMPT ENCODING:
-   - "chatgpt_prompt": Formatted to prevent DALL-E 3 prompt expansion drift. Uses explicit identity-lock commands: "A realistic photograph maintaining the exact facial identity and facial bone structure of a [age, demographic]: [complete facial biometric anchor]. [Lighting, camera, attire, and atmosphere]. Realistic skin texture with visible micro-pores, no artificial smoothing, zero facial drift."
-   - "gemini_prompt": Structured for Google Gemini / Imagen 3 with authentic photographic optical parameters (85mm f/1.4 lens, softbox directional lighting, realistic subsurface skin scattering, exact facial landmark ratios).
-   - "midjourney_prompt": Clean comma-separated keyword prompt with stylistic modifiers, authentic camera tags, and "--v 6.1 --ar 16:9 --cref [IMAGE_URL] --cw 100".
+1. LAYER 1: VISUAL MEDIUM & ARTISTIC PIPELINE
+   - Exact Medium: (e.g., 35mm analog film photography, medium format studio portrait, 8k cinematic anamorphic film still, candid Polaroid 600, 3D Octane/Unreal Engine 5 render, digital concept painting, anime/manga cel-shaded, oil painting).
+   - Film Stock / Sensor / Render Texture: (e.g., Kodak Portra 400, Cinestill 800T, Fujifilm Superia, crisp digital RAW, authentic film grain, matte shadows, sub-surface scattering).
 
-4. "face_lock_dna": A standalone 40-60 word ultra-dense biometric facial DNA description designed to be copied and pasted into any image generator, custom GPT, or system prompt to lock facial identity across multiple generations.
+2. LAYER 2: SUBJECT IDENTITY, ANATOMY, EXACT POSE & EYE GAZE
+   - Demographics: Precise age range (e.g., "24-year-old woman", "16-year-old teenage boy"), ethnicity/heritage, skin tone and undertone.
+   - Facial & Physical Features: Exact eye shape and iris color, eyebrow arch, nose bridge and tip shape, lip fullness and shape, jawline, cheekbones, natural skin pores, freckles, moles, blemishes.
+   - Hair: Exact color, parting, texture (wavy, straight, coily, slicked back), length, styling, stray strands.
+   - Expression & Emotion: Exact subtle micro-expression (e.g., enigmatic slight smirk, intense piercing stare, melancholic gaze, joyful candid laugh).
+   - Gaze Direction: Exact vector relative to the camera (e.g., "looking directly into the lens with piercing eye contact", "gazing 45 degrees to the right out of frame", "looking downward pensively").
+   - Pose & Posture: Exact head tilt angle, shoulder orientation, body angle, spine curvature, hand and finger placement, seated/standing posture.
+
+3. LAYER 3: WARDROBE, MATERIALS & ACCESSORIES
+   - Garments: Item-by-item breakdown of every visible piece (garment type, exact color hue, cut/neckline, fit).
+   - Materials & Textures: Fabric weave (e.g., chunky cable-knit wool, distressed washed denim, vintage worn black leather, ribbed cotton, sheer silk, tailored linen).
+   - Accessories & Details: Necklaces, earrings, rings, watches, glasses/frames, hats, tattoos, scars, nail polish, makeup (eyeliner, lip gloss, blush).
+
+4. LAYER 4: ENVIRONMENT, BACKGROUND & SPATIAL DEPTH LAYERS
+   - Setting: Specific location and context (e.g., dimly lit 1980s neon diner booth, sun-drenched minimalist Scandinavian loft, misty pine forest at twilight).
+   - Foreground, Midground, Background: Specific props, furniture, architectural elements, windows, wall textures, wallpaper, plants, distant light sources.
+   - Atmospheric Details: Light fog, haze, dust motes, rain droplets on glass, steam, neon reflections, depth-of-field background blur.
+
+5. LAYER 5: LIGHTING PHYSICS & SHADOW ARCHITECTURE
+   - Key Light: Source type, direction, angle, height, intensity, softness/hardness (e.g., "soft diffused golden hour sunlight streaming from a 45-degree angle on the upper left").
+   - Fill & Rim Light: Subtle fill light lifting shadow details, edge/rim light separating subject from background, hair highlight.
+   - Practical & Ambient Lights: Warm lamps, neon signs, candle flickers, monitor glow.
+   - Color Temperature: Warm tungsten (2800-3200K), neutral daylight (5000-5600K), cool overcast (6500K), or colored gels (magenta/cyan).
+   - Shadow Falloff: Deep sharp cast shadows vs smooth gradual chiaroscuro roll-off.
+
+6. LAYER 6: CAMERA, OPTICS & COMPOSITION GEOMETRY
+   - Shot Framing: (e.g., extreme close-up macro, close-up portrait, chest-up bust shot, medium half-body shot, three-quarter shot, full-body environmental shot).
+   - Camera Angle: (e.g., eye-level neutral, low-angle hero perspective, high-angle downward tilt, Dutch angle).
+   - Lens & Aperture: (e.g., 85mm f/1.4 for creamy bokeh, 35mm f/2.0 for environmental portrait, 50mm f/1.8 natural field of view, 24mm wide angle).
+   - Compositional Rules: (e.g., rule of thirds, centered symmetrical balance, leading lines, negative space).
+   - Aspect Ratio: Estimate the aspect ratio of the image (e.g., "1:1", "4:5", "3:4", "2:3", "16:9", "9:16").
+
+7. LAYER 7: COLOR PALETTE & COLOR GRADING
+   - Dominant Color Palette: 4 to 6 key color tones.
+   - Contrast & Tonal Curve: High-contrast punchy, muted vintage film matte, crushed blacks, glowing highlights.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT PROMPT REQUIREMENTS FOR GENERATORS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- "reconstructed_prompt": The Master 1:1 Clone Prompt (140-220 words). A rich, seamless, hyper-detailed narrative combining all 7 layers to allow ANY AI generator to reproduce the exact picture.
+- "chatgpt_prompt": Formatted specifically for ChatGPT (DALL-E 3 / GPT-4o). Natural, vivid sentences describing the complete scene, subject, attire, lighting, and optical realism without meta-placeholders or bracketed text.
+- "gemini_prompt": Formatted specifically for Google Gemini (Imagen 3). Structured with optical photographic parameters (e.g. 85mm f/1.4 lens, soft directional lighting, realistic subsurface skin scattering, authentic material textures, and precise spatial composition).
+- "midjourney_prompt": Clean comma-separated high-impact descriptors covering medium, subject, wardrobe, environment, lighting, camera specs, color grade, ending with "--style raw --v 6.1 --ar [aspect_ratio]". (Do NOT include invalid placeholder text like "[IMAGE_URL]").
+- "flux_prompt": Formatted specifically for FLUX.1 (Dev / Schnell). Dense, highly descriptive natural language prompt that FLUX follows with maximum fidelity.
+- "face_lock_dna": Standalone 40-60 word ultra-dense biometric facial DNA description for locking identity across all AI tools.
+- "negative_prompt": Tailored negative prompt to eliminate common AI artifacts (e.g., "blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text").
 
 Respond ONLY with a valid JSON object matching exactly this schema:
 {
-    "reconstructed_prompt": "string", // Rich, ultra-descriptive master prompt (60-120 words) in natural language.
-    "chatgpt_prompt": "string", // Prompt specifically optimized for ChatGPT (DALL-E 3 / GPT-4o) with anti-drift facial lock commands.
-    "gemini_prompt": "string", // Prompt specifically optimized for Google Gemini (Imagen 3), with 85mm camera specs, lighting fidelity, and exact facial/body landmarks.
-    "midjourney_prompt": "string", // Prompt formatted for Midjourney v6 with stylistic keywords and parameters (e.g., --v 6.1 --ar 16:9, and --cref [IMAGE_URL] if a face is detected).
-    "face_lock_dna": "string", // Standalone 40-60 word ultra-dense biometric facial DNA description for locking identity across all AI tools.
-    "detected_style": "string", // The primary overriding art style (1-3 words)
-    "confidence_score": 95, // Overall confidence score between 1 and 100
+    "reconstructed_prompt": "string",
+    "chatgpt_prompt": "string",
+    "gemini_prompt": "string",
+    "midjourney_prompt": "string",
+    "flux_prompt": "string",
+    "face_lock_dna": "string",
+    "negative_prompt": "string",
+    "detected_style": "string",
+    "aspect_ratio": "string",
+    "confidence_score": 98,
     "demographics": {
-        "identity_classification": "e.g. Teen Girl (15-17 yrs) / Young Boy (7-9 yrs) / Adult Woman (26-28 yrs) / Adult Man (32-35 yrs)",
-        "gender": "e.g. Female (Girl) / Female (Woman) / Male (Boy) / Male (Man)",
-        "estimated_age": "e.g. 16 years old",
-        "body_physique": "e.g. Petite adolescent frame with natural posture",
-        "face_shape": "e.g. Soft oval with youthful features and light freckles"
+        "identity_classification": "string",
+        "gender": "string",
+        "estimated_age": "string",
+        "body_physique": "string",
+        "face_shape": "string"
     },
     "sub_metrics": {
-        "image_clarity": 92, // 1-100: Score evaluating sharpness, noise, and resolution fidelity of the uploaded image
-        "face_retention": 95, // 1-100: Score evaluating facial landmark precision and face-lock capability
-        "body_consistency": 88, // 1-100: Score evaluating body type, proportions, posture, and physique consistency
-        "lighting_fidelity": 90 // 1-100: Score evaluating lighting accuracy, shadows, and atmosphere
+        "image_clarity": 95,
+        "face_retention": 98,
+        "body_consistency": 94,
+        "lighting_fidelity": 96,
+        "composition_accuracy": 97,
+        "styling_precision": 95
     },
-    "key_elements": ["string", "string", "string", "string"], // 4-6 specific visual tags
-    "face_detected": true, // true if a human face or identifiable character is present, otherwise false
+    "key_elements": ["string", "string", "string", "string", "string", "string"],
+    "face_detected": true,
+    "scene_breakdown": {
+        "medium_and_style": "string",
+        "camera_and_optics": "string",
+        "lighting_and_atmosphere": "string",
+        "subject_and_pose": "string",
+        "wardrobe_and_styling": "string",
+        "environment_and_background": "string",
+        "color_palette": ["#HEX1", "#HEX2", "#HEX3", "#HEX4", "#HEX5"]
+    },
     "face_consistency_instructions": {
-        "chatgpt_tip": "string", // Step-by-step guidance for ChatGPT (e.g., upload reference image and paste this prompt)
-        "gemini_tip": "string", // Step-by-step guidance for Gemini (e.g., use with Imagen 3 / Gemini Advanced with reference image)
-        "key_facial_traits": ["string", "string", "string", "string"], // 3-5 bullet points of unique facial identifiers extracted from the image
-        "body_physique_traits": ["string", "string"] // 2-4 bullet points of body build, stature, posture, and clothing identifiers
+        "chatgpt_tip": "string",
+        "gemini_tip": "string",
+        "midjourney_tip": "string",
+        "flux_tip": "string",
+        "key_facial_traits": ["string", "string", "string", "string"],
+        "body_physique_traits": ["string", "string"]
     }
 }`;
 
