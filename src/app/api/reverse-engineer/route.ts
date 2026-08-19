@@ -9,6 +9,7 @@ export async function POST(req: Request) {
         const formData = await req.formData();
         const file = formData.get('image') as File;
         const subjectType = (formData.get('subjectType') as string) || 'auto';
+        const ageRange = (formData.get('ageRange') as string) || 'auto';
         const recreationMode = (formData.get('recreationMode') as string) || 'exact_clone';
 
         if (!file) {
@@ -27,7 +28,12 @@ export async function POST(req: Request) {
         const mimeType = file.type;
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash",
+            generationConfig: {
+                responseMimeType: "application/json"
+            }
+        });
 
         const subjectOverrideInstruction = subjectType === 'any_person'
             ? `\nUSER EXPLICIT SUBJECT SELECTION: "ANY PERSON / GENDER-NEUTRAL / VERSATILE HUMAN".
@@ -38,6 +44,30 @@ The user explicitly specified that the subject is: "${subjectType.toUpperCase()}
 You MUST strictly construct all prompts for a "${subjectType}" (e.g. if 'girl' -> young/teen girl; if 'boy' -> young/teen boy; if 'woman' -> adult female; if 'man' -> adult male; if 'non_human' -> focus on landscape/object/animal without human attributes). Ensure zero demographic ambiguity.\n`
             : '';
 
+        const ageOverrideInstruction = ageRange === 'toddler'
+            ? `\nUSER EXPLICIT AGE LOCK: "TODDLER (3-5 YEARS OLD)".
+You MUST strictly lock the subject as a 3-5 year old toddler child with youthful soft baby facial anatomy, delicate features, and toddler proportions. Start EVERY prompt declaring "A photorealistic portrait of an exact 4-year-old toddler [girl/boy]...". Zero aging up.\n`
+            : ageRange === 'child'
+            ? `\nUSER EXPLICIT AGE LOCK: "YOUNG CHILD (6-10 YEARS OLD)".
+You MUST strictly lock the subject as a 6-10 year old young child with authentic child facial bone structure and youthful features. Start EVERY prompt declaring "A photorealistic portrait of an exact 8-year-old young [girl/boy]...". Zero aging up.\n`
+            : ageRange === 'teen'
+            ? `\nUSER EXPLICIT AGE LOCK: "TEENAGER (14-17 YEARS OLD)".
+You MUST strictly lock the subject as an adolescent teenager (14-17 years old) with adolescent facial proportions, authentic skin, and youthful hair. Start EVERY prompt declaring "A photorealistic portrait of an exact 16-year-old adolescent teenage [girl/boy]...". Zero aging up or down.\n`
+            : ageRange === 'young_adult'
+            ? `\nUSER EXPLICIT AGE LOCK: "YOUNG ADULT (20-25 YEARS OLD)".
+You MUST strictly lock the subject as a young adult (20-25 years old). Start EVERY prompt declaring "A photorealistic portrait of an exact 22-year-old young adult [woman/man]...".\n`
+            : ageRange === 'adult'
+            ? `\nUSER EXPLICIT AGE LOCK: "ADULT (28-38 YEARS OLD)".
+You MUST strictly lock the subject as a mature adult (28-38 years old). Start EVERY prompt declaring "A photorealistic portrait of an exact 32-year-old adult [woman/man]...".\n`
+            : ageRange === 'middle_aged'
+            ? `\nUSER EXPLICIT AGE LOCK: "MIDDLE-AGED ADULT (45-55 YEARS OLD)".
+You MUST strictly lock the subject as a middle-aged adult (45-55 years old) with distinguished facial character lines and mature bone structure. Start EVERY prompt declaring "A photorealistic portrait of an exact 50-year-old middle-aged [woman/man]...".\n`
+            : ageRange === 'senior'
+            ? `\nUSER EXPLICIT AGE LOCK: "SENIOR / ELDERLY (65+ YEARS OLD)".
+You MUST strictly lock the subject as a senior (65+ years old) with graceful aging textures, natural wrinkles, and silver/grey hair. Start EVERY prompt declaring "A photorealistic portrait of an exact 68-year-old senior [woman/man]...".\n`
+            : `\nAUTOMATIC AGE DETECTION & LOCK:
+Carefully diagnose the exact life stage and age in the image (e.g. "7-year-old child", "16-year-old teenager", "24-year-old woman", "48-year-old man"). You MUST declare this exact age at the very beginning of EVERY prompt to prevent the AI generator from hallucinating a different age.\n`;
+
         const modeInstruction = recreationMode === 'photo_upgrade'
             ? `\nRECREATION TARGET MODE: "PHOTOREALISTIC 35MM UPGRADE".
 Transform the core scene into an ultra-high-end cinematic 35mm film photograph shot on Leica / Hasselblad with Kodak Portra 400, authentic optical depth of field, micro-textures, and realistic lighting physics while preserving the exact composition, pose, and subject identity.\n`
@@ -47,15 +77,19 @@ Recreate the exact composition, lighting, subject pose, and color harmony in a h
             : `\nRECREATION TARGET MODE: "1:1 EXACT CLONE (MAXIMUM PRECISION)".
 Your primary goal is absolute 1:1 visual clone fidelity. Deconstruct every single pixel element—exact attire, fabric weave, background objects, lighting angle, shadow depth, camera lens, eye gaze vector, skin texture, color temperature, and aspect ratio—so the generated prompt produces an image virtually indistinguishable from the original.\n`;
 
-        const prompt = `You are the World's Foremost Reverse-Engineering Image Analyst and Prompt Architect.
-Your mission is to perform an exhaustive, 7-layer forensic deconstruction of the provided image to generate PROMPTS THAT WILL RECREATE THIS EXACT PICTURE WITH NEAR-IDENTICAL PRECISION across ChatGPT (DALL-E 3 / GPT-4o), Google Gemini (Imagen 3), Midjourney v6.1, and FLUX.1 (Dev / Schnell).
+        const prompt = `You are the World's Foremost Reverse-Engineering Image Analyst and Biometric Facial Cloning Architect.
+Your mission is to perform an exhaustive, 7-layer forensic deconstruction of the provided image to generate PROMPTS THAT WILL RECREATE THIS EXACT PICTURE WITH 100% IDENTICAL FACE AND DEMOGRAPHIC FIDELITY across ChatGPT (DALL-E 3 / GPT-4o), Google Gemini (Imagen 3), Midjourney v6.1, and FLUX.1 (Dev / Schnell).
 
 ${subjectOverrideInstruction}
+${ageOverrideInstruction}
 ${modeInstruction}
 
-CRITICAL RECREATION PROBLEM TO SOLVE:
-Generic prompts (e.g., "a woman in a room with nice lighting") cause AI generators to hallucinate random backgrounds, random clothing, random lighting, and distorted faces—producing a totally different image.
-To achieve an EXACT 1:1 CLONE, you MUST forensically extract all 7 essential visual layers:
+CRITICAL PROBLEM TO SOLVE:
+1. When users generate an image from a prompt, AI image models often create a completely different, generic face or swap their age (e.g., aging a teen into an adult or giving a random stock photo face).
+2. To prevent face drift and age alteration, you MUST construct prompts that combine:
+   - Strict Demographic & Age Declaration at the very start of every prompt.
+   - Deep Anthropometric Micro-Features: Exact eye morphology (almond/hooded, canthal tilt, iris pigment sub-tones, limbal ring), nasal architecture (bridge width, tip shape, columella), oral structure (lip fullness ratio, Cupid's bow, resting smile), cheekbones (zygomatic arch), jawline contour, and epidermal micro-texture (freckles, pores, beauty marks, skin undertone).
+   - Reference-Image Cloning Directive: Prompts explicitly formulated to instruct AI generators (like ChatGPT or Gemini) to clone the face from the attached reference photo while keeping the exact scene, lighting, and wardrobe.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 7-LAYER FORENSIC RECREATION BLUEPRINT:
@@ -65,13 +99,13 @@ To achieve an EXACT 1:1 CLONE, you MUST forensically extract all 7 essential vis
    - Exact Medium: (e.g., 35mm analog film photography, medium format studio portrait, 8k cinematic anamorphic film still, candid Polaroid 600, 3D Octane/Unreal Engine 5 render, digital concept painting, anime/manga cel-shaded, oil painting).
    - Film Stock / Sensor / Render Texture: (e.g., Kodak Portra 400, Cinestill 800T, Fujifilm Superia, crisp digital RAW, authentic film grain, matte shadows, sub-surface scattering).
 
-2. LAYER 2: SUBJECT IDENTITY, ANATOMY, EXACT POSE & EYE GAZE
-   - Demographics: Precise age range (e.g., "24-year-old woman", "16-year-old teenage boy"), ethnicity/heritage, skin tone and undertone.
-   - Facial & Physical Features: Exact eye shape and iris color, eyebrow arch, nose bridge and tip shape, lip fullness and shape, jawline, cheekbones, natural skin pores, freckles, moles, blemishes.
-   - Hair: Exact color, parting, texture (wavy, straight, coily, slicked back), length, styling, stray strands.
-   - Expression & Emotion: Exact subtle micro-expression (e.g., enigmatic slight smirk, intense piercing stare, melancholic gaze, joyful candid laugh).
+2. LAYER 2: SUBJECT IDENTITY, EXACT AGE, ANATOMY, POSE & EYE GAZE
+   - Demographics: Precise age (e.g. "16-year-old teenage girl", "7-year-old boy", "24-year-old young woman"), ethnicity, skin tone/undertone.
+   - Facial Anatomy: Eye shape, iris pigmentation, eyebrows, nose bridge/tip, lip fullness, jawline shape, cheekbones, natural skin pores, freckles, moles, blemishes.
+   - Hair: Exact color, parting, texture (wavy, straight, coily, slicked back), length, styling, stray flyaway strands.
+   - Expression & Emotion: Exact micro-expression (e.g., subtle enigmatic smirk, intense piercing gaze, joyful candid laugh).
    - Gaze Direction: Exact vector relative to the camera (e.g., "looking directly into the lens with piercing eye contact", "gazing 45 degrees to the right out of frame", "looking downward pensively").
-   - Pose & Posture: Exact head tilt angle, shoulder orientation, body angle, spine curvature, hand and finger placement, seated/standing posture.
+   - Pose & Posture: Exact head tilt angle, shoulder orientation, body angle, spine curvature, hand/finger placement, seated/standing posture.
 
 3. LAYER 3: WARDROBE, MATERIALS & ACCESSORIES
    - Garments: Item-by-item breakdown of every visible piece (garment type, exact color hue, cut/neckline, fit).
@@ -105,17 +139,19 @@ To achieve an EXACT 1:1 CLONE, you MUST forensically extract all 7 essential vis
 OUTPUT PROMPT REQUIREMENTS FOR GENERATORS:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- "reconstructed_prompt": The Master 1:1 Clone Prompt (140-220 words). A rich, seamless, hyper-detailed narrative combining all 7 layers to allow ANY AI generator to reproduce the exact picture.
-- "chatgpt_prompt": Formatted specifically for ChatGPT (DALL-E 3 / GPT-4o). Natural, vivid sentences describing the complete scene, subject, attire, lighting, and optical realism without meta-placeholders or bracketed text.
-- "gemini_prompt": Formatted specifically for Google Gemini (Imagen 3). Structured with optical photographic parameters (e.g. 85mm f/1.4 lens, soft directional lighting, realistic subsurface skin scattering, authentic material textures, and precise spatial composition).
-- "midjourney_prompt": Clean comma-separated high-impact descriptors covering medium, subject, wardrobe, environment, lighting, camera specs, color grade, ending with "--style raw --v 6.1 --ar [aspect_ratio]". (Do NOT include invalid placeholder text like "[IMAGE_URL]").
+- "reconstructed_prompt": The Master 1:1 Clone Prompt (140-220 words). Starts with the exact age declaration and subject identity, seamlessly integrating all 7 layers (biometrics, wardrobe, lighting, lens optics, background, color grading).
+- "reference_clone_prompt": Formatted specifically for use WITH an uploaded photo in ChatGPT or Gemini: "Using the uploaded reference image as the absolute facial identity source, generate a photorealistic recreation maintaining the exact facial bone structure, features, eye shape, and exact [age] age of the person in the photo with 100% likeness. [Complete wardrobe, environment, lighting, and camera optics]. Zero facial drift, exact facial replica of reference image."
+- "chatgpt_prompt": Formatted specifically for ChatGPT (DALL-E 3 / GPT-4o) with reference image locking commands and vivid natural language.
+- "gemini_prompt": Formatted specifically for Google Gemini (Imagen 3) with optical photographic parameters (e.g. 85mm f/1.4 lens, soft directional lighting, realistic subsurface skin scattering, authentic material textures, exact age and facial landmarks).
+- "midjourney_prompt": Clean comma-separated high-impact descriptors covering medium, subject, wardrobe, environment, lighting, camera specs, color grade, ending with "--style raw --v 6.1 --ar [aspect_ratio] --cref [IMAGE_URL] --cw 100".
 - "flux_prompt": Formatted specifically for FLUX.1 (Dev / Schnell). Dense, highly descriptive natural language prompt that FLUX follows with maximum fidelity.
 - "face_lock_dna": Standalone 40-60 word ultra-dense biometric facial DNA description for locking identity across all AI tools.
-- "negative_prompt": Tailored negative prompt to eliminate common AI artifacts (e.g., "blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text").
+- "negative_prompt": Tailored negative prompt to eliminate common AI artifacts (e.g., "blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text, different face, wrong age").
 
 Respond ONLY with a valid JSON object matching exactly this schema:
 {
     "reconstructed_prompt": "string",
+    "reference_clone_prompt": "string",
     "chatgpt_prompt": "string",
     "gemini_prompt": "string",
     "midjourney_prompt": "string",
@@ -172,19 +208,32 @@ Respond ONLY with a valid JSON object matching exactly this schema:
         const responseText = result.response.text();
 
         // Extract JSON from potential markdown formatting
-        let jsonStr = responseText;
+        let jsonStr = responseText.trim();
         if (jsonStr.includes('```json')) {
             jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
         } else if (jsonStr.includes('```')) {
             jsonStr = jsonStr.split('```')[1].split('```')[0].trim();
         }
 
-        const parsedJson = JSON.parse(jsonStr);
+        const firstBrace = jsonStr.indexOf('{');
+        const lastBrace = jsonStr.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+        }
+
+        let parsedJson;
+        try {
+            parsedJson = JSON.parse(jsonStr);
+        } catch (parseErr) {
+            console.warn("Standard JSON parse failed, cleaning up string:", parseErr);
+            const cleaned = jsonStr.replace(/,\s*([}\]])/g, '$1');
+            parsedJson = JSON.parse(cleaned);
+        }
 
         return NextResponse.json({ result: parsedJson });
 
     } catch (error: any) {
         console.error("Reverse Engineer API Error:", error);
-        return new NextResponse(JSON.stringify({ error: "Failed to reverse engineer the image. The AI is stumped." }), { status: 500 });
+        return new NextResponse(JSON.stringify({ error: error?.message || "Failed to reverse engineer the image. The AI is stumped." }), { status: 500 });
     }
 }

@@ -7,7 +7,8 @@ import {
     Copy, Loader2, ScanSearch, UploadCloud, RefreshCw, AlertCircle,
     Fingerprint, Crop as CropIcon, Sparkles, Check, UserCheck, Camera,
     Activity, Target, User, Focus, Layers, Sliders, Palette, Zap,
-    Ban, Eye, FileText, Sun, Compass, Shirt, MapPin, Film, CheckCircle2
+    Ban, Eye, FileText, Sun, Compass, Shirt, MapPin, Film, CheckCircle2,
+    Clock, HelpCircle, Image as ImageIcon, Sparkle
 } from 'lucide-react'
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
@@ -48,6 +49,7 @@ type Demographics = {
 
 type ReconstructionResult = {
     reconstructed_prompt: string;
+    reference_clone_prompt?: string;
     chatgpt_prompt?: string;
     gemini_prompt?: string;
     midjourney_prompt?: string;
@@ -77,12 +79,14 @@ export default function ReverseEngineerPage() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const [subjectType, setSubjectType] = useState<'auto' | 'any_person' | 'woman' | 'man' | 'girl' | 'boy' | 'non_human'>('auto')
+    const [ageRange, setAgeRange] = useState<'auto' | 'toddler' | 'child' | 'teen' | 'young_adult' | 'adult' | 'middle_aged' | 'senior'>('auto')
     const [recreationMode, setRecreationMode] = useState<'exact_clone' | 'photo_upgrade' | 'artistic'>('exact_clone')
+    const [promptMode, setPromptMode] = useState<'reference' | 'standalone'>('reference')
 
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<ReconstructionResult | null>(null)
     const [error, setError] = useState<string | null>(null)
-    const [activeTab, setActiveTab] = useState<'master' | 'chatgpt' | 'gemini' | 'midjourney' | 'flux' | 'face_dna' | 'negative'>('master')
+    const [activeTab, setActiveTab] = useState<'master' | 'reference' | 'chatgpt' | 'gemini' | 'midjourney' | 'flux' | 'face_dna' | 'negative'>('master')
     const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
     // Cropping State
@@ -140,7 +144,6 @@ export default function ReverseEngineerPage() {
             return
         }
 
-        // Prevent zero-pixel crops which throw DOM exceptions
         if (completedCrop.width <= 0 || completedCrop.height <= 0) {
             setCropModalOpen(false)
             return
@@ -257,6 +260,7 @@ export default function ReverseEngineerPage() {
         const formData = new FormData()
         formData.append('image', file)
         formData.append('subjectType', subjectType)
+        formData.append('ageRange', ageRange)
         formData.append('recreationMode', recreationMode)
 
         try {
@@ -316,28 +320,36 @@ export default function ReverseEngineerPage() {
 
     const getActivePrompt = () => {
         if (!result) return '';
-        if (activeTab === 'master') return result.reconstructed_prompt;
-        if (activeTab === 'chatgpt') return result.chatgpt_prompt || result.reconstructed_prompt;
-        if (activeTab === 'gemini') return result.gemini_prompt || result.reconstructed_prompt;
+        if (activeTab === 'master') {
+            return promptMode === 'reference'
+                ? (result.reference_clone_prompt || result.reconstructed_prompt)
+                : result.reconstructed_prompt;
+        }
+        if (activeTab === 'reference') return result.reference_clone_prompt || result.reconstructed_prompt;
+        if (activeTab === 'chatgpt') return result.chatgpt_prompt || result.reference_clone_prompt || result.reconstructed_prompt;
+        if (activeTab === 'gemini') return result.gemini_prompt || result.reference_clone_prompt || result.reconstructed_prompt;
         if (activeTab === 'midjourney') return result.midjourney_prompt || result.reconstructed_prompt;
         if (activeTab === 'flux') return result.flux_prompt || result.reconstructed_prompt;
         if (activeTab === 'face_dna') return result.face_lock_dna || result.reconstructed_prompt;
-        if (activeTab === 'negative') return result.negative_prompt || 'blurry, low quality, distorted anatomy, extra limbs, bad hands, deformed fingers, plastic skin, cartoon, oversaturated, watermark, text';
+        if (activeTab === 'negative') return result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text, different face, wrong age';
         return result.reconstructed_prompt;
     }
 
     const copyFullDossier = () => {
         if (!result) return;
-        const dossier = `# 📸 FORENSIC 1:1 RECREATION DOSSIER
+        const dossier = `# 📸 FORENSIC 1:1 RECREATION & FACE CLONE DOSSIER
 
-## 🎯 Master 1:1 Recreation Prompt
+## 🎯 1:1 Reference-Image Clone Prompt (Attach Photo in ChatGPT/Gemini)
+${result.reference_clone_prompt || result.reconstructed_prompt}
+
+## 📝 Standalone Biometric Master Prompt (Text-to-Image)
 ${result.reconstructed_prompt}
 
 ## 🤖 ChatGPT (DALL-E 3) Prompt
-${result.chatgpt_prompt || result.reconstructed_prompt}
+${result.chatgpt_prompt || result.reference_clone_prompt || result.reconstructed_prompt}
 
 ## 💎 Google Gemini (Imagen 3) Prompt
-${result.gemini_prompt || result.reconstructed_prompt}
+${result.gemini_prompt || result.reference_clone_prompt || result.reconstructed_prompt}
 
 ## 🎨 Midjourney v6.1 Prompt
 ${result.midjourney_prompt || result.reconstructed_prompt}
@@ -347,10 +359,11 @@ ${result.flux_prompt || result.reconstructed_prompt}
 
 ${result.face_lock_dna ? `## 🧬 Biometric Face-DNA Anchor\n${result.face_lock_dna}\n` : ''}
 ## 🚫 Negative Prompt
-${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text'}
+${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers, extra limbs, plastic skin, 3d render, cartoon, oversaturated, watermark, text, different face, wrong age'}
 
 ---
-## 🔍 Forensic Scene Breakdown
+## 🔍 Demographic & Scene Diagnosis
+- **Diagnosed Age & Subject:** ${result.demographics?.estimated_age || 'Exact age locked'} • ${result.demographics?.identity_classification || result.demographics?.gender || 'Subject'}
 - **Art Medium & Style:** ${result.scene_breakdown?.medium_and_style || result.detected_style}
 - **Camera & Optics:** ${result.scene_breakdown?.camera_and_optics || '85mm f/1.4, eye-level framing'}
 - **Lighting & Atmosphere:** ${result.scene_breakdown?.lighting_and_atmosphere || 'Directional natural lighting'}
@@ -379,20 +392,20 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                 <div className="flex flex-col gap-4 text-center items-center">
                     <Badge variant="outline" className="px-4 py-1.5 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)] tracking-widest text-xs font-mono rounded-md backdrop-blur-md uppercase">
                         <ScanSearch className="w-3.5 h-3.5 mr-2 inline-block -mt-0.5" />
-                        7-Layer Forensic Engine • Exact 1:1 Picture Recreation
+                        7-Layer Forensic Engine • Exact Face & Age Cloning
                     </Badge>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white uppercase text-center flex flex-col items-center">
                         Reverse Engineer
                     </h1>
                     <p className="text-zinc-400 text-base md:text-lg font-medium max-w-2xl px-4 leading-relaxed font-mono">
-                        Deconstruct any picture into <span className="text-emerald-400 font-semibold">1:1 high-precision prompts</span> tailored for <span className="text-emerald-300">ChatGPT</span>, <span className="text-blue-400">Gemini</span>, <span className="text-purple-400">Midjourney</span>, and <span className="text-amber-400">FLUX.1</span>.
+                        Deconstruct any picture into <span className="text-emerald-400 font-semibold">100% face-accurate prompts</span> locked for all ages across <span className="text-emerald-300">ChatGPT</span>, <span className="text-blue-400">Gemini</span>, <span className="text-purple-400">Midjourney</span>, and <span className="text-amber-400">FLUX</span>.
                     </p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
                     {/* Left Column: Upload & Precision Controls (5 cols) */}
-                    <div className="lg:col-span-5 flex flex-col gap-5 w-full">
+                    <div className="lg:col-span-5 flex flex-col gap-4 w-full">
                         <div
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
@@ -419,14 +432,14 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
 
                                     {isAnalyzing && (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center p-8 z-20">
-                                            <div className="w-full max-w-xs overflow-hidden relative bg-black/70 rounded-xl border border-emerald-500/30 p-5 shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-md">
+                                            <div className="w-full max-w-xs overflow-hidden relative bg-black/80 rounded-xl border border-emerald-500/30 p-5 shadow-[0_0_30px_rgba(16,185,129,0.2)] backdrop-blur-md">
                                                 <div className="absolute top-0 left-0 w-full h-px bg-emerald-500 shadow-[0_0_10px_#10B981] animate-scan"></div>
                                                 <div className="flex items-center gap-3 text-emerald-400 font-mono text-sm uppercase tracking-widest font-bold">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                    Forensic 7-Layer Scan...
+                                                    Biometric Face Locking...
                                                 </div>
                                                 <p className="text-[11px] text-zinc-400 font-mono mt-2 leading-tight">
-                                                    Extracting lens optics, lighting angles, fabric textures & identity locks...
+                                                    Extracting facial bone structure, exact age proportions, lighting, and wardrobe...
                                                 </p>
                                                 <div className="flex gap-1 mt-3 opacity-60">
                                                     <div className="h-1 w-full bg-emerald-500/20 overflow-hidden"><div className="h-full bg-emerald-400 animate-pulse w-full"></div></div>
@@ -440,60 +453,112 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                 <div className="flex flex-col items-center justify-center p-8 text-center pointer-events-none">
                                     <UploadCloud className="w-12 h-12 text-zinc-600 mb-4" />
                                     <h3 className="text-lg font-bold text-zinc-300 mb-1 font-mono uppercase">Drop Target Image</h3>
-                                    <p className="text-xs text-zinc-500 max-w-xs leading-relaxed">Supports JPEG, PNG, WEBP up to 20MB. Click to browse files.</p>
+                                    <p className="text-xs text-zinc-500 max-w-xs leading-relaxed">Upload any photo to extract its exact face & scene recreation blueprint.</p>
                                 </div>
                             )}
                         </div>
 
-                        {/* Recreation Precision Goal Option */}
+                        {/* Age Lock Option */}
                         {file && (
                             <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-zinc-900 border border-zinc-800">
                                 <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
                                     <span className="flex items-center gap-1.5 font-bold text-zinc-300">
-                                        <Target className="w-3.5 h-3.5 text-emerald-400" />
-                                        Recreation Precision Goal
+                                        <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                                        Subject Age Lock
                                     </span>
                                     <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
-                                        {recreationMode === 'exact_clone' ? '🎯 1:1 Precision' : recreationMode === 'photo_upgrade' ? '📸 35mm Realism' : '🎨 Artistic'}
+                                        {ageRange === 'auto' ? '🤖 Auto Detect Age' : ageRange.toUpperCase()}
                                     </span>
                                 </span>
 
-                                <div className="grid grid-cols-3 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
+                                <div className="grid grid-cols-4 gap-1 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
                                     <button
                                         type="button"
-                                        onClick={() => setRecreationMode('exact_clone')}
-                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
-                                            recreationMode === 'exact_clone'
+                                        onClick={() => setAgeRange('auto')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'auto'
                                                 ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                         }`}
                                     >
-                                        <span className="font-extrabold">🎯 1:1 Clone</span>
-                                        <span className="text-[9px] opacity-75">Exact Picture</span>
+                                        🤖 Auto
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setRecreationMode('photo_upgrade')}
-                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
-                                            recreationMode === 'photo_upgrade'
-                                                ? 'bg-cyan-500 text-zinc-950 shadow-sm shadow-cyan-500/20'
+                                        onClick={() => setAgeRange('toddler')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'toddler'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                         }`}
                                     >
-                                        <span className="font-extrabold">📸 35mm Film</span>
-                                        <span className="text-[9px] opacity-75">Cinema Photo</span>
+                                        🧒 3-5y
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setRecreationMode('artistic')}
-                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
-                                            recreationMode === 'artistic'
-                                                ? 'bg-purple-500 text-zinc-950 shadow-sm shadow-purple-500/20'
+                                        onClick={() => setAgeRange('child')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'child'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
                                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                                         }`}
                                     >
-                                        <span className="font-extrabold">🎨 Artistic</span>
-                                        <span className="text-[9px] opacity-75">Digital Art</span>
+                                        👧 6-10y
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAgeRange('teen')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'teen'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        🧑 14-17y
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAgeRange('young_adult')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'young_adult'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👩 20-25y
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAgeRange('adult')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'adult'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👨 28-38y
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAgeRange('middle_aged')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'middle_aged'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        🧑 45-55y
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setAgeRange('senior')}
+                                        className={`py-1.5 px-1 rounded font-mono text-[10px] font-bold transition-all ${
+                                            ageRange === 'senior'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        👵 65+y
                                     </button>
                                 </div>
                             </div>
@@ -505,12 +570,12 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                 <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
                                     <span className="flex items-center gap-1.5 font-bold text-zinc-300">
                                         <User className="w-3.5 h-3.5 text-emerald-400" />
-                                        Target Demographic Mode
+                                        Target Subject
                                     </span>
-                                    <span className="text-[10px] text-zinc-500">Subject Framing</span>
+                                    <span className="text-[10px] text-zinc-500">Gender & Type</span>
                                 </span>
 
-                                <div className="grid grid-cols-4 sm:grid-cols-4 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
+                                <div className="grid grid-cols-4 gap-1 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
                                     <button
                                         type="button"
                                         onClick={() => setSubjectType('auto')}
@@ -592,6 +657,60 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                             </div>
                         )}
 
+                        {/* Recreation Precision Goal Option */}
+                        {file && (
+                            <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                                <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                                    <span className="flex items-center gap-1.5 font-bold text-zinc-300">
+                                        <Target className="w-3.5 h-3.5 text-emerald-400" />
+                                        Recreation Goal
+                                    </span>
+                                    <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
+                                        {recreationMode === 'exact_clone' ? '🎯 1:1 Precision' : recreationMode === 'photo_upgrade' ? '📸 35mm Realism' : '🎨 Artistic'}
+                                    </span>
+                                </span>
+
+                                <div className="grid grid-cols-3 gap-1.5 p-1 bg-zinc-950 rounded-lg border border-zinc-800/80">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRecreationMode('exact_clone')}
+                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
+                                            recreationMode === 'exact_clone'
+                                                ? 'bg-emerald-500 text-zinc-950 shadow-sm shadow-emerald-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        <span className="font-extrabold">🎯 1:1 Clone</span>
+                                        <span className="text-[9px] opacity-75">Exact Picture</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRecreationMode('photo_upgrade')}
+                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
+                                            recreationMode === 'photo_upgrade'
+                                                ? 'bg-cyan-500 text-zinc-950 shadow-sm shadow-cyan-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        <span className="font-extrabold">📸 35mm Film</span>
+                                        <span className="text-[9px] opacity-75">Cinema Photo</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setRecreationMode('artistic')}
+                                        className={`py-2 px-1.5 rounded font-mono text-[11px] font-bold transition-all text-center flex flex-col items-center gap-0.5 ${
+                                            recreationMode === 'artistic'
+                                                ? 'bg-purple-500 text-zinc-950 shadow-sm shadow-purple-500/20'
+                                                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                        }`}
+                                    >
+                                        <span className="font-extrabold">🎨 Artistic</span>
+                                        <span className="text-[9px] opacity-75">Digital Art</span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         {error && (
                             <div className="p-4 bg-red-950/30 text-red-400 text-xs rounded-xl border border-red-900/50 flex items-center gap-3 font-mono">
                                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -635,13 +754,13 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                     </div>
 
                     {/* Right Column: Results & 7-Layer Deconstruction (7 cols) */}
-                    <div className="lg:col-span-7 w-full flex flex-col gap-6 min-h-[400px]">
+                    <div className="lg:col-span-7 w-full flex flex-col gap-5 min-h-[400px]">
                         {!result && !isAnalyzing ? (
                             <div className="w-full h-full min-h-[380px] rounded-2xl border border-zinc-800 bg-zinc-900/30 flex flex-col items-center justify-center p-8 text-center text-zinc-600">
                                 <Fingerprint className="w-16 h-16 mb-4 opacity-40 text-emerald-500/60" />
                                 <h3 className="text-lg font-bold mb-2 font-mono uppercase text-zinc-400">Awaiting Target Image</h3>
                                 <p className="text-xs text-zinc-500 leading-relaxed max-w-sm">
-                                    Upload any image to extract an exact 1:1 recreation prompt blueprint covering lens optics, lighting geometry, clothing textures, and color grading.
+                                    Upload any image to extract an exact 1:1 recreation prompt blueprint covering biometric facial geometry, lens optics, and lighting.
                                 </p>
                             </div>
                         ) : result ? (
@@ -650,19 +769,19 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                 {/* Top Stats Row */}
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
+                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Diagnosed Age & Stage</span>
+                                        <span className="font-bold text-emerald-300 text-xs sm:text-sm truncate">
+                                            {result.demographics?.estimated_age || 'Exact age locked'} • {result.demographics?.identity_classification || result.demographics?.gender || 'Subject'}
+                                        </span>
+                                    </div>
+                                    <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
                                         <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Base Medium</span>
-                                        <span className="font-bold text-white text-sm truncate" title={result.detected_style}>
+                                        <span className="font-bold text-white text-xs sm:text-sm truncate" title={result.detected_style}>
                                             {result.detected_style}
                                         </span>
                                     </div>
                                     <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
-                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Aspect Ratio</span>
-                                        <span className="font-bold text-emerald-400 text-sm font-mono">
-                                            {result.aspect_ratio || '16:9'}
-                                        </span>
-                                    </div>
-                                    <div className="p-3.5 rounded-xl bg-zinc-900/90 border border-zinc-800 flex flex-col gap-1">
-                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Clone Match</span>
+                                        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Face Match Retention</span>
                                         <div className="flex items-end gap-1.5">
                                             <span className="font-black text-emerald-400 text-sm font-mono">
                                                 {result.confidence_score}%
@@ -674,11 +793,37 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                     </div>
                                 </div>
 
+                                {/* 100% Face Match How-To Banner */}
+                                <div className="p-3.5 sm:p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex flex-col gap-2 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold font-mono text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                                            <Sparkles className="w-4 h-4 text-emerald-400" />
+                                            How To Get 100% Identical Face Replication:
+                                        </span>
+                                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                                            CRITICAL STEP
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                                        Pure text prompts alone will generate a random face. To guarantee the <strong>exact same face</strong>:
+                                    </p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono text-zinc-300">
+                                        <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800 flex items-start gap-2">
+                                            <span className="text-emerald-400 font-bold">1.</span>
+                                            <span><strong>ChatGPT / Gemini:</strong> Click 📎 to attach your photo + paste prompt below.</span>
+                                        </div>
+                                        <div className="p-2 rounded-lg bg-zinc-950/80 border border-zinc-800 flex items-start gap-2">
+                                            <span className="text-purple-400 font-bold">2.</span>
+                                            <span><strong>Midjourney:</strong> Use prompt with <code>--cref [IMAGE_URL] --cw 100</code>.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Reconstructed Prompt Card with Engine Selector */}
                                 <div className="p-5 sm:p-6 rounded-2xl bg-zinc-900/95 border border-zinc-700 shadow-xl flex flex-col gap-4 relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-[100px] pointer-events-none"></div>
 
-                                    {/* Engine Tabs (7 Targets) */}
+                                    {/* Engine Tabs (8 Targets) */}
                                     <div className="flex flex-col gap-2.5">
                                         <div className="flex items-center justify-between flex-wrap gap-2">
                                             <h3 className="text-xs font-bold font-mono text-zinc-300 uppercase tracking-widest flex items-center gap-1.5">
@@ -699,11 +844,11 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             </Button>
                                         </div>
 
-                                        <div className="grid grid-cols-3 sm:grid-cols-7 gap-1 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
+                                        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1 p-1 bg-zinc-950 rounded-xl border border-zinc-800">
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('master')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'master'
                                                         ? 'bg-emerald-500 text-zinc-950 shadow-md shadow-emerald-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -713,8 +858,19 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             </button>
                                             <button
                                                 type="button"
+                                                onClick={() => setActiveTab('reference')}
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                    activeTab === 'reference'
+                                                        ? 'bg-emerald-400 text-zinc-950 shadow-md shadow-emerald-400/20'
+                                                        : 'text-emerald-400 hover:text-emerald-200 hover:bg-zinc-900'
+                                                }`}
+                                            >
+                                                📸 Photo Lock
+                                            </button>
+                                            <button
+                                                type="button"
                                                 onClick={() => setActiveTab('chatgpt')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'chatgpt'
                                                         ? 'bg-emerald-400 text-zinc-950 shadow-md shadow-emerald-400/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -725,7 +881,7 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('gemini')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'gemini'
                                                         ? 'bg-blue-500 text-zinc-950 shadow-md shadow-blue-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -736,7 +892,7 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('midjourney')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'midjourney'
                                                         ? 'bg-purple-500 text-zinc-950 shadow-md shadow-purple-500/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -747,7 +903,7 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('flux')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'flux'
                                                         ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20'
                                                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
@@ -758,7 +914,7 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('face_dna')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'face_dna'
                                                         ? 'bg-teal-400 text-zinc-950 shadow-md shadow-teal-400/20'
                                                         : 'text-teal-400 hover:text-teal-200 hover:bg-zinc-900'
@@ -769,7 +925,7 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                             <button
                                                 type="button"
                                                 onClick={() => setActiveTab('negative')}
-                                                className={`py-1.5 px-1 rounded-lg font-mono text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
+                                                className={`py-1.5 px-1 rounded-lg font-mono text-[10px] sm:text-[11px] font-bold transition-all flex items-center justify-center gap-1 ${
                                                     activeTab === 'negative'
                                                         ? 'bg-rose-500 text-zinc-950 shadow-md shadow-rose-500/20'
                                                         : 'text-rose-400 hover:text-rose-200 hover:bg-zinc-900'
@@ -791,13 +947,14 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-950/60 border border-zinc-800 text-[11px] font-mono text-zinc-400">
                                         <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                                         <span>
-                                            {activeTab === 'master' && "Master 1:1 Prompt: Contains all 7 forensic layers for high-precision replication across any generator."}
-                                            {activeTab === 'chatgpt' && "ChatGPT / DALL-E 3: Paste directly in ChatGPT. For best results, attach your source image alongside this prompt."}
-                                            {activeTab === 'gemini' && "Google Gemini (Imagen 3): Optimized with optical parameters (85mm lens, subsurface scattering, authentic skin pores)."}
-                                            {activeTab === 'midjourney' && "Midjourney v6.1: Configured with --style raw and matched aspect ratio to eliminate unwanted AI stylization."}
+                                            {activeTab === 'master' && "Master 1:1 Prompt: Contains full demographic age lock and 7-layer scene blueprint for all image generators."}
+                                            {activeTab === 'reference' && "Photo-Reference Clone: Attach your photo in ChatGPT or Gemini and paste this prompt to force a 100% identical face match."}
+                                            {activeTab === 'chatgpt' && "ChatGPT / DALL-E 3: Click the paperclip 📎 in ChatGPT, attach your source image, and paste this prompt."}
+                                            {activeTab === 'gemini' && "Google Gemini (Imagen 3): Click ➕ in Gemini, attach your image, and paste this prompt with optical lens specs."}
+                                            {activeTab === 'midjourney' && "Midjourney v6.1: Uses --style raw, aspect ratio, and --cref [IMAGE_URL] --cw 100 for character consistency."}
                                             {activeTab === 'flux' && "FLUX.1: Dense natural language prompt crafted for FLUX.1 Dev/Schnell text-encoders."}
-                                            {activeTab === 'face_dna' && "Face DNA Anchor: Copy and append this 50-word biometric DNA block to lock facial identity across multiple seeds."}
-                                            {activeTab === 'negative' && "Negative Prompt: Paste into negative prompt fields in Stable Diffusion / FLUX web UIs to block artifacts."}
+                                            {activeTab === 'face_dna' && "Face DNA Anchor: Standalone 50-word biometric DNA string to lock facial bone structure across all tools."}
+                                            {activeTab === 'negative' && "Negative Prompt: Blocks face morphing, age shifting, cartoon smoothing, and extra limbs."}
                                         </span>
                                     </div>
 
@@ -808,6 +965,8 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                                 ? 'bg-emerald-500 text-emerald-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:bg-emerald-400'
                                                 : activeTab === 'master'
                                                 ? 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                                                : activeTab === 'reference'
+                                                ? 'bg-emerald-400 text-zinc-950 hover:bg-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.2)]'
                                                 : activeTab === 'chatgpt'
                                                 ? 'bg-emerald-400 text-zinc-950 hover:bg-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.2)]'
                                                 : activeTab === 'gemini'
@@ -1026,13 +1185,13 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                                 </div>
                                                 <div>
                                                     <h4 className="text-sm font-bold font-mono text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                                                        Face & Identity Lock
+                                                        Face & Age Identity Lock
                                                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                                                             ACTIVE
                                                         </span>
                                                     </h4>
                                                     <p className="text-xs text-zinc-400 font-mono">
-                                                        Biometric facial landmarks & physical traits locked for zero identity-drift.
+                                                        Biometric facial landmarks & exact age proportions locked for zero identity-drift.
                                                     </p>
                                                 </div>
                                             </div>
@@ -1044,7 +1203,7 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                                 <div className="flex items-center justify-between flex-wrap gap-2">
                                                     <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 font-bold">
                                                         <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                                                        Subject Demographics:
+                                                        Subject Demographics & Age Diagnosis:
                                                     </span>
                                                     <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-xs font-mono py-0.5">
                                                         {result.demographics.identity_classification || result.demographics.gender || 'Person'}
@@ -1052,16 +1211,16 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
                                                 </div>
 
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
+                                                    {result.demographics.estimated_age && (
+                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                                                            <span className="text-zinc-500">Diagnosed Age:</span>
+                                                            <span className="font-bold text-emerald-400">{result.demographics.estimated_age}</span>
+                                                        </div>
+                                                    )}
                                                     {result.demographics.gender && (
                                                         <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
                                                             <span className="text-zinc-500">Gender / Stage:</span>
                                                             <span className="font-bold text-white">{result.demographics.gender}</span>
-                                                        </div>
-                                                    )}
-                                                    {result.demographics.estimated_age && (
-                                                        <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-between">
-                                                            <span className="text-zinc-500">Estimated Age:</span>
-                                                            <span className="font-bold text-white">{result.demographics.estimated_age}</span>
                                                         </div>
                                                     )}
                                                     {result.demographics.face_shape && (
@@ -1197,4 +1356,5 @@ ${result.negative_prompt || 'blurry, low quality, bad anatomy, deformed fingers,
         </div>
     )
 }
+
 
