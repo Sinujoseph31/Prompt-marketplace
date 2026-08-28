@@ -8,7 +8,6 @@ import Comments from '@/components/Comments'
 import GoogleAd from '@/components/GoogleAd'
 import { Metadata } from 'next'
 import Script from 'next/script'
-import AdSenseScript from '@/components/AdSenseScript'
 
 type Props = {
     params: Promise<{ id: string }>
@@ -139,7 +138,6 @@ export default async function PromptDetailPage({
 
     return (
         <div className="w-full min-h-screen flex flex-col items-center">
-            {prompt.status === 'approved' && <AdSenseScript />}
             <Script
                 id="prompt-jsonld"
                 type="application/ld+json"
@@ -209,14 +207,16 @@ export default async function PromptDetailPage({
 
                             {/* Price & Action */}
                             <div className="flex flex-col gap-4 p-6 border rounded-2xl bg-card shadow-sm">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-black text-primary">Points Base</span>
-                                    <span className="text-muted-foreground text-sm">premium access</span>
+                                <div className="flex items-baseline justify-between">
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-3xl font-black text-primary">Free Access</span>
+                                        <span className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Community Verified</span>
+                                    </div>
+                                    <span className="text-xs bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-full">
+                                        Ready to Use
+                                    </span>
                                 </div>
                                 <RevealPrompt promptId={prompt.id} fullPrompt={prompt.full_prompt} category={prompt.category} subcategory={prompt.subcategory} />
-                                <p className="text-xs text-center text-muted-foreground mt-2">
-                                    Unlock prompts using your points. Earn points by watching ads.
-                                </p>
                             </div>
 
                             {/* Buyer Protection & Usage Info - Adding High-Value Content */}
@@ -237,10 +237,10 @@ export default async function PromptDetailPage({
                                 </ul>
                             </div>
 
-                            {/* Sticky Sidebar Ad Unit - Only show if the page has significant content depth */}
-                            {((prompt.description?.length || 0) > 500 || (comments?.length || 0) > 0) && (
+                            {/* Sticky Sidebar Ad Unit - Only show if the page has significant content depth and valid slot */}
+                            {((prompt.description?.length || 0) > 500 || (comments?.length || 0) > 0) && process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SIDEBAR_SLOT && (
                                 <div className="w-full bg-background rounded-2xl overflow-hidden mt-2">
-                                    <GoogleAd slot="prompt-detail-sidebar" />
+                                    <GoogleAd slot={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SIDEBAR_SLOT} />
                                 </div>
                             )}
 

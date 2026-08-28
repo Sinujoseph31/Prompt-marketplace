@@ -40,9 +40,9 @@ export default function TermsPage() {
           <li>Is of low quality or non-functional.</li>
         </ul>
 
-        <h2>5. Points System</h2>
+        <h2>5. Points & Reputation System</h2>
         <p>
-          The Platform uses a points-based system for accessing premium prompts. Points can be earned through community contribution or by viewing advertisements. Points have no cash value and cannot be transferred or redeemed for real-world currency.
+          The Platform uses a points and reputation system for rewarding community engagement. Points can be earned through community contributions, prompt submissions, and platform participation. Points have no cash value and cannot be transferred, sold, or redeemed for real-world currency.
         </p>
 
         <h2>6. Limitation of Liability</h2>

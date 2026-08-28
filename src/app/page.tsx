@@ -8,7 +8,6 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import GoogleAd from '@/components/GoogleAd'
 import Script from 'next/script'
-import AdSenseScript from '@/components/AdSenseScript'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -43,7 +42,6 @@ export default async function Index() {
 
   return (
     <div className="w-full flex flex-col min-h-screen items-center">
-      <AdSenseScript />
       <Script
         id="org-jsonld"
         type="application/ld+json"
@@ -201,10 +199,10 @@ export default async function Index() {
         <PopularPromptsCarousel title="Popular Prompts" prompts={popularPrompts} />
       )}
 
-      {/* Primary Homepage Ad — below Popular Prompts - Only show if we have content blocks */}
-      {((popularPrompts?.length || 0) + (latestPrompts?.length || 0)) > 2 && (
+      {/* Primary Homepage Ad — below Popular Prompts - Only show if we have content blocks and a valid ad slot */}
+      {((popularPrompts?.length || 0) + (latestPrompts?.length || 0)) > 2 && process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_HOMEPAGE_SLOT && (
         <div className="w-full max-w-7xl px-5 mb-16">
-          <GoogleAd slot="homepage-top" className="min-h-[100px]" />
+          <GoogleAd slot={process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_HOMEPAGE_SLOT} className="min-h-[100px]" />
         </div>
       )}
 

@@ -6,6 +6,7 @@ import Navbar from '@/components/navbar'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import NextTopLoader from 'nextjs-toploader'
+import AdSenseScript from '@/components/AdSenseScript'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -51,6 +52,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <AdSenseScript />
           <NextTopLoader color="#22c55e" showSpinner={false} />
           <Navbar />
           <main className="min-h-screen bg-background flex flex-col items-center pt-[116px] md:pt-16">

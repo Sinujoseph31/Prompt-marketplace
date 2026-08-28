@@ -41,7 +41,7 @@ const faqs = [
         items: [
             {
                 q: "How do I earn points?",
-                a: "You can earn points by submitting high-quality prompts that get approved, referring new users, or watching sponsored advertisements on the platform."
+                a: "You can earn points by submitting high-quality AI prompts that get approved, sharing prompt engineering tips, and participating in the creator community."
             },
             {
                 q: "Can I sell my own prompts?",

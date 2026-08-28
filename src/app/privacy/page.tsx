@@ -56,20 +56,30 @@ export default function PrivacyPolicy() {
                 <ul>
                     <li><strong>To facilitate account creation and logon process.</strong></li>
                     <li><strong>To post user-generated content:</strong> Your name and uploaded prompt data are displayed publicly on the marketplace.</li>
-                    <li><strong>To serve targeted advertising:</strong> We use Google AdSense to serve ads. Google and its partners use cookies to serve ads based on your prior visits to our App or other websites on the Internet.</li>
+                    <li><strong>To serve advertising:</strong> We use Google AdSense to serve advertisements when you visit our website. Google and its third-party advertising partners use cookies (such as the DoubleClick DART cookie) to serve ads based on your prior visits to our website or other websites across the Internet. You may opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google Ads Settings</a> or <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" className="text-primary underline">aboutads.info</a>.</li>
                 </ul>
 
-                <h2>3. Will your information be shared with anyone?</h2>
+                <h2>3. Cookies and Third-Party Advertising (Google AdSense)</h2>
+                <p>
+                    <strong>In Short:</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website.
+                </p>
+                <ul>
+                    <li>Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visit to our site and/or other sites on the Internet.</li>
+                    <li>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google Ads Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-primary underline">www.aboutads.info</a>.</li>
+                    <li>If you have not opted out of third-party ad serving, the cookies of other third-party vendors or ad networks may also be used to serve ads on our site.</li>
+                </ul>
+
+                <h2>4. Will your information be shared with anyone?</h2>
                 <p>
                     <strong>In Short:</strong> We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations.
                 </p>
                 <p>We may process or share your data that we hold based on the following legal basis:</p>
                 <ul>
                     <li><strong>Third-Party Vendors:</strong> We share necessary data with third-party vendors, service providers, contractors, or agents who perform services for us or on our behalf (e.g., Supabase for database hosting and authentication, Vercel for web hosting).</li>
-                    <li><strong>Advertising Partners:</strong> We allow Google AdSense to place tracking tools (like cookies) on our App to tailor advertising to your interests.</li>
+                    <li><strong>Advertising Partners:</strong> We allow Google AdSense to place tracking tools (like cookies) on our App to tailor advertising to your interests according to Google AdSense program policies.</li>
                 </ul>
 
-                <h2>4. How long do we keep your information?</h2>
+                <h2>5. How long do we keep your information?</h2>
                 <p>
                     <strong>In Short:</strong> We keep your information for as long as necessary to fulfill the purposes outlined in this privacy notice unless otherwise required by law.
                 </p>
@@ -77,7 +87,7 @@ export default function PrivacyPolicy() {
                     We will only keep your personal information for as long as it is necessary for the purposes set out in this privacy notice, unless a longer retention period is required or permitted by law (such as tax, accounting, or other legal requirements).
                 </p>
 
-                <h2>5. How do we keep your information safe?</h2>
+                <h2>6. How do we keep your information safe?</h2>
                 <p>
                     <strong>In Short:</strong> We aim to protect your personal information through a system of organizational and technical security measures.
                 </p>
@@ -86,7 +96,7 @@ export default function PrivacyPolicy() {
                     Your data is encrypted in transit using industry-standard HTTPS protocols, and our database provider (Supabase) implements strict Row Level Security (RLS) policies.
                 </p>
 
-                <h2>6. What are your privacy rights?</h2>
+                <h2>7. What are your privacy rights?</h2>
                 <p>
                     <strong>In Short:</strong> You may review, change, or terminate your account at any time.
                 </p>
